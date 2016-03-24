@@ -4,7 +4,7 @@
 
 This project provides tools for processing and analysing output of NEMO ocean model. 
 
-Our aim is to simplify the analysis of **very large datasets of model output** (~1-100Tb) like those produced by submesoscale permitting models at basin scales,ensemble simulations of edddying ocean models. 
+Our aim is to simplify the analysis of **very large datasets of model output** (~1-100Tb) like those produced by submesoscale permitting models at basin scales and ensemble simulations of edddying ocean models. 
 
 The main ambition of this project is to provide simple tools for performing **out-of-core** computations with ocean model output, namely processing  data that is too large to fit into a computer's main memory at one time. 
 
