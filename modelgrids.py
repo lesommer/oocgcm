@@ -8,6 +8,8 @@ Define the classes that give acces to model grid metrics and operators (e.g. gra
 ## to do list 
   - dtype
   - get_shape
+  - dask from arrays
+  - pbm with xarray concatenation
 """
 
 import numpy as np
@@ -18,19 +20,24 @@ import xarray as xr
 
 from collections import Iterable
 
+axis2dim = {-1:'x',-2:'y'}
 
 class generic_netcdf_loader_for_grids:
-    def __init__(self,array_type=None):
+    def __init__(self,array_type=None,chunks=None):
 	"""
 	"""
         self.array_type = array_type
+        self.chunks = chunks
 
     def __call__(self,filename=None,varname=None):
 	if self.array_type == 'numpy':
             out = Dataset(filename).variables[varname][:].squeeze()
-        elif self.array_type == 'dask':
+        elif self.array_type == 'xarray':
 	    ds = xr.open_dataset(filename)
             out = ds[varname][:]
+	elif self.array_type == 'dask':
+	    d = Dataset(filename).variables[varname][:].squeeze()
+	    out = da.from_array(np.array(d), chunks=self.chunks)
         return out
 
 class generic_grid:
@@ -60,18 +67,12 @@ class generic_grid:
 
     def _extend_array(self,array,axis=None,where=None):
         """Extends an array to fit the initial grid.
-
-	input : axis, where are integer   
+             input : axis, where are integer   
 	"""
 	shape = list(self.shape)
 	shape[axis] = 1
 	shape = tuple(shape)
 	boundary_value = self._zeros(shape)
-	#if axis==-1:
-	#   other_axis = -2
-	#elif axis==-2:
-	#   other_axis = -1
-        #boundary_value = self._zeros(self.shape[other_axis])
 	if where==1:
 	   list_to_concatenate = [boundary_value,array]
 	elif where==-1:
@@ -81,8 +82,7 @@ class generic_grid:
 
     def extend_array(self,q,axis=None,where=None):
         """Extends an array to fit the initial grid.
-
-	input : axis, where are integer or iterable
+	     input : axis, where are integer or iterable
 	"""
         if isinstance( axis, int ) and isinstance( where, int ):
             out = self._extend_array(q,axis=axis,where=where)
@@ -126,3 +126,33 @@ class nemo_grid_with_numpy(generic_grid):
 
  
 
+class nemo_grid_with_dask(generic_grid):
+
+    def __init__(self, coordfile=None,chunks=(1000,1000)):
+	self.chunks = chunks
+        generic_grid.__init__(self)
+        self.coordfile = coordfile
+        self.define_array_type_specific_functions()
+        self.load_horizontal_metrics()
+
+    def define_array_type_specific_functions(self):
+        self._load = generic_netcdf_loader_for_grids(array_type='dask',chunks=self.chunks)
+	self._zeros = lambda n:da.zeros(n,chunks=self.chunks)
+ 
+    def _concatenate(self,list_of_bits,axis=None):
+	    return da.concatenate(list_of_bits,axis= axis)
+
+
+class nemo_grid_with_xarray(generic_grid):
+
+    def __init__(self, coordfile=None,chunks=(1000,1000)):
+	self.chunks = chunks
+        generic_grid.__init__(self)
+        self.coordfile = coordfile
+        self.define_array_type_specific_functions()
+        self.load_horizontal_metrics()
+
+    def define_array_type_specific_functions(self):
+        self._load = generic_netcdf_loader_for_grids(array_type='xarray',chunks=self.chunks)
+        self._zeros = lambda n : xr.DataArray(np.zeros(n))
+        self._concatenate = lambda listbits: xr.concat(listbits,dim=axis2dim[axis])
