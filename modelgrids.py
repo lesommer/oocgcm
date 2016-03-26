@@ -136,7 +136,8 @@ class nemo_grid_with_dask(generic_grid):
         self.load_horizontal_metrics()
 
     def define_array_type_specific_functions(self):
-        self._load = generic_netcdf_loader_for_grids(array_type='dask',chunks=self.chunks)
+        self._load = generic_netcdf_loader_for_grids\
+			(array_type='dask',chunks=self.chunks)
 	self._zeros = lambda n:da.zeros(n,chunks=self.chunks)
  
     def _concatenate(self,list_of_bits,axis=None):
@@ -153,6 +154,7 @@ class nemo_grid_with_xarray(generic_grid):
         self.load_horizontal_metrics()
 
     def define_array_type_specific_functions(self):
-        self._load = generic_netcdf_loader_for_grids(array_type='xarray',chunks=self.chunks)
+        self._load = generic_netcdf_loader_for_grids\
+			(array_type='xarray',chunks=self.chunks)
         self._zeros = lambda n : xr.DataArray(np.zeros(n))
         self._concatenate = lambda listbits: xr.concat(listbits,dim=axis2dim[axis])
