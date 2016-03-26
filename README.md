@@ -13,7 +13,7 @@ We are trying to developp a framework **flexible** enough that does not impose t
  
 We try to keep the **list of dependencies** as small as possible to simplify the deployment on a number of platforms. 
  
-This project build upon previous projects including [pyclim](http://servforge.legi.grenoble-inp.fr/projects/soft-pyclim) and [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom). 
+This project builds upon previous projects including [pyclim](http://servforge.legi.grenoble-inp.fr/projects/soft-pyclim) and [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom). 
 
 #### Acknowledgment
 
