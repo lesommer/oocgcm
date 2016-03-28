@@ -8,20 +8,6 @@ see the associated [wiki page](https://github.com/lesommer/oocgcm/wiki/modelgrid
 
 """
 
-"""
-## to do list 
-  - specifying the dtype
-  - clean get_shape
-  - not needed : dask from arrays : self.to_array() ou render array 
-  - not needed. pbm with xarray concatenation
-  - still no chunk with xarray (map overlap ?)
-  - rechunk grid dask from array
-  - boundary with d_i ?
-
-  - later : think about 2D versus 3D grid objects
-  - 
-"""
-
 import numpy as np
 import numpy.ma as ma
 import dask.array as da

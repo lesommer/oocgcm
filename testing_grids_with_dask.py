@@ -5,12 +5,6 @@ Test the performance of modelgrids.nemo_grid objects.
 """
 # from http://stackoverflow.com/questions/5478351/python-time-measure-function
 
-"""
-#- to do / problems 
-
-- ok dask from array with different shape
-- not needed : xarray extend... on verra apres.
-"""
 
 #- Modules
 #
