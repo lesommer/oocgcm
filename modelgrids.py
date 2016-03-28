@@ -16,12 +16,11 @@ import xarray as xr
 
 from collections import Iterable
 
-axis2dim = {-1:'x',-2:'y'}
 
 class generic_netcdf_loader_for_grids:
+    """Method for loading netcdf files
+    """
     def __init__(self,array_type=None,chunks=None):
-	"""
-	"""
         self.array_type = array_type
         self.chunks = chunks
 
@@ -51,36 +50,6 @@ class generic_grid:
         self.e2v = self._load(self.coordfile,varname='e2v')
 	self.shape = self.e1t.shape # with dask ? 
 
-    def _extend_array(self,array,axis=None,where=None):
-        """Extends an array to fit the initial grid.
-             input : axis, where are integer   
-	"""
-	shape = list(self.shape)
-	shape[axis] = 1
-	shape = tuple(shape)
-	boundary_value = self._zeros(shape)
-	if where==1:
-	   list_to_concatenate = [boundary_value,array]
-	elif where==-1:
-	   list_to_concatenate = [array,boundary_value]
-        out = self._concatenate(list_to_concatenate,axis=axis)
-        return out 
-
-    def extend_array(self,q,axis=None,where=None):
-        """Extends an array to fit the initial grid.
-	     input : axis, where are integer or iterable
-	"""
-        if isinstance( axis, int ) and isinstance( where, int ):
-            out = self._extend_array(q,axis=axis,where=where)
-        #
-        elif isinstance( axis, Iterable) and isinstance( where, Iterable):
-            for iax,(ax,wh) in enumerate(zip(axis,wh)):
-                if iax==0:
-                   out = self._extend_array(q,axis=ax,where=wh)
-                else:
-                   out = self._extend_array(out,axis=ax,where=wh)
-        return out
-
 
     def gradh(self,q):
         """Return the 2D gradient of a scalar field.
@@ -89,9 +58,6 @@ class generic_grid:
          """
         gx = self.d_i(q) / self.e1u
         gy = self.d_j(q) / self.e2v
-        #
-        #egx = self.extend_array(gx,axis=-1,where=-1)
-        #egy = self.extend_array(gy,axis=-2,where=-1)
         #
         return gx,gy
 
@@ -115,14 +81,12 @@ class nemo_grid_with_numpy(generic_grid):
 
     def d_i(self,q):
         """Return the difference q(i+1) - q(i)"""
-        #di = q[...,1:] - q[...,0:-1]
         di = np.roll(q,-1,axis=-1) - q
         return di
 
     def d_j(self,q):
         """Return the difference q(j+1) - q(j)"""
         dj = np.roll(q,-1,axis=-2) - q
-        #dj = q[...,1:,:] - q[...,0:-1,:]
         return dj
  
 
