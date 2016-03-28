@@ -15,6 +15,11 @@ We try to keep the **list of dependencies** as small as possible to simplify the
  
 This project builds upon previous projects including [pyclim](http://servforge.legi.grenoble-inp.fr/projects/soft-pyclim) and [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom). 
 
+#### Installation 
+```
+git clone https://github.com/lesommer/oocgcm.git
+```
+
 #### Acknowledgment
 
 oocgcm is made possible thanks to numpy/scipy ecosystem and in particular [dask](https://github.com/dask/dask) and [xarray](https://github.com/pydata/xarray) modules. 
