@@ -109,9 +109,6 @@ class nemo_grid_with_dask_from_array(generic_grid):
 			(array_type='dask',chunks=self.chunks)
 	self._zeros = lambda n:da.zeros(n,chunks=self.chunks)
  
-    def _concatenate(self,list_of_bits,axis=None):
-	    return da.concatenate(list_of_bits,axis= axis)
-
     def define_overlap_operations(self):
         """Define grid operations requiring exchanges among chuncks
         """
@@ -145,18 +142,12 @@ class nemo_grid_with_xarray(generic_grid):
 			(array_type='xarray',chunks=self.chunks)
         self._zeros = lambda n : xr.DataArray(np.zeros(n))
 
-    def _concatenate(self,list_of_bits,axis=None):
-	#self._concatenate = lambda listbits: 
-	xr.concat(list_of_bits,dim=axis2dim[axis])
-
     def d_i(self,q):
         """Return the difference q(i+1) - q(i)"""
-        #di = q[...,1:] - q[...,0:-1]
         di = np.roll(q,-1,axis=-1) - q
         return di
 
     def d_j(self,q):
         """Return the difference q(j+1) - q(j)"""
         dj = np.roll(q,-1,axis=-2) - q
-        #dj = q[...,1:,:] - q[...,0:-1,:]
         return dj
