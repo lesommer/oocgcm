@@ -10,11 +10,16 @@ see the associated [wiki page](https://github.com/lesommer/oocgcm/wiki/modelgrid
 
 import numpy as np
 import numpy.ma as ma
-import dask.array as da
 from netCDF4 import Dataset
 import xarray as xr
 
 from collections import Iterable
+
+try:
+    import dask.array as da
+    has_dask = True
+except ImportError:
+    has_dask = False
 
 
 class generic_netcdf_loader_for_grids:
@@ -30,9 +35,12 @@ class generic_netcdf_loader_for_grids:
         elif self.array_type == 'xarray':
 	    ds = xr.open_dataset(filename,chunks=self.chunks)
             out = ds[varname][:]
-	elif self.array_type == 'dask':
+	elif self.array_type == 'dask_from_numpy':
 	    d = Dataset(filename).variables[varname][:].squeeze()
 	    out = da.from_array(np.array(d), chunks=self.chunks)
+        elif self.array_type == 'dask_from_netcdf':
+            d = Dataset(filename).variables[varname]
+            out = da.from_array(d, chunks=self.chunks)
         return out
 
 class generic_grid:
@@ -96,8 +104,9 @@ class nemo_grid_with_dask_from_array(generic_grid):
     dask (from array) version : for grids that fit in memory but with 
     parralelized operations.  
     """
-    def __init__(self, coordfile=None,chunks=(1000,1000)):
+    def __init__(self, coordfile=None,chunks=(1000,1000),array_type='dask_from_netcdf'):
 	self.chunks = chunks
+	self._array_type = array_type
         generic_grid.__init__(self)
         self.coordfile = coordfile
         self.define_array_type_specific_functions()
@@ -106,7 +115,7 @@ class nemo_grid_with_dask_from_array(generic_grid):
 
     def define_array_type_specific_functions(self):
         self._load = generic_netcdf_loader_for_grids\
-			(array_type='dask',chunks=self.chunks)
+			(array_type=self._array_type,chunks=self.chunks)
 	self._zeros = lambda n:da.zeros(n,chunks=self.chunks)
  
     def define_overlap_operations(self):
