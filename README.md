@@ -28,6 +28,10 @@ and [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom).
 ```
 git clone https://github.com/lesommer/oocgcm.git
 ```
+#### Status
+The project is still under developpment. More information can be found on the
+project [wiki](https://github.com/lesommer/oocgcm/wiki). Ideas, comments and
+contributions are welcome !!
 
 #### Acknowledgment
 
