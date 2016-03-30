@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+#
+"""grids module.
+Define the classes that give acces to model grid metrics and operators (e.g. gradients) 
+"""
+
+
+import numpy as np

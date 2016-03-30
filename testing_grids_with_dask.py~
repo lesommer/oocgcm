@@ -29,8 +29,8 @@ def timeit_context(name):
 coordfile  = '/Users/lesommer/data/NATL60/NATL60-I/NATL60_coordinates_v4.nc'
 filenatl60 = '/Users/lesommer/data/NATL60/NATL60-MJM155-S/1d/2008/NATL60-MJM155_y2008m01.1d_BUOYANCYFLX.nc' 
 
-#chunks = (3454,5422)
-chunks = (1727,2711)
+chunks = (3454,5422)
+#chunks = (1727,2711)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
 #chunks = (500,500)
 
