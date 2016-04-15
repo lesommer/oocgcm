@@ -27,22 +27,22 @@ def timeit_context(name):
 
 #- Parameter
 coordfile  = '/Users/lesommer/data/NATL60/NATL60-I/NATL60_coordinates_v4.nc'
-filenatl60 = '/Users/lesommer/data/NATL60/NATL60-MJM155-S/1d/2008/NATL60-MJM155_y2008m01.1d_BUOYANCYFLX.nc' 
+filenatl60 = '/Users/lesommer/data/NATL60/NATL60-MJM155-S/1d/2008/NATL60-MJM155_y2008m01.1d_BUOYANCYFLX.nc'
 
-#chunks = (3454,5422)
-chunks = (1727,2711)
-xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
+chunks = (3454,5422)
+#chunks = (1727,2711)
 #chunks = (500,500)
+xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
 
-with_numpy     = False 
-with_dask_np   = False
+with_numpy     = True
+with_dask_np   = False 
 with_dask_nc   = False
 with_xarray    = True
 
 #- Actual code
 #
-# with numpy : 
-# 
+# with numpy :
+#
 
 if with_numpy is True:
     print('\n')
@@ -51,7 +51,7 @@ if with_numpy is True:
     with timeit_context('The creation of grid object and loading a 2D t-file'):
         grd = mgd.nemo_grid_with_numpy_arrays(coordfile=coordfile)
         sig0 = Dataset(filenatl60).variables['vosigma0'][0]
-	#sig0 = Dataset(filenatl60).variables['vosigma0'] # test
+	    #sig0 = Dataset(filenatl60).variables['vosigma0'] # test
         print('The grid shape is ' + str(grd.e1u.shape))
         print('The array shape is ' + str(sig0.shape))
 
@@ -71,7 +71,7 @@ if with_dask_np is True:
     with timeit_context('The creation of grid object and loading a 2D t-file'):
         grd = mgd.nemo_grid_with_dask_arrays(coordfile=coordfile,chunks=chunks,array_type='dask_from_numpy')
         sig0 = da.from_array(np.array(Dataset(filenatl60).variables['vosigma0'][0]),chunks=chunks)
-	#sig0 = da.from_array(np.array(Dataset(filenatl60).variables['vosigma0']),chunks=chunks) # test 
+	#sig0 = da.from_array(np.array(Dataset(filenatl60).variables['vosigma0']),chunks=chunks) # test
         #ds = da.open_dataset(filenatl60)
         #sig0 = ds.variables['vosigma0']
         print('The grid shape is ' + str(grd.e1u.shape))
@@ -84,14 +84,15 @@ if with_dask_np is True:
 
 if with_dask_nc is True:
     print('\n')
-    print('with dask (from array): ')
+    print('with dask (from netcdf): ')
 
     with timeit_context('The creation of grid object and loading a 2D t-file'):
-        grd = mgd.nemo_grid_with_dask_arrays(coordfile=coordfile,chunks=chunks,array_type='dask_from_netcdf')
-        sig0 = da.from_array(np.array(Dataset(filenatl60).variables['vosigma0'][0]),chunks=chunks)
-        #sig0 = da.from_array(np.array(Dataset(filenatl60).variables['vosigma0']),chunks=chunks) # test
-        #ds = da.open_dataset(filenatl60)
-        #sig0 = ds.variables['vosigma0']
+        grd = mgd.nemo_grid_with_dask_arrays(coordfile=coordfile,chunks=chunks,
+                                             array_type='dask_from_netcdf')
+        #sig0 = da.from_array(np.array(Dataset(filenatl60).variables
+        #                              ['vosigma0'][0]),chunks=chunks)
+	ds = Dataset(filenatl60).variables['vosigma0']
+        sig0 = da.from_array(ds, chunks=(1,)+ chunks)[0]
         print('The grid shape is ' + str(grd.e1u.shape))
         print('The array shape is ' + str(sig0.shape))
 
@@ -110,7 +111,7 @@ if with_xarray is True:
 
     with timeit_context('The creation of grid object and loading a 2D t-file'):
         grd = mgd.nemo_grid_with_xarray(coordfile=coordfile,chunks=xr_chunks)
-        ds = xr.open_dataset(filenatl60,chunks=xr_chunks)
+        ds = xr.open_dataset(filenatl60,chunks=xr_chunks,lock=False)
         sig0 = ds.variables['vosigma0'][0]
         print('The grid shape is ' + str(grd.e1u.shape))
         print('The array shape is ' + str(sig0.shape))
@@ -118,6 +119,6 @@ if with_xarray is True:
     with timeit_context('The computation of the horizontal gradient'):
         gradsig = grd.gradh(sig0)
         #xr_gradsig = (gradsig[0].to_masked_array(),gradsig[1].to_masked_array())
-        #xr_gradsig = (gradsig[0].values,gradsig[1].values)
-        xr_gradsig = (gradsig[0],gradsig[1])
+        xr_gradsig = (gradsig[0].values,gradsig[1].values)
+        #xr_gradsig = (gradsig[0],gradsig[1])
         print('The output array shape is ' + str(xr_gradsig[0].shape))

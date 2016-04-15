@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #
 """modelgrids module.
-Define the classes that give acces to model grid metrics and operators (e.g. gradients) 
+Define classes that give acces to model grid metrics and operators
+(e.g. gradients)
 
-This submodule is still under development. 
-see the associated [wiki page](https://github.com/lesommer/oocgcm/wiki/modelgrids_design)
+This submodule is still under development. See the project
+[wiki page](https://github.com/lesommer/oocgcm/wiki/modelgrids_design)
 
 """
 
@@ -33,8 +34,8 @@ class generic_netcdf_loader_for_grids:
 	if self.array_type == 'numpy':
             out = Dataset(filename).variables[varname][:].squeeze()
         elif self.array_type == 'xarray':
-	    ds = xr.open_dataset(filename,chunks=self.chunks)
-            out = ds[varname][:]
+            ds = xr.open_dataset(filename,chunks=self.chunks,lock=False)
+            out = ds[varname]
 	elif self.array_type == 'dask_from_numpy':
 	    d = Dataset(filename).variables[varname][:].squeeze()
 	    out = da.from_array(np.array(d), chunks=self.chunks)
@@ -56,7 +57,7 @@ class generic_grid:
         self.e2u = self._load(self.coordfile,varname='e2u')
         self.e1v = self._load(self.coordfile,varname='e1v')
         self.e2v = self._load(self.coordfile,varname='e2v')
-	self.shape = self.e1t.shape # with dask ? 
+	self.shape = self.e1t.shape # with dask ?
 
 
     def gradh(self,q):
@@ -72,9 +73,9 @@ class generic_grid:
 
 
 class nemo_grid_with_numpy_arrays(generic_grid):
-    """Define a grid object holding metric terms and all the methods 
-    related to the grid. 
-    numpy version : for grids that fit in memory.  
+    """Define a grid object holding metric terms and all the methods
+    related to the grid.
+    numpy version : for grids that fit in memory.
     """
     def __init__(self, coordfile=None):
         generic_grid.__init__(self)
@@ -96,18 +97,18 @@ class nemo_grid_with_numpy_arrays(generic_grid):
         """Return the difference q(j+1) - q(j)"""
         dj = np.roll(q,-1,axis=-2) - q
         return dj
- 
 
 class nemo_grid_with_dask_arrays(generic_grid):
     """Define a grid object holding metric terms and all the methods
-    related to the grid. 
-    dask (from array) version : for grids that fit in memory but with 
-    parralelized operations.  
+    related to the grid.
+    dask (from array) version : for grids that fit in memory but with
+    parralelized operations.
     """
-    def __init__(self, coordfile=None,chunks=(1000,1000),array_type='dask_from_netcdf'):
-	    """Two types of array : 
-	    	- array_type='dask_from_netcdf' 
-		- array_type='dask_from_numpy'
+    def __init__(self, coordfile=None,chunks=(1000,1000),
+                 array_type='dask_from_netcdf'):
+	"""Two types of array :
+            - array_type='dask_from_netcdf'
+	        - array_type='dask_from_numpy'
 	"""
 	self.chunks = chunks
 	self._array_type = array_type
@@ -120,8 +121,8 @@ class nemo_grid_with_dask_arrays(generic_grid):
     def define_array_type_specific_functions(self):
         self._load = generic_netcdf_loader_for_grids\
 			(array_type=self._array_type,chunks=self.chunks)
-	self._zeros = lambda n:da.zeros(n,chunks=self.chunks)
- 
+        self._zeros = lambda n:da.zeros(n,chunks=self.chunks)
+
     def define_overlap_operations(self):
         """Define grid operations requiring exchanges among chuncks
         """
@@ -143,7 +144,7 @@ class nemo_grid_with_xarray(generic_grid):
     related to the grid.
     x-array version : for grids that do not fit in memory.
     """
-    def __init__(self, coordfile=None,chunks=(1000,1000)):
+    def __init__(self, coordfile=None,chunks=None):
 	self.chunks = chunks
         generic_grid.__init__(self)
         self.coordfile = coordfile
@@ -152,15 +153,15 @@ class nemo_grid_with_xarray(generic_grid):
 
     def define_array_type_specific_functions(self):
         self._load = generic_netcdf_loader_for_grids\
-			(array_type='xarray',chunks=self.chunks)
+			                  (array_type='xarray',chunks=self.chunks)
         self._zeros = lambda n : xr.DataArray(np.zeros(n))
 
     def d_i(self,q):
         """Return the difference q(i+1) - q(i)"""
-        di = q.roll(-1,axis=-1) - q
+        di = q.shift(x=-1) - q
         return di
 
     def d_j(self,q):
         """Return the difference q(j+1) - q(j)"""
-        dj = q.roll(-1,axis=-2) - q # works with chunks too
+        dj = q.shift(y=-1) - q # works with chunks too
         return dj
