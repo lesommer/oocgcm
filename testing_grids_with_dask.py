@@ -9,7 +9,7 @@ Test the performance of modelgrids.nemo_grid objects.
 #- Modules
 #
 import time
-import modelgrids as mgd
+import test_modelgrids as mgd
 from contextlib import contextmanager
 from netCDF4 import Dataset
 import dask.array as da
@@ -29,14 +29,14 @@ def timeit_context(name):
 coordfile  = '/Users/lesommer/data/NATL60/NATL60-I/NATL60_coordinates_v4.nc'
 filenatl60 = '/Users/lesommer/data/NATL60/NATL60-MJM155-S/1d/2008/NATL60-MJM155_y2008m01.1d_BUOYANCYFLX.nc'
 
-chunks = (3454,5422)
-#chunks = (1727,2711)
+#chunks = (3454,5422)
+chunks = (1727,2711)
 #chunks = (500,500)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
 
 with_numpy     = True
-with_dask_np   = False 
-with_dask_nc   = False
+with_dask_np   = True 
+with_dask_nc   = True
 with_xarray    = True
 
 #- Actual code
