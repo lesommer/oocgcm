@@ -61,8 +61,8 @@ def convert_dataarray_attributes_xderivative(attrs):
         new_attrs['long_name'] = 'x-derivative of ' + attrs['long_name']
     if attrs.has_key('short_name'):
             new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dx'
-    if attrs.has_key('unit'):
-            new_attrs['unit'] = attrs['unit'] + '/m'
+    if attrs.has_key('units'):
+            new_attrs['units'] = attrs['units'] + '/m'
     return new_attrs
 
 def convert_dataarray_attributes_yderivative(attrs):
@@ -74,8 +74,8 @@ def convert_dataarray_attributes_yderivative(attrs):
         new_attrs['long_name'] = 'y-derivative of ' + attrs['long_name']
     if hasattr(attrs,'short_name'):
             new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dy'
-    if attrs.has_key('unit'):
-            new_attrs['unit'] = attrs['unit'] + '/m'
+    if attrs.has_key('units'):
+            new_attrs['units'] = attrs['units'] + '/m'
     return new_attrs
 
 #======================= NEMO-Specific Tools ===================================
