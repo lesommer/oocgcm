@@ -40,6 +40,44 @@ def get_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
         dataarray.attrs[kwargs] = extra_kwargs[kwargs]
     return dataarray
 
+#======================== Working with DataArray ===============================
+#
+
+def finalize_dataarray_attributes(arr,**kwargs):
+    """Update the disctionary of attibutes of a xarray dataarray.
+    """
+    if isinstance(arr, xr.DataArray):
+        arr.attrs.update(kwargs)
+    if arr.attrs.has_key('short_name'):
+        arr.name = arr.attrs['short_name']
+    return arr
+
+def convert_dataarray_attributes_xderivative(attrs):
+    """Return the dictionary of attributes corresponding to spatial derivative
+    in the x-direction
+    """
+    new_attrs = attrs.copy()
+    if attrs.has_key('long_name'):
+        new_attrs['long_name'] = 'x-derivative of ' + attrs['long_name']
+    if attrs.has_key('short_name'):
+            new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dx'
+    if attrs.has_key('unit'):
+            new_attrs['unit'] = attrs['unit'] + '/m'
+    return new_attrs
+
+def convert_dataarray_attributes_yderivative(attrs):
+    """Return the dictionary of attributes corresponding to spatial derivative
+    in the y-direction
+    """
+    new_attrs = attrs.copy()
+    if hasattr(attrs,'long_name'):
+        new_attrs['long_name'] = 'y-derivative of ' + attrs['long_name']
+    if hasattr(attrs,'short_name'):
+            new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dy'
+    if attrs.has_key('unit'):
+            new_attrs['unit'] = attrs['unit'] + '/m'
+    return new_attrs
+
 #======================= NEMO-Specific Tools ===================================
 # TODO : this section should move to a file dedicated to gcm specific features.
 #
@@ -169,7 +207,6 @@ class generic_2d_grid:
         self._vmask = self.variables["sea_binary_mask_at_v_location"]
         self._fmask = self.variables["sea_binary_mask_at_f_location"]
 
-
 #--------------------- Chunking and Slicing ------------------------------------
     def rechunk(self,chunks=None):
         """Rechunk all the variables defining the grid.
@@ -250,7 +287,13 @@ class generic_2d_grid:
         # TODO : check that the chunks are aligned
         gx = self.d_i(q) / self._e1u
         gy = self.d_j(q) / self._e2v
-        # TODO : finalize unit and name of output variables
+        # finalize dataarray attributes
+        gxatts = convert_dataarray_attributes_xderivative(q.attrs)
+        gxatts['grid_location'] = 'u'
+        gyatts = convert_dataarray_attributes_yderivative(q.attrs)
+        gxatts['grid_location'] = 'v'
+        gx = finalize_dataarray_attributes(gx,**gxatts)
+        gy = finalize_dataarray_attributes(gy,**gyatts)
         return gx,gy
 
     def vertical_component_of_curl(self,a):
