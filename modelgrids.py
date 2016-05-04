@@ -78,7 +78,7 @@ def convert_dataarray_attributes_yderivative(attrs):
             new_attrs['units'] = attrs['units'] + '/m'
     return new_attrs
 
-def assert_chunks_are_compatible(chunks1=None,chunks2=None):
+def assert_chunks_are_compatible(chunks1=None,chunks2=None,ndims=None):
     """Return True when two chunks are aligned over their common dimensions.
     """
     test = True
@@ -87,11 +87,8 @@ def assert_chunks_are_compatible(chunks1=None,chunks2=None):
             return True
         else:
             return False
-    for dim in chunks1:
-        if dim in chunks2:
-           pass
-           #test *= (chunks1[dim] == chunks2[dim])
-           # TODO : debug : different chunks definition in xarray...
+    for idim in range(ndims):
+        test *= chunks1[-idim-1] == chunks2[-idim-1]
     return test
 
 def assert_grid_location(xarr,grid_location=None):
@@ -102,7 +99,8 @@ def assert_grid_location(xarr,grid_location=None):
         test *= (xarr.attrs['grid_location']==grid_location)
     return test
 
-def check_input_array(xarr,shape=None,chunks=None,grid_location=None):
+def check_input_array(xarr,shape=None,chunks=None,\
+                      grid_location=None,ndims=None):
     """Returns true if arr is a dataarray with expected shape, chunks at
     grid_location attribute. Otherwise raise errors.
     """
@@ -113,7 +111,7 @@ def check_input_array(xarr,shape=None,chunks=None,grid_location=None):
     if not(isinstance(xarr,xr.DataArray)):
         raise TypeError(arrayname + 'is expected to be a xarray.DataArray')
         return False
-    if not(assert_chunks_are_compatible(xarr.chunks,chunks)):
+    if not(assert_chunks_are_compatible(xarr.chunks,chunks,ndims=ndims)):
         raise ChunkError()
         return False
     if not(assert_grid_location(xarr,grid_location)):
@@ -149,6 +147,8 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self.define_horizontal_metrics()
         self.define_masks()
         self.chunk(chunks=chunks)
+        self.parameters = {}
+        self.parameters['chunks'] = chunks
 
     def define_projection_coordinate(self):
         self.variables["projection_x_coordinate_at_t_location"] = \
@@ -206,7 +206,8 @@ def nemo_2d_grid(nemo_coordinate_file=None,nemo_byte_mask_file=None,\
                      nemo_coordinate_file=nemo_coordinate_file,\
                      nemo_byte_mask_file=nemo_byte_mask_file,\
                      chunks=chunks)
-    grid = generic_2d_grid(variables=variables.variables)
+    grid = generic_2d_grid(variables=variables.variables,\
+                           parameters= variables.parameters)
     return grid
 
 #======================== Generic 2D Grid Class ================================
@@ -237,7 +238,10 @@ class generic_2d_grid:
         self.parameters = parameters
         self._define_aliases_for_arrays()
         self.chunks = self.arrays["sea_binary_mask_at_t_location"].chunks
-        self.shape = self.arrays["sea_binary_mask_at_t_location"].shape
+        # TODO : what chunk should we use ?
+        self.shape  = self.arrays["sea_binary_mask_at_t_location"].shape
+        self.dims   = self.arrays["sea_binary_mask_at_t_location"].dims
+        self.ndims = len(self.dims)
 
 #--------------------- Aliases for DataArrays ----------------------------------
     def _define_aliases_for_arrays(self):
@@ -338,7 +342,8 @@ class generic_2d_grid:
         Return the horizontal gradient of a scalar field.
         """
         # check
-        check_input_array(q,chunks=self.chunks,grid_location='t')
+        check_input_array(q,\
+                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
         # define
         gx = self.d_i(q) / self.array_e1u
         gy = self.d_j(q) / self.array_e2v
