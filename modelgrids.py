@@ -44,7 +44,7 @@ def get_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
 #
 
 def finalize_dataarray_attributes(arr,**kwargs):
-    """Update the disctionary of attibutes of a xarray dataarray.
+    """Update the dictionary of attibutes of a xarray dataarray.
     """
     if isinstance(arr, xr.DataArray):
         arr.attrs.update(kwargs)
@@ -52,7 +52,7 @@ def finalize_dataarray_attributes(arr,**kwargs):
         arr.name = arr.attrs['short_name']
     return arr
 
-def convert_dataarray_attributes_xderivative(attrs):
+def convert_dataarray_attributes_xderivative(attrs,grid_location=None):
     """Return the dictionary of attributes corresponding to spatial derivative
     in the x-direction
     """
@@ -60,12 +60,14 @@ def convert_dataarray_attributes_xderivative(attrs):
     if attrs.has_key('long_name'):
         new_attrs['long_name'] = 'x-derivative of ' + attrs['long_name']
     if attrs.has_key('short_name'):
-            new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dx'
+        new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dx'
     if attrs.has_key('units'):
-            new_attrs['units'] = attrs['units'] + '/m'
+        new_attrs['units'] = attrs['units'] + '/m'
+    if grid_location is not None:
+        new_attrs['grid_location'] = grid_location
     return new_attrs
 
-def convert_dataarray_attributes_yderivative(attrs):
+def convert_dataarray_attributes_yderivative(attrs,grid_location=None):
     """Return the dictionary of attributes corresponding to spatial derivative
     in the y-direction
     """
@@ -73,9 +75,44 @@ def convert_dataarray_attributes_yderivative(attrs):
     if hasattr(attrs,'long_name'):
         new_attrs['long_name'] = 'y-derivative of ' + attrs['long_name']
     if hasattr(attrs,'short_name'):
-            new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dy'
+        new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dy'
     if attrs.has_key('units'):
-            new_attrs['units'] = attrs['units'] + '/m'
+        new_attrs['units'] = attrs['units'] + '/m'
+    if grid_location is not None:
+        new_attrs['grid_location'] = grid_location
+    return new_attrs
+
+def convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
+    """Return the dictionary of attributes corresponding to horiz. laplacian
+    """
+    new_attrs = attrs.copy()
+    if hasattr(attrs,'long_name'):
+        new_attrs['long_name'] = 'horizontal laplacian of ' + attrs['long_name']
+    if hasattr(attrs,'short_name'):
+        new_attrs['short_name'] = 'hlap_' + attrs['short_name']
+    if attrs.has_key('units'):
+        new_attrs['units'] = attrs['units'] + '/m2'
+    if grid_location is not None:
+        new_attrs['grid_location'] = grid_location
+    return new_attrs
+
+def convert_dataarray_attributes_divergence(attrs1,attrs2,grid_location='t'):
+    """Return the dictionary of attributes corresponding to divergence of a
+    vector field.
+    """
+    new_attrs = attrs1.copy()
+    if hasattr(attrs1,'long_name') and hasattr(attrs2,'long_name'):
+        new_attrs['long_name'] = \
+           'horizontal divergence of ('\
+           + attrs1['long_name'] + ','\
+           + attrs2['long_name'] + ')'
+    if hasattr(attrs1,'short_name') and hasattr(attrs2,'short_name'):
+            new_attrs['short_name'] = 'div_()' + attrs1['short_name'] + ','\
+                                               + attrs1['short_name'] + ')'
+    if attrs1.has_key('units'):
+            new_attrs['units'] = attrs1['units'] + '/m'
+    if grid_location is not None:
+        new_attrs['grid_location'] = grid_location
     return new_attrs
 
 def assert_chunks_are_compatible(chunks1=None,chunks2=None,ndims=None):
@@ -339,7 +376,7 @@ class generic_2d_grid:
 #-------------------- Differential Operators------------------------------------
     def horizontal_gradient(self,q):
         """
-        Return the horizontal gradient of a scalar field.
+        Return the horizontal gradient of a scalar field at t-points.
         """
         # check
         check_input_array(q,\
@@ -348,24 +385,55 @@ class generic_2d_grid:
         gx = self.d_i(q) / self.array_e1u
         gy = self.d_j(q) / self.array_e2v
         # finalize attributes
-        gxatts = convert_dataarray_attributes_xderivative(q.attrs)
-        gxatts['grid_location'] = 'u'
-        gyatts = convert_dataarray_attributes_yderivative(q.attrs)
-        gyatts['grid_location'] = 'v'
+        gxatts = \
+            convert_dataarray_attributes_xderivative(q.attrs,grid_location='u')
+        gyatts = \
+            convert_dataarray_attributes_yderivative(q.attrs,grid_location='v')
         #
         gx = finalize_dataarray_attributes(gx,**gxatts)
         gy = finalize_dataarray_attributes(gy,**gyatts)
         return gx,gy
+
+    def horizontal_laplacian(self,q):
+        """
+        Return the horizontal laplacian of a scalar field at t-points.
+        """
+        # check
+        check_input_array(q,\
+                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        # define
+        lap = self.horizontal_divergence(self.horizontal_gradient(q))
+        # finalize
+        lapatts = \
+            convert_dataarray_attributes_laplacian(q.attrs,grid_location='t')
+        lap = finalize_dataarray_attributes(lap,**lapatts)
+        return lap
 
     def vertical_component_of_curl(self,a):
         """Return the vertical component of the curl of a vector field.
         """
         pass
 
-    def horizontal_divergence(self,a,masked=False):
+    def horizontal_divergence(self,a):
         """
-        Return the horizontal divergence of a vector field.
+        Return the horizontal divergence of a vector field at u,v-points.
         """
+        a1,a2 = a
+        # check
+        check_input_array(a1,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(a2,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+        # define
+        div  = self.d_i(a1 / self.array_e2u)
+        div += self.d_i(a2 / self.array_e1v)
+        div /= self.array_e1t * self.array_e2t
+        # finalize
+        divatts = \
+            convert_dataarray_attributes_divergence(a1.attrs,a2.attrs)
+        div = finalize_dataarray_attributes(div,**divatts)
+        return div
+
 #----------------------- Specific operators ------------------------------------
     def geostrophic_current_from_sea_surface_height(self,ssh):
         """Return the geostrophic current on u,v-grids.
