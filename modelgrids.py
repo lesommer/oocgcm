@@ -72,9 +72,9 @@ def convert_dataarray_attributes_yderivative(attrs,grid_location=None):
     in the y-direction
     """
     new_attrs = attrs.copy()
-    if hasattr(attrs,'long_name'):
+    if attrs.has_key('long_name'):
         new_attrs['long_name'] = 'y-derivative of ' + attrs['long_name']
-    if hasattr(attrs,'short_name'):
+    if attrs.has_key('short_name'):
         new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dy'
     if attrs.has_key('units'):
         new_attrs['units'] = attrs['units'] + '/m'
@@ -86,9 +86,9 @@ def convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
     """Return the dictionary of attributes corresponding to horiz. laplacian
     """
     new_attrs = attrs.copy()
-    if hasattr(attrs,'long_name'):
+    if attrs.has_key('long_name'):
         new_attrs['long_name'] = 'horizontal laplacian of ' + attrs['long_name']
-    if hasattr(attrs,'short_name'):
+    if attrs.has_key('short_name'):
         new_attrs['short_name'] = 'hlap_' + attrs['short_name']
     if attrs.has_key('units'):
         new_attrs['units'] = attrs['units'] + '/m2'
@@ -101,12 +101,12 @@ def convert_dataarray_attributes_divergence(attrs1,attrs2,grid_location='t'):
     vector field.
     """
     new_attrs = attrs1.copy()
-    if hasattr(attrs1,'long_name') and hasattr(attrs2,'long_name'):
+    if attrs1.has_key('long_name') and attrs2.has_key('long_name'):
         new_attrs['long_name'] = \
            'horizontal divergence of ('\
            + attrs1['long_name'] + ','\
            + attrs2['long_name'] + ')'
-    if hasattr(attrs1,'short_name') and hasattr(attrs2,'short_name'):
+    if attrs1.has_key('short_name') and attrs2.has_key('short_name'):
             new_attrs['short_name'] = 'div_()' + attrs1['short_name'] + ','\
                                                + attrs1['short_name'] + ')'
     if attrs1.has_key('units'):
@@ -426,7 +426,7 @@ class generic_2d_grid:
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
         # define
         div  = self.d_i(a1 / self.array_e2u)
-        div += self.d_i(a2 / self.array_e1v)
+        div += self.d_j(a2 / self.array_e1v)
         div /= self.array_e1t * self.array_e2t
         # finalize
         divatts = \
