@@ -78,6 +78,59 @@ def convert_dataarray_attributes_yderivative(attrs):
             new_attrs['units'] = attrs['units'] + '/m'
     return new_attrs
 
+def assert_chunks_are_compatible(chunks1=None,chunks2=None):
+    """Return True when two chunks are aligned over their common dimensions.
+    """
+    test = True
+    if (chunks1 is None) or (chunks2 is None):
+        if (chunks1 is None) and (chunks2 is None):
+            return True
+        else:
+            return False
+    for dim in chunks1:
+        if dim in chunks2:
+           pass
+           #test *= (chunks1[dim] == chunks2[dim])
+           # TODO : debug : different chunks definition in xarray...
+    return test
+
+def assert_grid_location(xarr,grid_location=None):
+    """Return True when the xarr grid_location attribute is grid_location
+    """
+    test = True
+    if xarr.attrs.has_key('grid_location'):
+        test *= (xarr.attrs['grid_location']==grid_location)
+    return test
+
+def check_input_array(xarr,shape=None,chunks=None,grid_location=None):
+    """Returns true if arr is a dataarray with expected shape, chunks at
+    grid_location attribute. Otherwise raise errors.
+    """
+    if hasattr(xarr,'name'):
+       arrayname = xarr.name
+    else:
+       arrayname = 'array'
+    if not(isinstance(xarr,xr.DataArray)):
+        raise TypeError(arrayname + 'is expected to be a xarray.DataArray')
+        return False
+    if not(assert_chunks_are_compatible(xarr.chunks,chunks)):
+        raise ChunkError()
+        return False
+    if not(assert_grid_location(xarr,grid_location)):
+        raise GridLocationError()
+        return False
+    return True
+
+# Minimal exceptions
+#
+class ChunkError(Exception):
+    def __init__(self):
+        Exception.__init__(self,"incompatible chunk size")
+
+class GridLocationError(Exception):
+    def __init__(self):
+        Exception.__init__(self,"incompatible grid_location")
+
 #======================= NEMO-Specific Tools ===================================
 # TODO : this section should move to a file dedicated to gcm specific features.
 #
@@ -180,49 +233,51 @@ class generic_2d_grid:
     def __init__(self,variables=None,parameters=None):
         """Initialize grid from dictionary of variables.
         """
-        self.variables = variables
+        self.arrays = variables
         self.parameters = parameters
-        self._define_aliases_for_variabless()
-        self.shape = self.variables["sea_binary_mask_at_t_location"].shape
+        self._define_aliases_for_arrays()
+        self.chunks = self.arrays["sea_binary_mask_at_t_location"].chunks
+        self.shape = self.arrays["sea_binary_mask_at_t_location"].shape
 
 #--------------------- Aliases for DataArrays ----------------------------------
-    def _define_aliases_for_variabless(self):
+    def _define_aliases_for_arrays(self):
         """Define alias for frequently used variables.
         This mostly follows nemo name conventions and will evolve in the future.
         """
         # coordinates
-        self._navlon = self.variables["projection_x_coordinate_at_t_location"]
-        self._navlat = self.variables["projection_y_coordinate_at_t_location"]
+        self.array_navlon = self.arrays["projection_x_coordinate_at_t_location"]
+        self.array_navlat = self.arrays["projection_y_coordinate_at_t_location"]
         # metrics
-        self._e1t = self.variables["cell_x_size_at_t_location"]
-        self._e1u = self.variables["cell_x_size_at_u_location"]
-        self._e1v = self.variables["cell_x_size_at_v_location"]
-        self._e2t = self.variables["cell_y_size_at_t_location"]
-        self._e2u = self.variables["cell_y_size_at_u_location"]
-        self._e2v = self.variables["cell_y_size_at_v_location"]
+        self.array_e1t = self.arrays["cell_x_size_at_t_location"]
+        self.array_e1u = self.arrays["cell_x_size_at_u_location"]
+        self.array_e1v = self.arrays["cell_x_size_at_v_location"]
+        self.array_e2t = self.arrays["cell_y_size_at_t_location"]
+        self.array_e2u = self.arrays["cell_y_size_at_u_location"]
+        self.array_e2v = self.arrays["cell_y_size_at_v_location"]
 
         # masks
-        self._tmask = self.variables["sea_binary_mask_at_t_location"]
-        self._umask = self.variables["sea_binary_mask_at_u_location"]
-        self._vmask = self.variables["sea_binary_mask_at_v_location"]
-        self._fmask = self.variables["sea_binary_mask_at_f_location"]
+        self.array_tmask = self.arrays["sea_binary_mask_at_t_location"]
+        self.array_umask = self.arrays["sea_binary_mask_at_u_location"]
+        self.array_vmask = self.arrays["sea_binary_mask_at_v_location"]
+        self.array_fmask = self.arrays["sea_binary_mask_at_f_location"]
 
 #--------------------- Chunking and Slicing ------------------------------------
     def rechunk(self,chunks=None):
         """Rechunk all the variables defining the grid.
         """
-        for dataname in self.variables:
-            data = self.variables[dataname]
+        for dataname in self.arrays:
+            data = self.arrays[dataname]
             if isinstance(data, xr.DataArray):
-                self.variables[dataname] = data.chunk(chunks)
+                self.arrays[dataname] = data.chunk(chunks)
+        self.chunks = self.array_tmask.chunks
 
     def __getitem__(self,item):
         """Return a grid object restricted to a subdomain.
         """
-        sliced_variables = {}
-        for dataname in self.variables:
-            sliced_variables[dataname] = self.variables[dataname][item]
-        return generic_2d_grid(variables=sliced_variables,\
+        sliced_arrays = {}
+        for dataname in self.arrays:
+            sliced_arrays[dataname] = self.arrays[dataname][item]
+        return generic_2d_grid(variables=sliced_arrays,\
                              parameters=self.parameters)
 
 #---------------------------- Grid Swapping ------------------------------------
@@ -282,16 +337,17 @@ class generic_2d_grid:
         """
         Return the horizontal gradient of a scalar field.
         """
-        # TODO : test that the input is a xarray dataarray
-        # TODO : test the input grid location
-        # TODO : check that the chunks are aligned
-        gx = self.d_i(q) / self._e1u
-        gy = self.d_j(q) / self._e2v
-        # finalize dataarray attributes
+        # check
+        check_input_array(q,chunks=self.chunks,grid_location='t')
+        # define
+        gx = self.d_i(q) / self.array_e1u
+        gy = self.d_j(q) / self.array_e2v
+        # finalize attributes
         gxatts = convert_dataarray_attributes_xderivative(q.attrs)
         gxatts['grid_location'] = 'u'
         gyatts = convert_dataarray_attributes_yderivative(q.attrs)
-        gxatts['grid_location'] = 'v'
+        gyatts['grid_location'] = 'v'
+        #
         gx = finalize_dataarray_attributes(gx,**gxatts)
         gy = finalize_dataarray_attributes(gy,**gyatts)
         return gx,gy
