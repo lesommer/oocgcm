@@ -1,17 +1,18 @@
 # oocgcm
-#### Out of core diagnostics of C-grid ocean models
+#### Out of core diagnostics of C-grid general circulation models
 
 
 This project provides tools for processing and analysing output of ocean general 
-circulation models.
-
-The project is so far mostly targetting NEMO ocean model but we try to build a 
-framework that can be used for other ocean models as well. The framework could
-also be used for C-grid atmospheric general circulation model. 
+circulation models and gridded satellite data.
 
 Our aim is to simplify the analysis of **very large datasets of model output**
 (~1-100Tb) like those produced by submesoscale permitting models at basin scales
 and ensemble simulations of edddying ocean models.
+
+The project is so far mostly targetting NEMO ocean model and gridded ocean satellite 
+data but we try to build a framework that can be used for other ocean models as well. 
+The framework could also probably be used for C-grid atmospheric general circulation 
+models. 
 
 The main ambition of this project is to provide simple tools for performing
 **out-of-core** computations with ocean model output, namely processing data
