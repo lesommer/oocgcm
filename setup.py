@@ -53,6 +53,5 @@ setup(name=DISTNAME,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
       install_requires=INSTALL_REQUIRES,
-      tests_require=TESTS_REQUIRE,
       url=URL,
       packages=find_packages())
