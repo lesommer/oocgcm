@@ -1,1 +1,1 @@
-This is where we intend to store methode for computing wavenumber and frequency spectra.
+This is where we intend to store methods for computing wavenumber spectra and frequency spectra.
