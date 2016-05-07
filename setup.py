@@ -31,12 +31,13 @@ DESCRIPTION = "Out of core diagnostics of C-grid GCMs in Python"
 LONG_DESCRIPTION = """
 **oocgcm** is an open source project and Python package that aims to 
 simplify the analysis of large scale datasets (1-100Tb) produced by 
-ocean general circulation model. The project builds upon the xarray
+ocean general circulation models. The project builds upon the xarray
 and dask python packages.
+
 Our goal is to provide a set of tools that allow to perform out-of-core
 computations within a robust and intuitive framework. We intend to  
-reduce the time needed to developp a complex analysis from the prototyping
-phase to the production phase.
+reduce the time needed to deply a complex analysis of model output 
+from the prototyping phase to the production phase.
 
 Important links
 ---------------
