@@ -29,7 +29,8 @@ deployment on a number of platforms.
 
 This project builds upon previous projects including
 [pyclim](http://servforge.legi.grenoble-inp.fr/projects/soft-pyclim)
-and [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom).
+[PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom) and 
+[pycomodo](http://pycomodo.forge.imag.fr/).
 
 #### Installation
 ```
