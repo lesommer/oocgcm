@@ -2,8 +2,12 @@
 #### Out of core diagnostics of C-grid ocean models
 
 
-This project provides tools for processing and analysing output of NEMO ocean
-model.
+This project provides tools for processing and analysing output of ocean general 
+circulation models.
+
+The project is so far mostly targetting NEMO ocean model but we try to build a 
+framework that can be used for other ocean models as well. The framework could
+also be used for C-grid atmospheric general circulation model. 
 
 Our aim is to simplify the analysis of **very large datasets of model output**
 (~1-100Tb) like those produced by submesoscale permitting models at basin scales
@@ -12,7 +16,6 @@ and ensemble simulations of edddying ocean models.
 The main ambition of this project is to provide simple tools for performing
 **out-of-core** computations with ocean model output, namely processing data
 that is too large to fit into a computer's main memory at one time.
-
 
 We are trying to developp a framework **flexible** enough that does not impose
 too stricly a specific workflow to the end user.
