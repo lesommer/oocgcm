@@ -1,5 +1,5 @@
 # oocgcm
-#### Out of core diagnostics of C-grid general circulation models in python.
+#### Out of core analysis tools for C-grid general circulation models.
 
 
 This project provides tools for processing and analysing output of ocean general 
