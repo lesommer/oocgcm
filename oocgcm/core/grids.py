@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 #
-"""modelgrids module.
-Define classes that give acces to model grid metrics and operators
-(e.g. gradients)
-
-This submodule is still under development. See the project
-[wiki page](https://github.com/lesommer/oocgcm/wiki/modelgrids_design)
+"""oocgcm.core.grids.
+Define classes that give acces to model grid metrics and operators.
 
 """
 
@@ -13,36 +9,9 @@ import numpy as np
 import xarray as xr
 import xarray.ufuncs as xu # ufuncs like np.sin for xarray
 
-#=============================== Parameters ====================================
-# Physical parameters
-grav = 9.81                  # acceleration due to gravity (m.s-2)
-omega = 7.292115083046061e-5 # earth rotation rate (s-1)
-earthrad = 6371229            # mean earth radius (m)
-
-# Maths parameters
-deg2rad = np.pi / 180.
-mod360 = lambda x: xu.fmod(x+180,360) - 180
-
-#======================== General Purpose Tools ================================
-# TODO : this should probably move to the main module level.
-#
-def return_xarray_dataset(filename,chunks=None):
-    """Return an xarray dataset corresponding to filename.
-    """
-    return xr.open_dataset(filename,chunks=chunks,lock=False)
-
-def get_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
-    """Return a xarray dataarray corresponding to varname in filename.
-    """
-    ds = return_xarray_dataset(filename,chunks=chunks)
-    dataarray = ds[varname]
-    for kwargs in extra_kwargs:
-        dataarray.attrs[kwargs] = extra_kwargs[kwargs]
-    return dataarray
 
 #======================== Working with DataArray ===============================
 #
-
 def finalize_dataarray_attributes(arr,**kwargs):
     """Update the dictionary of attibutes of a xarray dataarray.
     """
@@ -165,87 +134,6 @@ class ChunkError(Exception):
 class GridLocationError(Exception):
     def __init__(self):
         Exception.__init__(self,"incompatible grid_location")
-
-#======================= NEMO-Specific Tools ===================================
-# TODO : this section should move to a file dedicated to gcm specific features.
-#
-class variables_holder_for_2d_grid_from_nemo_ogcm:
-    """This class create the variables used in generic_2d_grid.
-    """
-    def __init__(self,nemo_coordinate_file=None,\
-                     nemo_byte_mask_file=None,\
-                     chunks=None):
-        self.coordinate_file = nemo_coordinate_file
-        self.byte_mask_file  = nemo_byte_mask_file
-        self.chunks = chunks
-        self.variables = {}
-        self._get = get_xarray_dataarray
-        self.define_projection_coordinate()
-        self.define_horizontal_metrics()
-        self.define_masks()
-        self.chunk(chunks=chunks)
-        self.parameters = {}
-        self.parameters['chunks'] = chunks
-
-    def define_projection_coordinate(self):
-        self.variables["projection_x_coordinate_at_t_location"] = \
-                        self._get(self.coordinate_file,"nav_lon",\
-                        chunks=self.chunks,grid_location='t')
-        self.variables["projection_y_coordinate_at_t_location"] = \
-                        self._get(self.coordinate_file,"nav_lat",\
-                        chunks=self.chunks,grid_location='t')
-
-    def define_horizontal_metrics(self):
-        self.variables["cell_x_size_at_t_location"] = \
-                        self._get(self.coordinate_file,"e1t",\
-                        chunks=self.chunks,grid_location='t')
-        self.variables["cell_y_size_at_t_location"] = \
-                        self._get(self.coordinate_file,"e2t",\
-                        chunks=self.chunks,grid_location='t')
-        self.variables["cell_x_size_at_u_location"] = \
-                        self._get(self.coordinate_file,"e1u",\
-                        chunks=self.chunks,grid_location='u')
-        self.variables["cell_y_size_at_u_location"] = \
-                        self._get(self.coordinate_file,"e2u",\
-                        chunks=self.chunks,grid_location='u')
-        self.variables["cell_x_size_at_v_location"] = \
-                        self._get(self.coordinate_file,"e1v",\
-                        chunks=self.chunks,grid_location='v')
-        self.variables["cell_y_size_at_v_location"] = \
-                        self._get(self.coordinate_file,"e2v",\
-                        chunks=self.chunks,grid_location='v')
-
-    def define_masks(self):
-        self.variables["sea_binary_mask_at_t_location"] = \
-                      self._get(self.byte_mask_file,"tmask",\
-                      chunks=self.chunks,grid_location='t')[0,0,...]
-        self.variables["sea_binary_mask_at_u_location"] = \
-                      self._get(self.byte_mask_file,"umask",\
-                      chunks=self.chunks,grid_location='u')[0,0,...]
-        self.variables["sea_binary_mask_at_v_location"] = \
-                      self._get(self.byte_mask_file,"vmask",\
-                      chunks=self.chunks,grid_location='v')[0,0,...]
-        self.variables["sea_binary_mask_at_f_location"] = \
-                      self._get(self.byte_mask_file,"vmask",\
-                      chunks=self.chunks,grid_location='f')[0,0,...]
-
-    def chunk(self,chunks=None):
-        for dataname in self.variables:
-            data = self.variables[dataname]
-            if isinstance(data, xr.DataArray):
-                self.variables[dataname] = data.chunk(chunks)
-
-def nemo_2d_grid(nemo_coordinate_file=None,nemo_byte_mask_file=None,\
-                 chunks=None):
-    """Return a generic 2d grid from nemo coord and mask files.
-    """
-    variables = variables_holder_for_2d_grid_from_nemo_ogcm(\
-                     nemo_coordinate_file=nemo_coordinate_file,\
-                     nemo_byte_mask_file=nemo_byte_mask_file,\
-                     chunks=chunks)
-    grid = generic_2d_grid(variables=variables.variables,\
-                           parameters= variables.parameters)
-    return grid
 
 #======================== Generic 2D Grid Class ================================
 class generic_2d_grid:
