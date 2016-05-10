@@ -437,8 +437,8 @@ class generic_2d_grid:
         gy = finalize_dataarray_attributes(gy,**gyatts)
         #
         return VectorField2d(gx,gy,\
-                             'x_component_grid_location' = 'u',\
-                             'y_component_grid_location' = 'v')
+                             x_component_grid_location = 'u',\
+                             y_component_grid_location = 'v')
 
     def horizontal_laplacian(self,q):
         """
