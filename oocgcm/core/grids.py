@@ -125,7 +125,162 @@ def check_input_array(xarr,shape=None,chunks=None,\
         return False
     return True
 
-# Minimal exceptions
+#========================== Data structures ====================================
+#
+
+# a data structure for vector field.
+#
+from collections import namedtuple
+
+
+def assert_and_set_grid_location_attribute(xarr,grid_location=None):
+    """Assert whether xarr holds an extra attribute 'grid_location' that
+    equals grid_location. If xarr does not have such extra-attribute, create
+    one with value grid_location.
+
+    Parameters
+    ----------
+    xarr : xarray.DataArray
+        xarray dataarray that should be associated with a grid location
+    grid_location : str
+        string describing the grid location : eg 'u','v','t','f'...
+    """
+    if xarr.attrs.has_key('grid_location'):
+        assert ( xarr.attrs['grid_location'] == grid_location )
+    else:
+        xarr.attrs['grid_location'] = grid_location
+
+def VectorField2d(vx,vy,\
+                  x_component_grid_location=None,\
+                  y_component_grid_location=None):
+    """Minimal data structure for manupulating 2d vector fields on a grid.
+
+    Parameters
+    ----------
+    vx : xarray.DataArray
+        x-component of the vector fields
+    vy : xarray.DataArray
+        y-component of the vector fields
+    x_component_grid_location : str
+        string describing the grid location of the x-component
+    y_component_grid_location : str
+        string describing the grid location of the y-component
+
+    Returns
+    -------
+    o : namedtuple
+       namedtuple containing the vector field.
+    """
+    v = namedtuple('VectorField2d',['x_component','y_component',\
+                                    'x_component_grid_location',\
+                                    'y_component_grid_location'])
+    #
+    assert_and_set_grid_location_attribute(vx,x_component_grid_location)
+    assert_and_set_grid_location_attribute(vy,y_component_grid_location)
+    #
+    o = v(vx,vy,x_component_grid_location,y_component_grid_location)
+    return o
+
+def VectorField3d(vx,vy,vz,\
+                  x_component_grid_location=None,\
+                  y_component_grid_location=None,\
+                  z_component_grid_location=None):
+    """Minimal data structure for manupulating 3d vector fields on a grid.
+
+    Parameters
+    ----------
+    vx : xarray.DataArray
+        x-component of the vector fields
+    vy : xarray.DataArray
+        y-component of the vector fields
+    vz : xarray.DataArray
+        z-component of the vector fields
+    x_component_grid_location : str
+        string describing the grid location of the x-component
+    y_component_grid_location : str
+        string describing the grid location of the y-component
+    z_component_grid_location : str
+        string describing the grid location of the z-component
+
+    Returns
+    -------
+    o : namedtuple
+           namedtuple containing the vector field.
+    """
+    v = namedtuple('VectorField3d',['x_component','y_component','z_component',\
+                                    'x_component_grid_location',\
+                                    'y_component_grid_location',\
+                                    'z_component_grid_location'])
+    #
+    assert_and_set_grid_location_attribute(vx,x_component_grid_location)
+    assert_and_set_grid_location_attribute(vy,y_component_grid_location)
+    assert_and_set_grid_location_attribute(vz,z_component_grid_location)
+    #
+    o = v(vx,vy,vz,\
+          x_component_grid_location,\
+          y_component_grid_location,\
+          z_component_grid_location)
+    return o
+
+def Tensor2d(axx,axy,ayx,ayy,\
+             xx_component_grid_location=None,\
+             xy_component_grid_location=None,\
+             yx_component_grid_location=None,\
+             yy_component_grid_location=None):
+    """Minimal data structure for manupulating 2d tensors on a grid.
+
+    use the following notations :
+                | axx   axy|
+            T = |          |
+                | ayx   ayy|
+    Parameters
+    ----------
+    axx : xarray.DataArray
+        xx-component of the tensor
+    axy : xarray.DataArray
+        xy-component of the tensor
+    ayx : xarray.DataArray
+        yx-component of the tensor
+    ayy : xarray.DataArray
+        yy-component of the tensor
+    xx_component_grid_location : str
+        string describing the grid location of the xx-component
+    xy_component_grid_location : str
+        string describing the grid location of the xy-component
+    yx_component_grid_location : str
+        string describing the grid location of the yx-component
+    yy_component_grid_location : str
+        string describing the grid location of the yy-component
+
+    Returns
+    -------
+    o : namedtuple
+           namedtuple containing the tensor field.
+    """
+    t = namedtuple('Tensor2d',['xx_component','xy_component',\
+                               'yx_component','yy_component',\
+                               'xx_component_grid_location',\
+                               'xy_component_grid_location',\
+                               'yx_component_grid_location',\
+                               'yy_component_grid_location'])
+    #
+    if axx.attrs.has_key('grid_location'):
+        assert (axx.attrs['grid_location'] == xx_component_grid_location )
+    else:
+        axx.attrs['grid_location'] = xx_component_grid_location
+    #
+    assert_and_set_grid_location_attribute(axx,xx_component_grid_location)
+    assert_and_set_grid_location_attribute(axy,xy_component_grid_location)
+    assert_and_set_grid_location_attribute(ayx,yx_component_grid_location)
+    assert_and_set_grid_location_attribute(ayy,yy_component_grid_location)
+    #
+    o = t(axx,axy,ayx,ayy,\
+          xx_component_grid_location,xy_component_grid_location,\
+          yx_component_grid_location,yy_component_grid_location)
+    return o
+
+#========================== Minimal exceptions =================================
+# TODO : should probably move to a dedicated file oocgcm.core.exceptions.py
 #
 class ChunkError(Exception):
     def __init__(self):
@@ -280,7 +435,10 @@ class generic_2d_grid:
         #
         gx = finalize_dataarray_attributes(gx,**gxatts)
         gy = finalize_dataarray_attributes(gy,**gyatts)
-        return gx,gy
+        #
+        return VectorField2d(gx,gy,\
+                             'x_component_grid_location' = 'u',\
+                             'y_component_grid_location' = 'v')
 
     def horizontal_laplacian(self,q):
         """
@@ -302,11 +460,12 @@ class generic_2d_grid:
         """
         pass
 
-    def horizontal_divergence(self,a):
+    def horizontal_divergence(self,vectorfield):
         """
         Return the horizontal divergence of a vector field at u,v-points.
         """
-        a1,a2 = a
+        a1 = vectorfield.x_component
+        a2 = vectorfield.y_component
         # check
         check_input_array(a1,\
                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
