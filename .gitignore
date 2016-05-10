@@ -9,3 +9,7 @@ clean
 *.swp
 
 *.swp
+
+doc/_build
+doc/generated
+oocgcm/version.py
