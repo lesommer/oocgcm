@@ -1,5 +1,10 @@
 #!/usr/bin/env python 
 
+import os
+import re
+import sys
+import warnings
+
 from setuptools import setup, find_packages
 
 MAJOR = 0
