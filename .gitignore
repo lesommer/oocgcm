@@ -8,4 +8,8 @@ clean
 
 *.swp
 
-*.swp
+# eclipse related files 
+.project
+.pydevproject
+.settings/
+
