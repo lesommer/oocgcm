@@ -429,9 +429,11 @@ class generic_2d_grid:
 
     Assume that dimension names are 'x' and 'y'.
     """
-    # TODO : keep _variables and _methods up to date for developpers.
     _required_arrays = [\
         "sea_binary_mask_at_t_location",\
+        "sea_binary_mask_at_u_location",\
+        "sea_binary_mask_at_v_location",\
+        "sea_binary_mask_at_f_location",\
         "projection_x_coordinate_at_t_location",\
         "projection_y_coordinate_at_t_location",\
         "cell_x_size_at_t_location",\
@@ -443,13 +445,15 @@ class generic_2d_grid:
         ]
 
     def __init__(self,variables=None,parameters=None):
-        """Initialize a grid from dictionary of xarrays and some parameters.
+        """Initialize a grid from a dictionary of xarrays and some parameters.
 
         Parameters
         ----------
         variables : dict-like object
             dictionnary of xarrays that describe the grid. Required variables
-            for the method actually implemented are listed in _required_arrays
+            for the method actually implemented are listed in _required_arrays.
+            This naming convention follows a mixture of cf and comodo norms in
+            order for this class to be model-agnostic.
 
         parameters : dict-object
             not used yet.
@@ -809,6 +813,6 @@ class generic_2d_grid:
         Returns
         -------
         vectorfield : VectorField2d namedtuple
-           Two-dimensional vector field of geostrophic currents at u,v-points.        
+           Two-dimensional vector field of geostrophic currents at u,v-points.
         """
         pass
