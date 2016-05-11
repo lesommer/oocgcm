@@ -8,8 +8,17 @@ clean
 
 *.swp
 
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 # eclipse related files 
 .project
 .pydevproject
 .settings/
+
+# fig and movies
+*.jpg
+*.pdf
+*.mp4
 
