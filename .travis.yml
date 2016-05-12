@@ -32,4 +32,4 @@ script:
   - py.test oocgcm --cov=oocgcm --cov-report term-missing
 
 after_success:
-  - echo 'ok'
+  - bash <(curl -s https://codecov.io/bash)
