@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/lesommer/oocgcm.svg?branch=master)](https://travis-ci.org/lesommer/oocgcm)
-
+[![codecov.io](https://codecov.io/github/lesommer/oocgcm/coverage.svg?branch=master)](https://codecov.io/github/lesommer/oocgcm?branch=master)
 # oocgcm
 #### Out of core analysis tools for C-grid general circulation models in python.
 
