@@ -1,0 +1,6 @@
+name: test_env
+dependencies:
+  - python=2.7
+  - numpy==1.9.3
+  - pandas==0.15.0
+  - xarray==0.7.2
