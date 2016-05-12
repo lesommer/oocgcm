@@ -157,29 +157,29 @@ print "sys.path:", sys.path
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.2.3'
+#needs_sphinx = '1.2.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-#extensions = [
-#    'sphinx.ext.autodoc',
-#    'sphinx.ext.autosummary',
-#    'sphinx.ext.intersphinx',
-#    'sphinx.ext.extlinks',
-#    'sphinx.ext.mathjax',
-#    'numpydoc',
-#    'IPython.sphinxext.ipython_directive',
-#    'IPython.sphinxext.ipython_console_highlighting',
-#]
-
 extensions = [
-    'sphinx.ext.mathjax', 'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
-    'sphinx.ext.viewcode',
+    'sphinx.ext.mathjax',
     'numpydoc',
+    'IPython.sphinxext.ipython_directive',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
+
+#extensions = [
+#    'sphinx.ext.mathjax', 'sphinx.ext.autodoc',
+#    'sphinx.ext.autosummary',
+#    'sphinx.ext.extlinks',
+#    'sphinx.ext.viewcode',
+#    'numpydoc',
+#]
 #extensions = ['sphinx.ext.autodoc', 'numpydoc']
 
 extlinks = {'issue': ('https://github.com/lesommer/oocgcm/issues/%s', 'GH')}

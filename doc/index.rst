@@ -45,17 +45,9 @@ Documentation
    grids
    io
    api
-   documentation
    faq
    whats-new
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 Get in touch
 ------------
