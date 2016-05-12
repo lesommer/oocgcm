@@ -1,2 +1,4 @@
-oocgcm grid objects
--------------------
+.. currentmodule:: oocgcm
+
+Grid descriptor objects
+=======================

@@ -2,8 +2,8 @@
    sphinx-quickstart on Tue May 10 23:41:48 2016.
 
 
-oocgcm : Out of core analysis tools for C-grid general circulation models in python.
-===================================================================================
+oocgcm : out of core analysis tools for C-grid general circulation models in python.
+====================================================================================
 
 This project provides tools for processing and analysing output of ocean general
 circulation models and gridded satellite data.
@@ -20,10 +20,10 @@ that is too large to fit into a computer's main memory at one time.
 The project is so far mostly targetting NEMO_
 ocean model and gridded ocean satellite data (AVISO, SST, ocean color...)
 but we try to build a framework that can be used for other ocean models as well.
-The framework could also probably be used for C-grid atmospheric general circulation
-models.
+The framework could also probably be used for C-grid atmospheric general
+circulation models.
 
-We are trying to developp a framework **flexible** enough that does not impose
+We are trying to developp a framework **flexible** enough in order not to impose
 too stricly a specific workflow to the end user.
 
 We try to keep the **list of dependencies** as small as possible to simplify the
@@ -40,9 +40,14 @@ Documentation
 .. toctree::
    :maxdepth: 1
 
+   installation
+   generic_specific
    grids
-    
-
+   io
+   api
+   documentation
+   faq
+   whats-new
 
 
 Indices and tables
@@ -52,3 +57,9 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+Get in touch
+------------
+
+- Report bugs, suggest feature ideas or view the source code `on GitHub`_.
+
+.. _on GitHub: http://github.com/lesommer/oocgcm
