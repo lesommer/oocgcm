@@ -9,6 +9,8 @@ from contextlib import contextmanager
 import numpy as np
 from numpy.testing import assert_array_equal
 
+PY3 = sys.version_info[0] >= 3
+
 
 try:
     import unittest2 as unittest
@@ -157,13 +159,6 @@ class TestCase(unittest.TestCase):
 class UnexpectedDataAccess(Exception):
     pass
 
-
-class InaccessibleArray(utils.NDArrayMixin):
-    def __init__(self, array):
-        self.array = array
-
-    def __getitem__(self, key):
-        raise UnexpectedDataAccess("Tried accessing data")
 
 
 class ReturnItem(object):
