@@ -31,3 +31,5 @@ install:
 script:
   - py.test oocgcm --cov=oocgcm --cov-report term-missing
 
+after_success:
+  - echo 'ok'
