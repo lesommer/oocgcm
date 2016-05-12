@@ -4,3 +4,6 @@ dependencies:
   - numpy==1.9.3
   - pandas==0.15.0
   - xarray==0.7.2
+ - pip:
+   - codecov
+   - pytest-cov

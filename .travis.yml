@@ -27,3 +27,10 @@ install:
   - conda env create --file ci/requirements-$CONDA_ENV.yml
   - source activate test_env
   - python setup.py install
+  - pip install codecov
+
+script:
+  - py.test oocgcm --cov=oocgcm --cov-report term-missing
+
+after_success:
+  - codecov
