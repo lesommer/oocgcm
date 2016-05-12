@@ -34,6 +34,10 @@ deployment on a number of platforms.
 .. _NEMO: http://www.nemo-ocean.eu/
 
 
+.. note::
+
+   oocgcm is at the pre-alpha stage. The API is therefore unstable.  
+
 Documentation
 -------------
 
