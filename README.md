@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/lesommer/oocgcm.svg?branch=master)](https://travis-ci.org/lesommer/oocgcm)
+
 # oocgcm
 #### Out of core analysis tools for C-grid general circulation models in python.
 
