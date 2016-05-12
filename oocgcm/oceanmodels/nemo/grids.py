@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-"""oocgcm.oceanmodels.grids.
+"""oocgcm.oceanmodels.nemo.grids
 Define classes that give acces to NEMO model grid metrics and operators.
 
 """
@@ -114,7 +114,7 @@ def nemo_2d_grid(nemo_coordinate_file=None,nemo_byte_mask_file=None,\
     Returns
     -------
     grid : oocgcm.core.grids.generic_2d_grid
-        grid object corresponding to the model configuration. 
+        grid object corresponding to the model configuration.
     """
     variables = variables_holder_for_2d_grid_from_nemo_ogcm(\
                      nemo_coordinate_file=nemo_coordinate_file,\

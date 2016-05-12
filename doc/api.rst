@@ -7,6 +7,15 @@ API reference
 This page provides an auto-generated summary of oocgcm's API. 
 
 
+Parameters
+==========
+
+.. autosummary::
+   :toctree: generated/
+
+   parameters.physicalparameters
+   parameters.mathematicalparameters
+
 Generic utilities
 =================
 

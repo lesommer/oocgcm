@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 #
-"""oocgcm.core.grids.
+"""oocgcm.core.grids
 Define classes that give acces to grid metrics and differential operators.
 
 """
-
 import numpy as np
 import xarray as xr
 import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
@@ -215,7 +214,7 @@ def check_input_array(xarr,shape=None,chunks=None,\
     grid_location : str
         string describing the expected grid location : eg 'u','v','t','f'...
     ndims : int
-        number of dimensions over which chunks should ne compared.
+        number of dimensions over which chunks should be compared.
 
     Returns
     -------

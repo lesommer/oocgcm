@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 #
+"""oocgcm.core.io
+Define tools that help dealing with the creation of xarray objects from
+netcdf files and creating netcdf files from xarray objects.
 
+"""
 import xarray as xr
 
+# TODO : some of these methods might move to oocgcm.oceanmodels.nemo.io
+
+#
+#--------------------- Creation of xarray objects ------------------------------
+#
 
 def return_xarray_dataset(filename,chunks=None):
     """Return an xarray dataset corresponding to filename.
@@ -43,3 +52,8 @@ def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
     for kwargs in extra_kwargs:
         dataarray.attrs[kwargs] = extra_kwargs[kwargs]
     return dataarray
+
+
+#
+#--------------------- Creation of netcdf files --------------------------------
+#
