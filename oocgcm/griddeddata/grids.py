@@ -9,7 +9,8 @@ import xarray as xr
 import numpy as np
 
 from ...core.grids import generic_2d_grid
-from ...core.io import return_xarray_dataarray
+from ...core.utils import add_extra_attrs_to_dataarray
+
 
 #==================== Variables holders for NEMO ===============================
 #
@@ -48,9 +49,10 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
         """
         #
         self.variables = {}
+
         if len(latitudes.shape) != len(longitudes.shape):
-            raise Exception('longitudes and latitudes arrays have'
-                            + 'similar dimensions')
+            raise Exception('longitudes and latitudes arrays should have '
+                            + 'identical shapes')
         if len(latitudes.shape) == 1 and len(longitudes.shape) == 1:
             latitudes = np.array(latitudes)
             longitudes = np.array(longitudes)
@@ -59,7 +61,65 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
             latitudes = xr.Dataarray(latitudes,dims=['y','x'])
         if is_numpy(longitudes):
             longitudes = xr.Dataarray(longitudes,dims=['y','x'])
+        if is_numpy(mask):
+            mask = xr.Dataarray(mask,dims=['y','x'])
+
+        self.shape = longitudes.shape
+
+        longitudes = add_extra_attrs_to_dataarray(longitudes,grid_location='t')
+        latitudes = add_extra_attrs_to_dataarray(latitudes,grid_location='t')
         self.variables\
             ["projection_x_coordinate_at_t_location"] = longitudes.chunk(chunks)
         self.variables\
             ["projection_y_coordinate_at_t_location"] = latitudes.chunk(chunks)
+
+        if mask is not None:
+            self.has_mask = True
+            mask = mask.chunk(chunks)
+        else:
+            self.has_mask = False
+            mask = xr.DataArray(np.ones(self.shape,dtype=bool),chunks=chunks)
+        mask = add_extra_attrs_to_dataarray(mask,grid_location='t')
+        self.variables["sea_binary_mask_at_t_location"] = mask
+
+        self._compute_projection_coordinates_at_all_locations()
+        self._compute_horizontal_metrics_at_all_locations()
+        self._compute_masks__at_all_locations()
+
+        def _compute_projection_coordinates_at_all_locations(self):
+            """Compute the projection coordinates at u,v,f location.
+            This includes :
+                - projection_x_coordinate_at_u_location,
+                - projection_y_coordinate_at_u_location,
+                - projection_x_coordinate_at_v_location,
+                - projection_y_coordinate_at_v_location,
+                - projection_x_coordinate_at_t_location,
+                - projection_y_coordinate_at_u_location,
+
+            Not implemented yet.
+
+            """
+            # not sure whether this is needed in generic_2d_grid
+            pass
+
+        def _compute_horizontal_metrics_at_all_locations(self):
+            """Compute the horizontal metric terms (aka scale factors) (m).
+            This includes :
+                - cell_x_size_at_t_location, cell_y_size_at_t_location
+                - cell_x_size_at_u_location, cell_y_size_at_u_location
+                - cell_x_size_at_v_location, cell_y_size_at_v_location
+                - cell_x_size_at_f_location, cell_y_size_at_f_location
+
+            Not implemented yet.
+
+            """
+            pass
+
+        def _compute_masks__at_all_locations(self):
+            """Compute the mask (eg. ocean / land) at u,v,f locations.
+            This includes :
+
+            Not implemented yet.
+                            
+            """
+            pass

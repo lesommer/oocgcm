@@ -15,8 +15,8 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
     """This class create the dictionnary of variables used for creating a
     oocgcm.core.grids.generic_2d_grid from NEMO output files.
     """
-    def __init__(self,nemo_coordinate_file=None,\
-                     nemo_byte_mask_file=None,\
+    def __init__(self,nemo_coordinate_file=None,
+                     nemo_byte_mask_file=None,
                      chunks=None):
         """This holder uses the files meshhgr.nc and byte_mask.nc
 
@@ -43,45 +43,51 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
 
     def _define_projection_coordinate(self):
         self.variables["projection_x_coordinate_at_t_location"] = \
-                        self._get(self.coordinate_file,"nav_lon",\
-                        chunks=self.chunks,grid_location='t')
+                        self._get(self.coordinate_file,"nav_lon",
+                                  chunks=self.chunks,grid_location='t')
         self.variables["projection_y_coordinate_at_t_location"] = \
-                        self._get(self.coordinate_file,"nav_lat",\
-                        chunks=self.chunks,grid_location='t')
+                        self._get(self.coordinate_file,"nav_lat",
+                                  chunks=self.chunks,grid_location='t')                     
 
     def _define_horizontal_metrics(self):
         self.variables["cell_x_size_at_t_location"] = \
-                        self._get(self.coordinate_file,"e1t",\
-                        chunks=self.chunks,grid_location='t')
+                        self._get(self.coordinate_file,"e1t",
+                                  chunks=self.chunks,grid_location='t')
         self.variables["cell_y_size_at_t_location"] = \
-                        self._get(self.coordinate_file,"e2t",\
-                        chunks=self.chunks,grid_location='t')
+                        self._get(self.coordinate_file,"e2t",
+                                  chunks=self.chunks,grid_location='t')
         self.variables["cell_x_size_at_u_location"] = \
-                        self._get(self.coordinate_file,"e1u",\
-                        chunks=self.chunks,grid_location='u')
+                        self._get(self.coordinate_file,"e1u",
+                                  chunks=self.chunks,grid_location='u')
         self.variables["cell_y_size_at_u_location"] = \
-                        self._get(self.coordinate_file,"e2u",\
-                        chunks=self.chunks,grid_location='u')
+                        self._get(self.coordinate_file,"e2u",
+                                  chunks=self.chunks,grid_location='u')
         self.variables["cell_x_size_at_v_location"] = \
-                        self._get(self.coordinate_file,"e1v",\
-                        chunks=self.chunks,grid_location='v')
+                        self._get(self.coordinate_file,"e1v",
+                                  chunks=self.chunks,grid_location='v')
         self.variables["cell_y_size_at_v_location"] = \
-                        self._get(self.coordinate_file,"e2v",\
-                        chunks=self.chunks,grid_location='v')
+                        self._get(self.coordinate_file,"e2v",
+                                  chunks=self.chunks,grid_location='v')
+        self.variables["cell_x_size_at_f_location"] = \
+                        self._get(self.coordinate_file,"e1f",
+                                  chunks=self.chunks,grid_location='f')
+        self.variables["cell_y_size_at_f_location"] = \
+                        self._get(self.coordinate_file,"e2f",
+                                  chunks=self.chunks,grid_location='f')
 
     def _define_masks(self):
         self.variables["sea_binary_mask_at_t_location"] = \
-                      self._get(self.byte_mask_file,"tmask",\
-                      chunks=self.chunks,grid_location='t')[0,0,...]
+                      self._get(self.byte_mask_file,"tmask",
+                                chunks=self.chunks,grid_location='t')[0,0,...]
         self.variables["sea_binary_mask_at_u_location"] = \
-                      self._get(self.byte_mask_file,"umask",\
-                      chunks=self.chunks,grid_location='u')[0,0,...]
+                      self._get(self.byte_mask_file,"umask",
+                                chunks=self.chunks,grid_location='u')[0,0,...]
         self.variables["sea_binary_mask_at_v_location"] = \
-                      self._get(self.byte_mask_file,"vmask",\
-                      chunks=self.chunks,grid_location='v')[0,0,...]
+                      self._get(self.byte_mask_file,"vmask",
+                                chunks=self.chunks,grid_location='v')[0,0,...]
         self.variables["sea_binary_mask_at_f_location"] = \
-                      self._get(self.byte_mask_file,"vmask",\
-                      chunks=self.chunks,grid_location='f')[0,0,...]
+                      self._get(self.byte_mask_file,"vmask",
+                                chunks=self.chunks,grid_location='f')[0,0,...]
 
     def chunk(self,chunks=None):
         """Chunk all the variables.
@@ -98,7 +104,8 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
 
 #================== NEMO grids from generic grids ==============================
 #
-def nemo_2d_grid(nemo_coordinate_file=None,nemo_byte_mask_file=None,\
+def nemo_2d_grid(nemo_coordinate_file=None,
+                 nemo_byte_mask_file=None,
                  chunks=None):
     """Return a generic 2d grid from nemo coordinate and mask files.
 
@@ -116,10 +123,10 @@ def nemo_2d_grid(nemo_coordinate_file=None,nemo_byte_mask_file=None,\
     grid : oocgcm.core.grids.generic_2d_grid
         grid object corresponding to the model configuration.
     """
-    variables = variables_holder_for_2d_grid_from_nemo_ogcm(\
-                     nemo_coordinate_file=nemo_coordinate_file,\
-                     nemo_byte_mask_file=nemo_byte_mask_file,\
+    variables = variables_holder_for_2d_grid_from_nemo_ogcm(
+                     nemo_coordinate_file=nemo_coordinate_file,
+                     nemo_byte_mask_file=nemo_byte_mask_file,
                      chunks=chunks)
-    grid = generic_2d_grid(variables=variables.variables,\
+    grid = generic_2d_grid(variables=variables.variables,
                            parameters= variables.parameters)
     return grid
