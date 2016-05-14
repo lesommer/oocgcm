@@ -11,6 +11,104 @@ import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 from collections import namedtuple # for vector data structures
 
 #
+#==================== Differences and Averages =================================
+#
+def _horizontal_gradient(scalararray):
+    """Return the gradient of a scalararray
+
+    Parameters
+    ----------
+    scalararray : xarray.DataArray
+        xarray that should be differentiated.
+
+    Return
+    ------
+    da_dj,da_di : tuple of xarray.DataArray
+        two arrays of the same shape as scalararray giving the derivative of
+        scalararray with respect to each dimension ('y','x').
+
+    Method
+    ------
+    Wrap numpy.gradient
+
+    Not implemented yet.
+    """
+    pass
+
+def _di(scalararray):
+    """Return the difference scalararray(i+1) - scalararray(i).
+
+    A priori, for internal use only.
+
+    Parameters
+    ----------
+    scalararray : xarray.DataArray
+        xarray that should be differentiated.
+
+    Returns
+    -------
+    di : xarray.DataArray
+       xarray of difference, defined at point i+1/2
+    """
+    di = scalararray.shift(x=-1) - scalararray
+    return di
+
+def _dj(scalararray):
+    """Return the difference scalararray(j+1) - scalararray(j)
+
+    A priori, for internal use only.
+
+    Parameters
+    ----------
+    scalararray : xarray.DataArray
+        xarray that should be differentiated.
+
+    Returns
+    -------
+    dj : xarray.DataArray
+       xarray of difference, defined at point j+1/2
+    """
+    dj = scalararray.shift(y=-1) - scalararray
+    return dj
+
+
+def _mi(scalararray):
+    """Return the average of scalararray(i+1) and scalararray(i)
+
+    A priori, for internal use only.
+
+    Parameters
+    ----------
+    scalararray : xarray.DataArray
+        xarray that should be averaged at i+1/2.
+
+    Returns
+    -------
+    mi : xarray.DataArray
+       averaged xarray, defined at point i+1/2
+    """
+    mi = ( scalararray.shift(x=-1) + scalararray ) / 2.
+    return mi
+
+def _mj(scalararray):
+    """Return the average of scalararray(j+1) and scalararray(j)
+
+    A priori, for internal use only.
+
+    Parameters
+    ----------
+    scalararray : xarray.DataArray
+        xarray that should be averaged at j+1/2.
+
+    Returns
+    -------
+    mi : xarray.DataArray
+       averaged xarray, defined at point j+1/2
+    """
+    mj = (scalararray.shift(y=-1) + scalararray ) / 2.
+    return mj
+
+#
 #==================== Methods for testing xarrays ==============================
 #
 def finalize_dataarray_attributes(xarr,**kwargs):
@@ -615,79 +713,6 @@ class generic_2d_grid:
         """
         pass
 
-#-------------------- Differences and Averages ---------------------------------
-    def _di(self,scalararray):
-        """Return the difference scalararray(i+1) - scalararray(i).
-
-        A priori, for internal use only.
-
-        Parameters
-        ----------
-        scalararray : xarray.DataArray
-            xarray that should be differentiated.
-
-        Returns
-        -------
-        di : xarray.DataArray
-           xarray of difference, defined at point i+1/2
-        """
-        di = scalararray.shift(x=-1) - scalararray
-        return di
-
-    def _dj(self,scalararray):
-        """Return the difference scalararray(j+1) - scalararray(j)
-
-        A priori, for internal use only.
-
-        Parameters
-        ----------
-        scalararray : xarray.DataArray
-            xarray that should be differentiated.
-
-        Returns
-        -------
-        dj : xarray.DataArray
-           xarray of difference, defined at point j+1/2
-        """
-        dj = scalararray.shift(y=-1) - scalararray
-        return dj
-
-
-    def _mi(self,scalararray):
-        """Return the average of scalararray(i+1) and scalararray(i)
-
-        A priori, for internal use only.
-
-        Parameters
-        ----------
-        scalararray : xarray.DataArray
-            xarray that should be averaged at i+1/2.
-
-        Returns
-        -------
-        mi : xarray.DataArray
-           averaged xarray, defined at point i+1/2
-        """
-        mi = ( scalararray.shift(x=-1) - scalararray ) / 2.
-        return mi
-
-    def _mj(self,scalararray):
-        """Return the average of scalararray(j+1) and scalararray(j)
-
-        A priori, for internal use only.
-
-        Parameters
-        ----------
-        scalararray : xarray.DataArray
-            xarray that should be averaged at j+1/2.
-
-        Returns
-        -------
-        mi : xarray.DataArray
-           averaged xarray, defined at point j+1/2
-        """
-        mj = (scalararray.shift(y=-1) - scalararray ) / 2.
-        return mj
 
 #-------------------- Differential Operators------------------------------------
     def horizontal_gradient(self,scalararray):
@@ -708,8 +733,8 @@ class generic_2d_grid:
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
         # define
-        gx = self._di(scalararray) / self._array_e1u
-        gy = self._dj(scalararray) / self._array_e2v
+        gx = _di(scalararray) / self._array_e1u
+        gy = _dj(scalararray) / self._array_e2v
         # finalize attributes
         gxatts = convert_dataarray_attributes_xderivative(scalararray.attrs,\
                                                           grid_location='u')
@@ -740,13 +765,13 @@ class generic_2d_grid:
             xarray of laplacian defined at grid_location='t'
         """
         # check
-        check_input_array(q,\
+        check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
         # define
-        lap = self.horizontal_divergence(self.horizontal_gradient(q))
+        lap = self.horizontal_divergence(self.horizontal_gradient(scalararray))
         # finalize
-        lapatts = \
-            convert_dataarray_attributes_laplacian(q.attrs,grid_location='t')
+        lapatts = convert_dataarray_attributes_laplacian(scalararray.attrs,
+                                                         grid_location='t')
         lap = finalize_dataarray_attributes(lap,**lapatts)
         return lap
 
@@ -785,8 +810,8 @@ class generic_2d_grid:
         check_input_array(vectorfield.y_component,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
         # define
-        div  = self._di( vectorfield.x_component / self._array_e2u)
-        div += self._dj( vectorfield.y_component / self._array_e1v)
+        div  = _di( vectorfield.x_component / self._array_e2u)
+        div += _dj( vectorfield.y_component / self._array_e1v)
         div /= self._array_e1t * self._array_e2t
         # finalize
         divatts = convert_dataarray_attributes_divergence(\
