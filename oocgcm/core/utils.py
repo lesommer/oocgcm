@@ -98,11 +98,11 @@ def map_apply(func,scalararray):
     scalararray : xarray.DataArray
 
     Returns
-    ------
+    -------
     out : xarray.DataArray
 
     Methods
-    ------
+    -------
     uses dask map_block
     """
     data = scalararray.data

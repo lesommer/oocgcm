@@ -42,9 +42,9 @@ def _compute_e1e2_from_latlon(latitudes,longitudes):
     dlon_dj,dlon_di = _horizontal_gradient(longitudes)
     # Compute the approximate size of the cells in x and y direction
     e1 = earthrad * deg2rad \
-          * sqrt(( dlat_di * cos( deg2rad * longitudes ) )**2. + dlon_di**2.)
+          * sqrt(( dlon_di * cos( deg2rad * latitudes ) )**2. + dlat_di**2.)
     e2 = earthrad * deg2rad \
-          * sqrt(( dlat_dj * cos( deg2rad * longitudes ) )**2. + dlon_dj**2.)
+          * sqrt(( dlon_dj * cos( deg2rad * latitudes ) )**2. + dlat_dj**2.)
     return e1,e2
 
 
