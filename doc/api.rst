@@ -13,8 +13,8 @@ Parameters
 .. autosummary::
    :toctree: generated/
 
-   parameters.physicalparameters
-   parameters.mathematicalparameters
+   parameters.physicalparameters.coriolis_parameter
+   parameters.physicalparameters.beta_parameter   
 
 Core utilities
 ==============

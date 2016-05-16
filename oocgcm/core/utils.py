@@ -6,8 +6,14 @@ Define various generic utilities tools to be used in several submodules.
 """
 import numpy as np
 import xarray as xr
+from xarray.ufuncs import cos, sin
 import dask.array as da
 
+
+
+#
+#=================== Working with array types ==================================
+#
 
 def add_extra_attrs_to_dataarray(xarr,**extra_kwargs):
     """Update the dictionnary of attributes a xarray dataarray (xarr.attrs).
@@ -95,6 +101,9 @@ def map_apply(func,scalararray):
 
     Parameters
     ----------
+    func : function
+        Any function that works on numpy arrays such that input and output
+        arrays have the same shape.
     scalararray : xarray.DataArray
 
     Returns
@@ -103,7 +112,7 @@ def map_apply(func,scalararray):
 
     Methods
     -------
-    uses dask map_block
+    uses dask map_block without ghost cells (map_overlap)
     """
     data = scalararray.data
     coords = scalararray.coords
