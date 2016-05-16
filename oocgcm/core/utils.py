@@ -23,7 +23,7 @@ def add_extra_attrs_to_dataarray(xarr,**extra_kwargs):
     ------
     da : xarray.DataArray
     """
-    if not(is_xarray(array)):
+    if not(is_xarray(xarr)):
         raise TypeError('except a xarray.DataArray')
     for kwargs in extra_kwargs:
         xarr.attrs[kwargs] = extra_kwargs[kwargs]

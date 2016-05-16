@@ -12,7 +12,7 @@ import dask.array as da
 import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
 
-from .core.utils import is_numpy,has_chunks
+from .utils import is_numpy,has_chunks
 
 #
 #==================== Differences and Averages =================================
