@@ -47,7 +47,7 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
                                   chunks=self.chunks,grid_location='t')
         self.variables["projection_y_coordinate_at_t_location"] = \
                         self._get(self.coordinate_file,"nav_lat",
-                                  chunks=self.chunks,grid_location='t')                     
+                                  chunks=self.chunks,grid_location='t')
 
     def _define_horizontal_metrics(self):
         self.variables["cell_x_size_at_t_location"] = \

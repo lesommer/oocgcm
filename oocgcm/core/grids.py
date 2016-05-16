@@ -12,7 +12,7 @@ import dask.array as da
 import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
 
-from .core.utils import is_numpy
+from .core.utils import is_numpy,has_chunks
 
 #
 #==================== Differences and Averages =================================
@@ -36,15 +36,19 @@ def _horizontal_gradient(scalararray):
     ------
     Wrap numpy.gradient
 
-    Caution : Not fully functional yet : problem with boundary values
-    TODO : solve the problem with boundary values.
+    Caution
+    -------
+    Not fully functional yet : problem with boundary values
+    see https://github.com/lesommer/oocgcm/issues/21
     """
+    # TODO : solve https://github.com/lesommer/oocgcm/issues/21
     data = scalararray.data
     coords = scalararray.coords
     dims = scalararray.dims
+    chunks = scalararray.chunks
     if is_numpy(data):
-        gy,gx = np.gradient(scalararray)
-    else: # if data is a dask array
+        gy,gx = np.gradient(data)
+    else:
         x_derivative = lambda arr:np.gradient(arr,axis=-1)
         y_derivative = lambda arr:np.gradient(arr,axis=-2)
         gx = data.map_overlap(x_derivative,depth=(0,1),boundary={1: np.nan})
