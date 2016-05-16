@@ -47,8 +47,8 @@ def _horizontal_gradient(scalararray):
     else: # if data is a dask array
         x_derivative = lambda arr:np.gradient(arr,axis=-1)
         y_derivative = lambda arr:np.gradient(arr,axis=-2)
-        gx = da_f.map_overlap(x_derivative,depth=(0,1),boundary={1: np.nan})
-        gy = da_f.map_overlap(y_derivative,depth=(1,0),boundary={0: np.nan})
+        gx = data.map_overlap(x_derivative,depth=(0,1),boundary={1: np.nan})
+        gy = data.map_overlap(y_derivative,depth=(1,0),boundary={0: np.nan})
     da_di = xr.DataArray(gx,coords,dims)
     da_dj = xr.DataArray(gy,coords,dims)
     return da_dj,da_di
