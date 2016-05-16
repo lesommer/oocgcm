@@ -19,7 +19,7 @@ from ...parameters.mathematicalparameters import deg2rad
 #
 
 def _compute_e1e2_from_latlon(latitudes,longitudes):
-    """Compute and return horizontal scale factors from lat, lon arrays.
+    """Return horizontal scale factors computed from lat, lon arrays.
 
         Parameters
         ----------
@@ -33,11 +33,11 @@ def _compute_e1e2_from_latlon(latitudes,longitudes):
         Return
         ------
         e1 : xarray dataarray
-            Array of gird cell with corresponding to  cell_x_size_at_*_location
+            Array of grid cell width corresponding to cell_x_size_at_*_location
         e2 : xarray dataarray
-            Array of gird cell with corresponding to  cell_y_size_at_*_location
+            Array of grid cell width corresponding to cell_y_size_at_*_location
     """
-    # Compute the centered first order derivatives of latitudes and longitudes
+    # Compute the centered first order derivatives of lat/lon arrays
     dlat_dj,dlat_di = _horizontal_gradient(latitudes)
     dlon_dj,dlon_di = _horizontal_gradient(longitudes)
     # Compute the approximate size of the cells in x and y direction
@@ -78,7 +78,7 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
 
         if len(latitudes.shape) != len(longitudes.shape):
             raise Exception('longitudes and latitudes arrays should have '
-                            + 'identical shapes')
+                            + 'the same number of dimensions')
         if len(latitudes.shape) == 1 and len(longitudes.shape) == 1:
             latitudes = np.array(latitudes)
             longitudes = np.array(longitudes)

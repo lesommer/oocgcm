@@ -4,11 +4,15 @@
 Define classes that give acces to grid metrics and differential operators.
 
 """
+from collections import namedtuple # for vector data structures
+
 import numpy as np
 import xarray as xr
+import dask.array as da
 import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
-from collections import namedtuple # for vector data structures
+
+from .core.utils import is_numpy
 
 #
 #==================== Differences and Averages =================================
@@ -19,7 +23,8 @@ def _horizontal_gradient(scalararray):
     Parameters
     ----------
     scalararray : xarray.DataArray
-        xarray that should be differentiated.
+        xarray that should be differentiated. So far scalararray should be 2d
+        with dimensions ('y','x').
 
     Return
     ------
@@ -31,9 +36,22 @@ def _horizontal_gradient(scalararray):
     ------
     Wrap numpy.gradient
 
-    Not implemented yet.
+    Caution : Not fully functional yet : problem with boundary values
+    TODO : solve the problem with boundary values.
     """
-    pass
+    data = scalararray.data
+    coords = scalararray.coords
+    dims = scalararray.dims
+    if is_numpy(data):
+        gy,gx = np.gradient(scalararray)
+    else: # if data is a dask array
+        x_derivative = lambda arr:np.gradient(arr,axis=-1)
+        y_derivative = lambda arr:np.gradient(arr,axis=-2)
+        gx = da_f.map_overlap(x_derivative,depth=(0,1),boundary={1: np.nan})
+        gy = da_f.map_overlap(y_derivative,depth=(1,0),boundary={0: np.nan})
+    da_di = xr.DataArray(gx,coords,dims)
+    da_dj = xr.DataArray(gy,coords,dims)
+    return da_dj,da_di
 
 def _di(scalararray):
     """Return the difference scalararray(i+1) - scalararray(i).
