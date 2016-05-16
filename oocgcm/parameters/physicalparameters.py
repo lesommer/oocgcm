@@ -31,7 +31,7 @@ def coriolis_parameter(latitudes):
         sin = np.sin
     elif is_xarray(latitudes):
         sin = xu.sin
-    corio = 2. * omega * math.sin(latitudes * deg2rad)
+    corio = 2. * omega * sin(latitudes * deg2rad)
     return corio
 
 def beta_parameter(latitudes):
