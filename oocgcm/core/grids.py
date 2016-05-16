@@ -133,7 +133,7 @@ def _mj(scalararray):
 #
 #==================== Methods for testing xarrays ==============================
 #
-def finalize_dataarray_attributes(xarr,**kwargs):
+def _finalize_dataarray_attributes(xarr,**kwargs):
     """Update the dictionary of attibutes of a xarray dataarray.
 
     Parameters
@@ -763,8 +763,8 @@ class generic_2d_grid:
         gyatts = convert_dataarray_attributes_yderivative(scalararray.attrs,\
                                                           grid_location='v')
         #
-        gx = finalize_dataarray_attributes(gx,**gxatts)
-        gy = finalize_dataarray_attributes(gy,**gyatts)
+        gx = _finalize_dataarray_attributes(gx,**gxatts)
+        gy = _finalize_dataarray_attributes(gy,**gyatts)
         #
         return VectorField2d(gx,gy,\
                              x_component_grid_location = 'u',\
@@ -794,7 +794,7 @@ class generic_2d_grid:
         # finalize
         lapatts = convert_dataarray_attributes_laplacian(scalararray.attrs,
                                                          grid_location='t')
-        lap = finalize_dataarray_attributes(lap,**lapatts)
+        lap = _finalize_dataarray_attributes(lap,**lapatts)
         return lap
 
     def vertical_component_of_curl(self,vectorfield):
@@ -838,7 +838,7 @@ class generic_2d_grid:
         # finalize
         divatts = convert_dataarray_attributes_divergence(\
                     vectorfield.x_component.attrs,vectorfield.y_component.attrs)
-        div = finalize_dataarray_attributes(div,**divatts)
+        div = _finalize_dataarray_attributes(div,**divatts)
         return div
 
 #

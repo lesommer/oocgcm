@@ -90,7 +90,7 @@ def has_chunks(array):
     else:
         return False
 
-def map_function(func,scalararray):
+def map_apply(func,scalararray):
     """Return a xarray dataarray with value func(scalararray.data)
 
     Parameters

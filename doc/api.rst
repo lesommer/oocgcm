@@ -16,8 +16,8 @@ Parameters
    parameters.physicalparameters
    parameters.mathematicalparameters
 
-Generic utilities
-=================
+Core utilities
+==============
 
 Grid-related data structures
 ----------------------------
@@ -38,8 +38,32 @@ I/O tools
    core.io.return_xarray_dataset
    core.io.return_xarray_dataarray
 
-NEMO-specific utilities
-================
+Other utilities
+---------------
+.. autosummary::
+   :toctree: generated/
+
+   core.utils.add_extra_attrs_to_dataarray
+   core.utils.is_numpy
+   core.utils.is_xarray
+   core.utils.is_daskarray
+   core.utils.has_chunks
+   core.utils.map_apply
+
+Tools for gridded data
+======================
+
+Grid-related data structures
+----------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   griddeddata.grids.variables_holder_for_2d_grid_from_latlon_arrays
+   griddeddata.grids.latlon_2d_grid
+
+Tools for NEMO ocean model
+==========================
 
 Grid-related data structures
 ----------------------------
