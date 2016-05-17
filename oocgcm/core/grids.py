@@ -13,6 +13,7 @@ import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
 
 from .utils import is_numpy,has_chunks,add_extra_attrs_to_dataarray
+from ..parameters.physicalparameters import coriolis_parameter, grav
 
 #
 #==================== Differences and Averages =================================
@@ -587,6 +588,8 @@ class generic_2d_grid:
         self.dims   = self.arrays["sea_binary_mask_at_t_location"].dims
         self.ndims = len(self.dims)
         self._define_area_of_grid_cells()
+        self._define_extra_projection_coordinates_if_required()
+        self._define_coriolis_parameter()
 
 #--------------------- Extra xarrays for the grid ------------------------------
 
@@ -595,10 +598,56 @@ class generic_2d_grid:
 
         This is only a definition, the computation is performed only if used.
         """
-        for gloc in ['t','u','v','f']
-        self.arrays["cell_area_at_" + gloc + "_location"] = \
-                  self.arrays["cell_x_size_at_" + gloc + "_location"] \
-                * self.arrays["cell_y_size_at_" + gloc + "_location"]
+        for gloc in ['t','u','v','f']:
+            self.arrays["cell_area_at_" + gloc + "_location"] = \
+                    self.arrays["cell_x_size_at_" + gloc + "_location"] \
+                  * self.arrays["cell_y_size_at_" + gloc + "_location"]
+
+    def _define_extra_projection_coordinates_if_required(self):
+        """Define projection coordinates at u,v,f grid_location if needed.
+
+        This is only a definition, the computation is performed only if used.
+        """
+        # projection_coordinates_at_u_location
+        xcoordname = "projection_x_coordinate_at_u_location"
+        ycoordname = "projection_y_coordinate_at_u_location"
+        if not(self.arrays.has_key(xcoordname)):
+            self.arrays[xcoordname] = _mi(
+                        self.arrays["projection_x_coordinate_at_t_location"])
+        if not(self.arrays.has_key(ycoordname)):
+            self.arrays[ycoordname] = _mi(
+                        self.arrays["projection_y_coordinate_at_t_location"])
+
+        # projection_coordinates_at_v_location
+        xcoordname = "projection_x_coordinate_at_v_location"
+        ycoordname = "projection_y_coordinate_at_v_location"
+        if not(self.arrays.has_key(xcoordname)):
+            self.arrays[xcoordname] = _mj(
+                        self.arrays["projection_x_coordinate_at_t_location"])
+        if not(self.arrays.has_key(ycoordname)):
+            self.arrays[ycoordname] = _mj(
+                        self.arrays["projection_y_coordinate_at_t_location"])
+
+        # projection_coordinates_at_f_location
+        xcoordname = "projection_x_coordinate_at_f_location"
+        ycoordname = "projection_y_coordinate_at_f_location"
+        if not(self.arrays.has_key(xcoordname)):
+            self.arrays[xcoordname] = _mj(
+                        self.arrays["projection_x_coordinate_at_u_location"])
+        if not(self.arrays.has_key(ycoordname)):
+            self.arrays[ycoordname] = _mj(
+                        self.arrays["projection_y_coordinate_at_u_location"])
+
+
+    def _define_coriolis_parameter(self):
+        """Define arrays of coriolis parameter at t,u,v,f grid_location.
+
+        This is only a definition, the computation is performed only if used.
+        """
+        for gloc in ['t','u','v','f']:
+            corname = "coriolis_parameter_at_" + gloc + "_location"
+            latname = "projection_y_coordinate_at_" + gloc + "_location"
+            self.arrays[corname] = coriolis_parameter(self.arrays[latname])
 
 
 #--------------------- Aliases for DataArrays ----------------------------------
@@ -689,6 +738,7 @@ class generic_2d_grid:
             if weights_out is None:
                 weights_out = average(weights_in)
             out = average(scalararray * weights_in) / weights_out
+        return out
 
     def _to_western_grid_location(self,scalararray,
                                   weights_in=None,weights_out=None):
@@ -701,6 +751,7 @@ class generic_2d_grid:
             if weights_out is None:
                 weights_out = average(weights_in)
             out = average(scalararray * weights_in) / weights_out
+        return out
 
     def _to_northern_grid_location(self,scalararray,
                                   weights_in=None,weights_out=None):
@@ -713,6 +764,7 @@ class generic_2d_grid:
             if weights_out is None:
                 weights_out = average(weights_in)
             out = average(scalararray * weights_in) / weights_out
+        return out
 
     def _to_southern_grid_location(self,scalararray,
                                   weights_in=None,weights_out=None):
@@ -725,26 +777,28 @@ class generic_2d_grid:
             if weights_out is None:
                 weights_out = average(weights_in)
             out = average(scalararray * weights_in) / weights_out
+        return out
 
 #- User swapping utilities
-    def _weights_for_change_grid_location(from=None,to=None,conserving=None):
+    def _weights_for_change_grid_location(self,input=None,output=None,
+                                          conserving=None):
         """Return the weights for changing grid location.
 
         This function is used internally for change_grid_location_*_to_*
         """
         if conserving is 'area':
-            weights_in  = self.arrays["cell_area_at_" + from + "_location"]
-            weights_out = self.arrays["cell_area_at_" + to   + "_location"]
+            weights_in  = self.arrays["cell_area_at_" + input  + "_location"]
+            weights_out = self.arrays["cell_area_at_" + output + "_location"]
         elif conserving is 'x_flux':
-            weights_in  = self.arrays["cell_y_size_at_" + from + "_location"]
-            weights_out = self.arrays["cell_y_size_at_" + to   + "_location"]
+            weights_in  = self.arrays["cell_y_size_at_" + input  + "_location"]
+            weights_out = self.arrays["cell_y_size_at_" + output + "_location"]
         elif conserving is 'y_flux':
-            weights_in  = self.arrays["cell_x_size_at_" + from + "_location"]
-            weights_out = self.arrays["cell_x_size_at_" + to   + "_location"]
+            weights_in  = self.arrays["cell_x_size_at_" + input  + "_location"]
+            weights_out = self.arrays["cell_x_size_at_" + output + "_location"]
 
         return weights_in, weights_out
 
-    def change_grid_location_t_to_u(scalararray,conserving='area'):
+    def change_grid_location_t_to_u(self,scalararray,conserving='area'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
 
@@ -758,13 +812,15 @@ class generic_2d_grid:
              - 'x_flux' : conserves the flux in x-direction (eastward)
              - 'y_flux' : conserves the flux in y-direction (northward)
         """
-        wi, wo = self._weights_for_change_grid_location(from='t',to='u'
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        wi, wo = self._weights_for_change_grid_location(input='t',output='u',
                                                         conserving=conserving)
-        out = self._to_eastern_grid_location(scalararray,weights_in=wi
+        out = self._to_eastern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return add_extra_attrs_to_dataarray(out,grid_location='u')
 
-    def change_grid_location_u_to_t(scalararray,conserving='x_flux'):
+    def change_grid_location_u_to_t(self,scalararray,conserving='x_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
 
@@ -778,13 +834,15 @@ class generic_2d_grid:
              - 'x_flux' : conserves the flux in x-direction (eastward)
              - 'y_flux' : conserves the flux in y-direction (northward)
         """
-        wi, wo = self._weights_for_change_grid_location(from='u',to='t'
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        wi, wo = self._weights_for_change_grid_location(input='u',output='t',
                                                         conserving=conserving)
-        out = self._to_western_grid_location(scalararray,weights_in=wi
+        out = self._to_western_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return add_extra_attrs_to_dataarray(out,grid_location='t')
 
-    def change_grid_location_t_to_v(scalararray,conserving='area'):
+    def change_grid_location_t_to_v(self,scalararray,conserving='area'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
 
@@ -798,13 +856,15 @@ class generic_2d_grid:
              - 'x_flux' : conserves the flux in x-direction (eastward)
              - 'y_flux' : conserves the flux in y-direction (northward)
         """
-        wi, wo = self._weights_for_change_grid_location(from='t',to='v'
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        wi, wo = self._weights_for_change_grid_location(input='t',output='v',
                                                         conserving=conserving)
-        out = self._to_nortern_grid_location(scalararray,weights_in=wi
+        out = self._to_northern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return add_extra_attrs_to_dataarray(out,grid_location='v')
 
-    def change_grid_location_v_to_t(scalararray,conserving='y_flux'):
+    def change_grid_location_v_to_t(self,scalararray,conserving='y_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
 
@@ -818,17 +878,63 @@ class generic_2d_grid:
              - 'x_flux' : conserves the flux in x-direction (eastward)
              - 'y_flux' : conserves the flux in y-direction (northward)
         """
-        wi, wo = self._weights_for_change_grid_location(from='v',to='t'
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+        wi, wo = self._weights_for_change_grid_location(input='v',output='t',
                                                         conserving=conserving)
-        out = self._to_southern_grid_location(scalararray,weights_in=wi
+        out = self._to_southern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return add_extra_attrs_to_dataarray(out,grid_location='t')
+
+    def change_grid_location_v_to_u(self,scalararray,conserving='area'):
+        """Return a xarray corresponding to scalararray averaged at a new
+        grid location.
+
+        Parameters
+        ----------
+        scalararray : xarray.DataArray
+            original array to be relocated
+        conserving : str
+            any of 'area', 'x_flux' or 'y_flux'.
+             - 'area' : conserves the area
+             - 'x_flux' : conserves the flux in x-direction (eastward)
+             - 'y_flux' : conserves the flux in y-direction (northward)
+        """
+        # first move to t-point
+        newarr = self.change_grid_location_v_to_t(scalararray,
+                                                  conserving=conserving)
+        # then move t v-point
+        out = self.change_grid_location_t_to_u(newarr,
+                                                  conserving=conserving)
+        return out
+
+    def change_grid_location_u_to_v(self,scalararray,conserving='area'):
+        """Return a xarray corresponding to scalararray averaged at a new
+        grid location.
+
+        Parameters
+        ----------
+        scalararray : xarray.DataArray
+            original array to be relocated
+        conserving : str
+            any of 'area', 'x_flux' or 'y_flux'.
+             - 'area' : conserves the area
+             - 'x_flux' : conserves the flux in x-direction (eastward)
+             - 'y_flux' : conserves the flux in y-direction (northward)
+        """
+        # first move to t-point
+        newarr = self.change_grid_location_u_to_t(scalararray,
+                                                  conserving=conserving)
+        # then move t v-point
+        out = self.change_grid_location_t_to_v(newarr,
+                                                  conserving=conserving)
+        return out
 
 #---------------------------- Vector Operators ---------------------------------
     def norm_of_vectorfield(self,vectorfield):
         """Return the norm of a vector field, at t-point.
 
-        Not implemented yet.
+        So far, only available for vector fields at u,v grid_location
 
         Parameters
         ----------
@@ -845,7 +951,7 @@ class generic_2d_grid:
     def scalar_product(self,vectorfield1,vectorfield2):
         """Return the scalar product of two vector fields, at t-point.
 
-        Not implemented yet.
+        So far, only available for vector fields at u,v grid_location
 
         Parameters
         ----------
@@ -856,7 +962,24 @@ class generic_2d_grid:
         ------
         scalararray : xarray.DataArray
         """
-        pass
+        check_input_array(vectorfield1.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield1.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+        check_input_array(vectorfield2.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield2.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+
+        x_component_u = vectorfield1.x_component * vectorfield2.x_component
+        y_component_v = vectorfield1.y_component * vectorfield2.y_component
+
+        x_component_t = self.change_grid_location_u_to_t(x_component_u,
+                                                    conserving='area')
+        y_component_t = self.change_grid_location_v_to_t(y_component_v,
+                                                    conserving='area')
+        out = x_component_t + y_component_t
+        return out
 
     def scalar_outer_product(self,scalararray,vectorfield):
         """Return the outer product of a scalar with a vector field, at t-point.
@@ -1001,7 +1124,7 @@ class generic_2d_grid:
 #
 #   TODO : could move to a subclass if oocgcm is used for atmospheric models
 
-    def geostrophic_current_from_sea_surface_height(self,ssh):
+    def geostrophic_current_from_sea_surface_height(self,sea_surface_height):
         """Return the geostrophic current on u,v-grids.
 
         Not implemented yet.
@@ -1016,4 +1139,17 @@ class generic_2d_grid:
         vectorfield : VectorField2d namedtuple
            Two-dimensional vector field of geostrophic currents at u,v-points.
         """
-        pass
+        check_input_array(sea_surface_height,\
+                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        gssh = self.horizontal_gradient(sea_surface_height)
+
+        vg = grav \
+           * self.change_grid_location_u_to_v(gssh.x_component) \
+           / self.arrays["coriolis_parameter_at_v_location"]
+        ug = - grav \
+           * self.change_grid_location_v_to_u(gssh.y_component) \
+           / self.arrays["coriolis_parameter_at_u_location"]
+
+        return VectorField2d(ug,vg,\
+                             x_component_grid_location = 'u',\
+                             y_component_grid_location = 'v')

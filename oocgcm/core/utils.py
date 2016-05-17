@@ -6,11 +6,27 @@ Define various generic utilities tools to be used in several submodules.
 """
 import numpy as np
 import xarray as xr
-from xarray.ufuncs import cos, sin
 import dask.array as da
 
+#
+#=========================== General purpose ==================================
+#
 
+class _SliceGetter(object):
+    """Class that returns the slice that is passed to __getitem__.
 
+    Example
+    -------
+    >>getslice = SliceGetter()
+    >>getslice[100:150,300:340]
+    """
+    def __init__(self):
+        pass
+
+    def __getitem__(self, index):
+        return index
+
+returnslice = _SliceGetter()
 #
 #=================== Working with array types ==================================
 #
@@ -67,7 +83,6 @@ def is_xarray(array):
 
 def is_daskarray(array):
     """Return True if array is a dask array
-
 
     Parameters
     ----------
