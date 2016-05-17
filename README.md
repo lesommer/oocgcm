@@ -33,8 +33,8 @@ Ideas, comments and contributions are welcome !!
 
 #### Related projects
 
-oocgcm project builds upon experience with previous projects including :
- - [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom) and
+oocgcm project builds upon past experience with previous projects including :
+ - [PyDom](http://servforge.legi.grenoble-inp.fr/projects/PyDom)
  - [pycomodo](http://pycomodo.forge.imag.fr/).
  - [pyclim](http://servforge.legi.grenoble-inp.fr/projects/soft-pyclim)
 
@@ -46,9 +46,11 @@ atmopshere/ocean/climate community. This include in particular:
  - [MPAS xarray wrapper](https://github.com/pwolfram/mpas_xarray_wrapper)
  - [infinite-diff](https://github.com/spencerahill/infinite-diff/)
  - [windspharm](https://github.com/ajdawson/windspharm)
+ - ...
 
 More can be found on related projects on this discussion thread on
 [xarray forum](https://groups.google.com/forum/#!topic/xarray/pv1d3txTLEw).
+
 #### License
 
 Copyright 2016, oocgcm Developers
