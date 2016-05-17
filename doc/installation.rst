@@ -20,7 +20,7 @@ Installing oocgcm developpers version
 -------------------------------------
 
 The project is still in pre-alpha phase, the only way to install oocgcm is
-therefore to clone the repository on github : 
+therefore to clone the repository on github:: 
 
     $ git clone https://github.com/lesommer/oocgcm.git
     $ cd oocgcm
