@@ -1295,7 +1295,7 @@ class generic_2d_grid:
                              x_component_grid_location = 'u',\
                              y_component_grid_location = 'v')
 
-    def q_vector_due_to_kinematic_deformation(self,velocityfield,buoyancy):
+    def q_vector_due_to_kinematic_deformation(self,velocity,buoyancy):
         """Return the component of the generalized Q-vector associated
         with kinematic deformation of a two-dimensional velocity field.
 
@@ -1313,7 +1313,7 @@ class generic_2d_grid:
 
         Parameters
         ----------
-        velocityfield : VectorField2d
+        velocity : VectorField2d
             namedtuple of horisontal velocity at u,v grid locations
         buoyancy : xarray.DataArray
             xarray of buoyancy  at grid_location='t'
@@ -1324,7 +1324,7 @@ class generic_2d_grid:
            Two-dimensional vector field of $Q_{kd}$ at u,v-points.
         """
         gradhb = self.horizontal_gradient(buoyancy)  # at u,v location
-        gradvel = self.horizontal_gradient(velocityfield) # at t,f locations
+        gradvel = self.horizontal_gradient(velocity) # at t,f locations
 
         # use readable notations
         dxb = gradhb.x_component
@@ -1340,3 +1340,30 @@ class generic_2d_grid:
         return VectorField2d(qxcomp,qycomp,\
                              x_component_grid_location = 'u',\
                              y_component_grid_location = 'v')
+
+    def frontogenesis_function(self,velocity,buoyancy):
+        """Return the component of the generalized Q-vector associated
+        with kinematic deformation of a two-dimensional velocity field.
+
+        Namely,
+        $$F_s = \mathbf{Q}_{kd} \cdot \nabla_h b$$
+
+        see Hoskins and Bretherthon 1972.
+
+        Parameters
+        ----------
+        velocityfield : VectorField2d
+            namedtuple of horisontal velocity at u,v grid locations
+        buoyancy : xarray.DataArray
+            xarray of buoyancy  at grid_location='t'
+
+        Returns
+        -------
+        result : xarray.DataArray
+           Frontogenesis fcuntion at at t location.
+        """
+        # TODO : avoid duplication of computation of gradhb
+        Qkd = self.q_vector_due_to_kinematic_deformation(velocity,buoyancy)
+        gradhb = self.horizontal_gradient(buoyancy)  # at u,v location
+        Fs = self.scalar_product(Qkd,gradhb)
+        return Fs
