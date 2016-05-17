@@ -12,7 +12,7 @@ import dask.array as da
 import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
 
-from .utils import is_numpy,has_chunks,add_extra_attrs_to_dataarray
+from .utils import is_numpy,is_xarray,has_chunks,add_extra_attrs_to_dataarray
 from ..parameters.physicalparameters import coriolis_parameter, grav
 
 #
@@ -886,6 +886,50 @@ class generic_2d_grid:
                                                          weights_out=wo)
         return add_extra_attrs_to_dataarray(out,grid_location='t')
 
+    def change_grid_location_f_to_u(self,scalararray,conserving='x_flux'):
+        """Return a xarray corresponding to scalararray averaged at a new
+        grid location.
+
+        Parameters
+        ----------
+        scalararray : xarray.DataArray
+            original array to be relocated
+        conserving : str
+            any of 'area', 'x_flux' or 'y_flux'.
+             - 'area' : conserves the area
+             - 'x_flux' : conserves the flux in x-direction (eastward)
+             - 'y_flux' : conserves the flux in y-direction (northward)
+        """
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='f',ndims=self.ndims)
+        wi, wo = self._weights_for_change_grid_location(input='f',output='u',
+                                                        conserving=conserving)
+        out = self._to_southern_grid_location(scalararray,weights_in=wi,
+                                                         weights_out=wo)
+        return add_extra_attrs_to_dataarray(out,grid_location='u')
+
+    def change_grid_location_f_to_v(self,scalararray,conserving='y_flux'):
+        """Return a xarray corresponding to scalararray averaged at a new
+        grid location.
+
+        Parameters
+        ----------
+        scalararray : xarray.DataArray
+            original array to be relocated
+        conserving : str
+            any of 'area', 'x_flux' or 'y_flux'.
+             - 'area' : conserves the area
+             - 'x_flux' : conserves the flux in x-direction (eastward)
+             - 'y_flux' : conserves the flux in y-direction (northward)
+        """
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='f',ndims=self.ndims)
+        wi, wo = self._weights_for_change_grid_location(input='f',output='v',
+                                                        conserving=conserving)
+        out = self._to_southern_grid_location(scalararray,weights_in=wi,
+                                                         weights_out=wo)
+        return add_extra_attrs_to_dataarray(out,grid_location='v')
+
     def change_grid_location_v_to_u(self,scalararray,conserving='area'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
@@ -1015,19 +1059,49 @@ class generic_2d_grid:
 
 
 #-------------------- Differential Operators------------------------------------
-    def horizontal_gradient(self,scalararray):
+
+    def horizontal_gradient(self,datastructure):
+        """
+        Return the horizontal gradient of the input datastructure.
+
+        Parameters
+        ----------
+        datastructure : xarray.DataArray or VectorField2d
+
+        Return
+        ------
+        result : VectorField2d or Tensor2d
+
+        Methods
+        -------
+        calls horizontal_gradient_vector or horizontal_gradient_tensor depending
+        on th type of the input datastructure.
+
+        See also:
+        --------
+        self.horizontal_gradient_vector,  self.horizontal_gradient_tensor
+
+        """
+        if is_xarray(datastructure):
+            return self.horizontal_gradient_vector(datastructure)
+        elif isinstance(datastructure,tuple):
+            return self.horizontal_gradient_tensor(datastructure)
+        else:
+            raise Exception('unrecognized type of datastructure')
+
+    def horizontal_gradient_vector(self,scalararray):
         """
         Return the horizontal gradient of a scalar field defined at t-points.
 
         Parameters
         ----------
         scalararray : xarray.DataArray
-            xarray of a variable at grid_location='t'
+            xarray of a scalar variable at grid_location='t'
 
         Return
         ------
         vectorfield : VectorField2d namedtuple
-            x and y component of the horizontal gradient at u,u-points
+            x and y component of the horizontal gradient at u,v-points
         """
         # check
         check_input_array(scalararray,\
@@ -1047,6 +1121,75 @@ class generic_2d_grid:
         return VectorField2d(gx,gy,\
                              x_component_grid_location = 'u',\
                              y_component_grid_location = 'v')
+
+    def horizontal_gradient_tensor(self,vectorfield):
+        """
+        Return the horizontal gradient tensor of a two-dimensional vector
+        field at u,v locations.
+
+        Namely, with $\mathbf{u} = (u,v)$
+        $$
+        \nabla \mathbf{u} =
+        \begin{pmatrix}
+        \partial_x u & \partial_y u \\
+        \partial_y v &  \partial_y v
+        \end{pmatrix}
+        $$
+
+        $ \partial_x u $ is defined at t grid location.
+        $ \partial_y u $ is defined at f grid location.
+        $ \partial_x v $ is defined at f grid location.
+        $ \partial_y v $ is defined at t grid location.
+
+
+        Parameters
+        ----------
+        vectorfield : VectorField2d
+            namedtuple of a vector field defined at u,v points
+
+        Return
+        ------
+        gradtensor : Tensor2d
+            namedtuple holding the component of the horizontal gradient of
+            the vector field at at t and f points.
+        """
+        # check
+        check_input_array(vectorfield.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+        # define
+        axx = _di(vectorfield.x_component).shift(x=1) \
+              / self.arrays["cell_x_size_at_t_location"]
+        axy = _dj(vectorfield.x_component) \
+              / self.arrays["cell_y_size_at_f_location"]
+        ayx = _di(vectorfield.y_component) \
+              / self.arrays["cell_x_size_at_f_location"]
+        ayy = _dj(vectorfield.y_component).shift(y=1) \
+              / self.arrays["cell_y_size_at_t_location"]
+
+        # finalize attributes
+        arr_x = vectorfield.x_component
+        arr_y = vectorfield.y_component
+        axxatts = convert_dataarray_attributes_xderivative(arr_x.attrs,
+                                                          grid_location='t')
+        axyatts = convert_dataarray_attributes_xderivative(arr_x.attrs,
+                                                          grid_location='f')
+        ayxatts = convert_dataarray_attributes_xderivative(arr_y.attrs,
+                                                          grid_location='f')
+        ayyatts = convert_dataarray_attributes_yderivative(arr_y.attrs,
+                                                          grid_location='t')
+
+        axx = _finalize_dataarray_attributes(axx,**axxatts)
+        axy = _finalize_dataarray_attributes(axy,**axyatts)
+        ayx = _finalize_dataarray_attributes(ayx,**ayxatts)
+        ayy = _finalize_dataarray_attributes(ayy,**ayyatts)
+        #
+        return Tensor2d(axx,axy,ayx,ayy,\
+                             xx_component_grid_location = 't',\
+                             xy_component_grid_location = 'f',\
+                             yx_component_grid_location = 'f',\
+                             yy_component_grid_location = 't')
 
     def horizontal_laplacian(self,scalararray):
         """
@@ -1122,12 +1265,10 @@ class generic_2d_grid:
 #
 #--------------- Operators specific to oceanic applications --------------------
 #
-#   TODO : could move to a subclass if oocgcm is used for atmospheric models
+#   TODO : could move to another module if oocgcm is used for atmospheric models
 
     def geostrophic_current_from_sea_surface_height(self,sea_surface_height):
         """Return the geostrophic current on u,v-grids.
-
-        Not implemented yet.
 
         Parameters
         ----------
@@ -1151,5 +1292,51 @@ class generic_2d_grid:
            / self.arrays["coriolis_parameter_at_u_location"]
 
         return VectorField2d(ug,vg,\
+                             x_component_grid_location = 'u',\
+                             y_component_grid_location = 'v')
+
+    def q_vector_due_to_kinematic_deformation(self,velocityfield,buoyancy):
+        """Return the component of the generalized Q-vector associated
+        with kinematic deformation of a two-dimensional velocity field.
+
+        Namely,
+        $$
+        \mathbf{Q}^g_{kd} =
+        -
+        \begin{pmatrix}
+        \partial_x u \,\partial_x b  + \partial_x v_g \,\partial_y b \\
+        \partial_y u \,\partial_x b  + \partial_y v_g \,\partial_y b
+        \end{pmatrix}
+        $$
+
+        see Hoskins and Bretherthon 1972.
+
+        Parameters
+        ----------
+        velocityfield : VectorField2d
+            namedtuple of horisontal velocity at u,v grid locations
+        buoyancy : xarray.DataArray
+            xarray of buoyancy  at grid_location='t'
+
+        Returns
+        -------
+        vectorfield : VectorField2d
+           Two-dimensional vector field of $Q_{kd}$ at u,v-points.
+        """
+        gradhb = self.horizontal_gradient(buoyancy)  # at u,v location
+        gradvel = self.horizontal_gradient(velocityfield) # at t,f locations
+
+        # use readable notations
+        dxb = gradhb.x_component
+        dyb = gradhb.y_component
+        dxu = gradvel.xx_component
+        dyu = gradvel.xy_component
+        dxv = gradvel.yx_component
+        dyv = gradvel.yy_component
+
+        qxcomp = dxu * dxb + self.change_grid_location_f_to_u(dxv * dyb)
+        qycomp = self.change_grid_location_f_to_v(dyu * dxb) + dyv * dyb
+
+        return VectorField2d(qxcomp,qycomp,\
                              x_component_grid_location = 'u',\
                              y_component_grid_location = 'v')
