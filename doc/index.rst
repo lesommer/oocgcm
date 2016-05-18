@@ -2,7 +2,7 @@
    sphinx-quickstart on Tue May 10 23:41:48 2016.
 
 
-oocgcm : out of core analysis tools for general circulation models in python.
+oocgcm : out of core analysis of general circulation models in python.
 =============================================================================
 
 This project provides tools for processing and analysing output of general
