@@ -15,8 +15,8 @@ xarray
 
 xarray_ implements a N-dimensional variants of the core pandas_ data structures.
 In addition, xarray_ adopts the Common Data Model for self-describing  data.
-In practice, py:class:`xarray.Dataset` is an therefore in-memory representation
-of a netCDF file or a collection of netCDF files.
+In practice, py:class:`xarray.Dataset` is an in-memory representation
+of a netCDF file or of a collection of netCDF files.
 
 Building upon xarray_ has several advantages :
  - metadata available in the netCDF files are associated with the python data-structure. This simplifies the exploration of the dataset, yields more robust code, and simplifies the export of the results to netCDF files.
@@ -35,10 +35,10 @@ dask
 ----
 dask_ implement an abstract description of the split/apply/combine process
 needed for performing out-of-core computation. dask_ also implement an efficient
-scheduling procedure for optimizing the execution of the tree of task on a given
+scheduling procedure for optimizing the execution time of the tree of tasks on a given
 machine.
 
-from a user standpoint the key concept of dask_ is the notion of chunk. A chunk
+From a user standpoint the key concept of dask_ is the notion of chunk. A chunk
 is the user-defined shape of the subdataset on which the unitary tasks will be
 applied.
 
@@ -46,7 +46,7 @@ dask_ allows to easily leverage the resources of shared memory architectures
 (multi-core laptop or work-station) but also the resources of distributed memory
 architectures (clusters of cpu).
 
-At present, xarray_ leveraged dask functionnalities for shared memory
+At present, xarray_ integrates dask functionalities for shared memory
 architectures. xarray_ will also allow to leverage dask potential on
 distributed memory architectures in the future.
 

@@ -16,14 +16,14 @@ several python libraries based on numpy_ and one of the several netcdf interface
 for python.
 
 But numpy-based model diagnostic libraries are facing a challenge with the ongoing
-evolution of geoscientific models and earth observing networks. Indeed, with the
-most high-end models being runs on several tens of thousand cores, even
+evolution of geoscientific models and earth observing networks. Indeed, with **the
+most high-end models being runs on several tens of thousand cores**, even
 a two-dimensional slice of model output cannot be loaded in memory at one time.
-Model diagnostic tools and gridded data analysis tools should therefore be
-parallelized and run out-of-core.
+Model diagnostic tools and gridded data analysis **tools should therefore be
+parallelized** and run out-of-core.
 
 One option is to run FORTRAN/MPI codes steered from bash scripts but there you
-loose the flexibility and the multiple benefits of a python-based workflow.
+loose the **flexibility and the multiple benefits of a python-based workflow**.
 Another option is to use one of the several libraries available for parallel
 computing in python. This usually implies a complete refactoring of your
 analysis package at the risk of eventually using different analysis tools
@@ -32,13 +32,13 @@ depending on the size of your dataset...
 A wider perspective
 -------------------
 
-We believe that the above question is not a "technical" problem but a real
-challenge for our fields of research. We are here facing a "technical" translation
+We believe that the above question is not a "technical" problem but **a real
+challenge for our fields of research**. We are here facing a "technical" translation
 of one of the "big data challenges" in earth system science.
 
 Transforming large gridded datasets into scientific results indeed requires
-innovative descriptive approaches that merge statistical descriptions and
-physically-motivated analyses. This usually involves performing rather "complex"
+**innovative descriptive approaches that merge statistical descriptions and
+physically-motivated analyses**. This usually involves performing rather "complex"
 analysis tasks on the dataset.
 
 In practice, this is usually a two stage process. A first stage involves
@@ -52,8 +52,8 @@ because it requires a more in-depth understanding of the hardware infrastructure
 and of the software design.
 
 So, depending on the language and one the libraries that you use, what actually
-changes is not your ability to perform your analysis but rather the time it takes
-for you to prepare your production code and eventually reach the scientific result
+changes is not your ability to perform your analysis but rather **the time it takes
+for you to prepare your production code** and eventually reach the scientific result
 you are after.
 
 More generally, there is objective risk for our fields of research if we don't
@@ -61,7 +61,7 @@ embrace the question of the development of analysis tools that accelerate the
 above idea-prototype-production-results cycle. If the time needed to transform
 and idea into an efficient production code is too long, we will keep performing
 only simple and/or well-documented analysis on our datasets, eventually missing
-the potential breakthrough of big-data in earth system science.
+**the potential breakthrough of big-data in earth system sciences**.
 
 .. _xarray: https://github.com/pydata/xarray
 .. _dask: http://dask.pydata.org
