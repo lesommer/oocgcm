@@ -42,9 +42,9 @@ From a user standpoint the key concept of dask_ is the notion of chunk. A chunk
 is the user-defined shape of the subdataset on which the unitary tasks will be
 applied.
 
-dask_ allows to easily leverage the resources of shared memory architectures
-(multi-core laptop or work-station) but also the resources of distributed memory
-architectures (clusters of cpu).
+dask_ allows to easily leverage the resources of **shared memory architectures**
+(multi-core laptop or work-station) but also the resources of **distributed memory
+architectures** (clusters of cpu).
 
 At present, xarray_ integrates dask functionalities for shared memory
 architectures. xarray_ will also allow to leverage dask potential on
@@ -53,7 +53,7 @@ distributed memory architectures in the future.
 
 Building upon dask_ has several advantages :
  - parallelization comes at no cost. The only modification of your code that is needed is your defining the chunks on which the computation should be performed.
- - dask_ back-end methods are generic, powerfull and well tested for a number of different applications.
+ - dask_ back-end methods are generic, powerful and well tested for a number of different applications.
  - dask_ comes with powerful and easy-to-use profiling tools for optimizing the execution time on a given machine.
 
 Most importantly, xarray_ and dask_ are supported by active and friendly teams
