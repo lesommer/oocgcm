@@ -12,7 +12,7 @@ science.
 Our aim is to simplify the analysis of **very large datasets of model output**
 (~1-100Tb) like those produced by basin-to-global scale sub-mesoscale permitting
 ocean models and ensemble simulations of eddying ocean models by **leveraging
-the potential of xarray_ and dask_ **  python packages.
+the potential of xarray_ and dask_**  python packages.
 
 The main ambition of this project is to provide simple tools for performing
 **out-of-core** computations with model output and gridded data, namely
