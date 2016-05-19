@@ -4,7 +4,7 @@ Why using xarray and dask ?
 ===========================
 
 oocgcm is a pure Python package built on the top of xarray_, which itself
-integrates dask_ to support streaming computation on large datasets that
+integrates dask.array to support streaming computation on large datasets that
 don’t fit into memory. Why have we choosen to use xarray_ and dask_ ?
 
 .. _xarray: https://github.com/pydata/xarray
@@ -33,21 +33,22 @@ Building upon xarray_ has several advantages :
 
 dask
 ----
-dask_ implement an abstract graph representation of the split/apply/combine process
-needed for performing out-of-core computation. dask_ also implement an efficient
-scheduling procedure for optimizing the execution time of the tree of tasks on a given
-machine.
 
-From a user standpoint the key concept of dask_ is the notion of chunk. A chunk
-is the user-defined shape of the subdataset on which the unitary tasks will be
-applied.
+dask_ implement an abstract graph representation of the dynamic task scheduling
+needed for performing out-of-core computation. dask_ also implement an efficient
+scheduling procedure for optimizing the execution time of acyclic graphs (DAG)
+of tasks on a given machine.
+
+From a user standpoint the key concept of dask.array is the notion of chunk.
+A chunk is the user-defined shape of the subdataset on which the unitary tasks
+will be applied.
 
 dask_ allows to easily leverage the resources of **shared memory architectures**
 (multi-core laptop or work-station) but also the resources of **distributed memory
 architectures** (clusters of cpu).
 
-At present, xarray_ integrates dask functionalities for shared memory
-architectures. xarray_ will also allow to leverage dask potential on
+At present, xarray_ integrates dask_ functionalities for shared memory
+architectures. xarray_ will also allow to leverage dask_ potential on
 distributed memory architectures in the future.
 
 
@@ -57,7 +58,7 @@ Building upon dask_ has several advantages :
  - dask_ comes with powerful and easy-to-use profiling tools for optimizing the execution time on a given machine.
 
 Most importantly, xarray_ and dask_ are supported by active and friendly teams
-of developpers, that we hereby gratefully acknowledge.
+of developers, that we hereby gratefully acknowledge.
 
  .. _dask: http://dask.pydata.org
  .. _xarray: https://github.com/pydata/xarray
