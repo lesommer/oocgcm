@@ -59,8 +59,8 @@ you are after.
 More generally, there is objective risk for our fields of research if we don't
 embrace the question of the development of analysis tools that accelerate the
 above idea-prototype-production-results cycle. If the time needed to transform
-and idea into an efficient production code is too long, we will keep performing
-only simple and/or well-documented analysis on our datasets, eventually missing
+an idea into an efficient production code is too long, we will keep performing
+only simple and/or routine analyses on our datasets, eventually missing
 **the potential breakthrough of big-data in earth system sciences**.
 
 .. _xarray: https://github.com/pydata/xarray
