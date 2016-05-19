@@ -33,7 +33,7 @@ Building upon xarray_ has several advantages :
 
 dask
 ----
-dask_ implement an abstract description of the split/apply/combine process
+dask_ implement an abstract graph representation of the split/apply/combine process
 needed for performing out-of-core computation. dask_ also implement an efficient
 scheduling procedure for optimizing the execution time of the tree of tasks on a given
 machine.
