@@ -1,6 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
-# mostly taken from xarray 
+# mostly taken from xarray
 
 import sys
 import warnings
@@ -8,6 +8,8 @@ from contextlib import contextmanager
 
 import numpy as np
 from numpy.testing import assert_array_equal
+
+from xarray.core.variable import as_variable
 
 PY3 = sys.version_info[0] >= 3
 
@@ -18,7 +20,7 @@ except ImportError:
     import unittest
 
 try:
-    import xarray 
+    import xarray
     has_xarray = True
 except ImportError:
     has_xarray = False
