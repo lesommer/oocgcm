@@ -19,12 +19,15 @@ In practice, xarray.Dataset is an in-memory representation
 of a netCDF file or of a collection of netCDF files.
 
 Building upon xarray_ has several advantages :
- - metadata available in the netCDF files are associated with the python data-structure. This simplifies the exploration of the dataset, yields more robust code, and simplifies the export of the results to netCDF files.
+ - metadata available in the netCDF files are associated with xarray objects in the form of a Python dictionary ``x.attrs``. This simplifies the exploration of the dataset, yields more robust code, and simplifies the export of the results to netCDF files.
+ - because dimensions are associated with the variable in xarray objects, xarray allows flexible split-apply-combine operations with groupby ``x.groupby('time.dayofyear').mean()``
  - xarray objects do not load data in memory by default. Loading the data is only done at the execution time if needed. This means that the user has access to all his dataset without having to worry about loading the data, therefore simplifying the prototyping of a new analysis.
  - xarray is natively integrated with pandas_, meaning that xarray objects can straightforwardly be exported to pandas DataFrames. This allows to easily access a range of time-series analysis tools.
  - xarray objects can be exported to iris_ or cdms_ so that the user can merge several different analysis tools in his workflow.
  - Little work is needed for applying a numpy function to xarray objects. Several numpy ufunc are already applicable to xarray.DatArray data-structure.
 
+ Keep track of arbitrary metadata in the form of a Python dictionary:
+    ``x.attrs``
 
 .. _xarray: https://github.com/pydata/xarray
 .. _pandas : http://pandas.pydata.org/
