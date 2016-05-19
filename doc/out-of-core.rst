@@ -51,16 +51,16 @@ The second stage involves transforming the **prototype** code into a
 because it requires a more in-depth understanding of the hardware infrastructure
 and of the software design.
 
-So, depending on the language and one the libraries that you use, what actually
+So, depending on the language and on the libraries that you use, what actually
 changes is not your ability to perform your analysis but rather **the time it takes
 for you to prepare your production code** and eventually reach the scientific result
 you are after.
 
-More generally, there is objective risk for our fields of research if we don't
+More generally, there is an objective risk for our fields of research if we don't
 embrace the question of the development of analysis tools that accelerate the
 above idea-prototype-production-results cycle. If the time needed to transform
 an idea into an efficient production code is too long, we will keep performing
-only simple and/or routine analyses on our datasets, eventually missing
+only simple or routine analyses on our datasets, eventually missing
 **the potential breakthrough of big-data in earth system sciences**.
 
 .. _xarray: https://github.com/pydata/xarray
