@@ -6,5 +6,52 @@ NEMO netcdf files and creating NEMO-like netcdf files from xarray objects.
 
 """
 
-# TODO : new functions return_xarray_dataarray / return_xarray_dataset which
-#        change the name of the time-dimension from 'timecounter' to 't' ?
+from ...core.io import return_xarray_dataset as _return_xarray_dataset
+from ...core.io import return_xarray_dataarray as _return_xarray_dataarray
+
+
+def return_xarray_dataset(*args,**kwargs):
+    """Wrapper for core.io.return_xarray_dataset.
+
+    Parameters
+    ----------
+    *args : arguments
+    **kwargs : keyword arguments
+
+    Returns
+    ------
+    ds : xarray.Dataset
+
+    Methods
+    ------
+    change the name of dimension 'time_counter' in 't'
+    """
+    _ds = _return_xarray_dataset(*args,**kwargs)
+    if 'time_counter' in _ds.keys():
+        ds = _ds.rename({'time_counter':'t'})
+    else:
+        ds = _ds
+    return ds
+
+def return_xarray_dataarray(*args,**kwargs):
+    """Wrapper for core.io.return_xarray_dataarray.
+
+    Parameters
+    ----------
+    *args : arguments
+    **kwargs : keyword arguments
+
+    Returns
+    ------
+    da : xarray.DataArray
+
+    Methods
+    ------
+    change the name of dimension 'time_counter' in 't'
+    """
+    _da = _return_xarray_dataarray(*args,**kwargs)
+    if 'time_counter' in _da.coords.keys():
+       da = _da.rename({'time_counter':'t'})
+    else:
+       da = _da
+    return da

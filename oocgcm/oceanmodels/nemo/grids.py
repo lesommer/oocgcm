@@ -7,7 +7,7 @@ Define classes that give acces to NEMO model grid metrics and operators.
 import xarray as xr
 
 from ...core.grids import generic_2d_grid
-from ...core.io import return_xarray_dataarray
+from .io import return_xarray_dataarray # alt version of return_xarray_dataarray
 
 #==================== Name of variables in NEMO ================================
 #
