@@ -87,9 +87,6 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
             latitudes = xr.DataArray(latitudes,dims=['y','x'])
         if is_numpy(longitudes):
             longitudes = xr.DataArray(longitudes,dims=['y','x'])
-        if is_numpy(mask):
-            mask = xr.DataArray(mask,dims=['y','x'])
-
         self.shape = longitudes.shape
 
         longitudes = add_extra_attrs_to_dataarray(longitudes,grid_location='t')
@@ -101,6 +98,8 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
 
         if mask is not None:
             self.has_mask = True
+            if is_numpy(mask):
+                mask = xr.DataArray(mask,dims=['y','x'])
         else:
             self.has_mask = False
             mask = xr.DataArray(np.ones(self.shape,dtype=bool), dims=['y','x'])
@@ -171,7 +170,7 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
 
         """
         tmask = self.variables["sea_binary_mask_at_t_location"]
-        if not(self.has_mask):
+        if not(self.has_mask): # no mask, only ocean points
             umask = add_extra_attrs_to_dataarray(tmask.copy(),
                                                  grid_location='u')
             vmask = add_extra_attrs_to_dataarray(tmask.copy(),
