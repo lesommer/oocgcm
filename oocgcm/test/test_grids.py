@@ -1,8 +1,12 @@
 import os
 import numpy as np
 
+import xarray as xr
+import xarray.ufuncs as xu
+
 from . import TestCase
 
+from oocgcm.core import grids
 from oocgcm.griddeddata import grids as agrids
 from oocgcm.oceanmodels.nemo import grids as fgrids
 
@@ -10,8 +14,33 @@ def path_to_test_coord():
     return open_dataset(os.path.join(os.path.dirname(__file__), 'data', name),
                         *args, **kwargs)
 
+class TestCoreDifferenceOperators(TestCase):
+    def setUp(self):
+        self.x = np.arange(start=0, stop=101, step=10,dtype=float)
+        self.y = np.arange(start=0, stop=101, step=10,dtype=float)
+        self.xx,self.yy = np.meshgrid(self.x, self.y)
+        self.xrx = xr.DataArray(self.xx,dims=['y','x'])
+        self.xry = xr.DataArray(self.yy,dims=['y','x'])
+        self.xrt = xu.sin(self.xrx/30.) + xu.cos(self.xry/30.)
+        self.t = np.sin(self.xx/30.) + np.cos(self.yy/30.)
 
-class TestGrid2d(TestCase):
+    def test_di(self):
+        di = np.roll(self.t,-1,axis=-1) - self.t
+        self.assertArrayClose(grids._di(self.xrt).to_masked_array(),di)
+
+    def test_dj(self):
+        dj = np.roll(self.t,-1,axis=-2) - self.t
+        self.assertArrayClose(grids._dj(self.xrt).to_masked_array(),dj)
+
+    def test_mi(self):
+        mi = (np.roll(self.t,-1,axis=-1) + self.t) / 2.
+        self.assertArrayClose(grids._mi(self.xrt).to_masked_array(),mi)
+
+    def test_mj(self):
+        mj = (np.roll(self.t,-1,axis=-2) + self.t) / 2.
+        self.assertArrayClose(grids._mj(self.xrt).to_masked_array(),mj)
+
+class TestGrid2d_Array(TestCase):
     def setUp(self):
         self.x = np.arange(start=-180, stop=181, step=10,dtype=float)
         self.y = np.arange(start=-90, stop=91, step=10,dtype=float)

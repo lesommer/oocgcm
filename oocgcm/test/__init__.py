@@ -7,7 +7,7 @@ import warnings
 from contextlib import contextmanager
 
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal,assert_allclose
 
 from xarray.core.variable import as_variable
 
@@ -115,6 +115,8 @@ class TestCase(unittest.TestCase):
     def assertArrayEqual(self, a1, a2):
         assert_array_equal(a1, a2)
 
+    def assertArrayClose(self, a1, a2,rtol=1e-05, atol=1e-08):
+        assert_allclose(a1, a2,rtol=rtol, atol=atol)
 
     def assertEqual(self, a1, a2):
         assert a1 == a2 or (a1 != a1 and a2 != a2)
