@@ -10,9 +10,6 @@ from oocgcm.core import grids
 from oocgcm.griddeddata import grids as agrids
 from oocgcm.oceanmodels.nemo import grids as fgrids
 
-def path_to_test_coord():
-    return open_dataset(os.path.join(os.path.dirname(__file__), 'data', name),
-                        *args, **kwargs)
 
 class TestCoreDifferenceOperators(TestCase):
     def setUp(self):
