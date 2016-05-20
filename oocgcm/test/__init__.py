@@ -131,7 +131,7 @@ class TestCase(unittest.TestCase):
         # but it checks each aspect of equality separately for easier debugging
         assert d1.identical(d2), (d1, d2)
 
-    def assertDatasetAllClose(self, d1, d2, rtol=1e-05, atol=1e-08):
+    def assertDatasetAllClose(self, d1, d2, rtol=1e-03, atol=1e-08):
         self.assertEqual(sorted(d1, key=str), sorted(d2, key=str))
         self.assertItemsEqual(d1.coords, d2.coords)
         for k in d1:
