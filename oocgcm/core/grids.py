@@ -767,7 +767,7 @@ class generic_2d_grid:
                                   weights_in=None,weights_out=None):
         """Return an average of scalararray at point i - 1/2
         """
-        average = lambda xarr:( xarr.shift(x=-1) + xarr ) / 2.
+        average = lambda xarr:( xarr.shift(x=1) + xarr ) / 2.
         if weights_in is None:
             out = average(scalararray)
         else:
@@ -793,7 +793,7 @@ class generic_2d_grid:
                                   weights_in=None,weights_out=None):
         """Return an average of scalararray at point j - 1/2
         """
-        average = lambda xarr:( xarr.shift(y=-1) + xarr ) / 2.
+        average = lambda xarr:( xarr.shift(y=1) + xarr ) / 2.
         if weights_in is None:
             out = average(scalararray)
         else:
@@ -1310,8 +1310,6 @@ class generic_2d_grid:
 
     def vertical_component_of_curl(self,vectorfield):
         """Return the vertical component of the curl of a vector field.
-
-        Not implemented yet.
 
         Parameters
         ----------
