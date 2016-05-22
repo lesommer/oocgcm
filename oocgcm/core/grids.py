@@ -995,7 +995,7 @@ class generic_2d_grid:
     def scalar_product(self,vectorfield1,vectorfield2):
         """Return the scalar product of two vector fields, at t-point.
 
-        So far, only available for vector fields at u,v grid_location
+        So far, only available for vector fields at u,v grid_location.
 
         Parameters
         ----------
@@ -1005,6 +1005,11 @@ class generic_2d_grid:
         Return
         ------
         scalararray : xarray.DataArray
+
+        Methods
+        -------
+        Multiplies each component independently, relocates each component at
+        t grid_location then add the two products.
         """
         check_input_array(vectorfield1.x_component,\
                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
@@ -1026,37 +1031,99 @@ class generic_2d_grid:
         return out
 
     def scalar_outer_product(self,scalararray,vectorfield):
-        """Return the outer product of a scalar with a vector field, at t-point.
+        """Return the outer product of a scalar (t location)
+        with a two-dimensional vector field (u,v location)
 
-        Not implemented yet.
+        So far, only available for vector fields at u,v grid_location.
 
         Parameters
         ----------
         scalararray : xarray.DataArray
         vectorfield : VectorField2d namedtuple
+            two-dimensional vector field at u,v grid_location
 
         Return
         ------
         vectorfield : VectorField2d namedtuple
+
+        Methods
+        -------
+        Relocates scalararray at u,v grid_location then multiply each component
+        of vectorfield by the relocated scalararray.
         """
-        pass
+
+        #- check input arrays
+        check_input_array(scalararray,\
+                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        check_input_array(vectorfield.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+
+        #- relocate scalararray at u,v grid_location
+        scalararray_u_location = self.change_grid_location_t_to_u(scalararray,
+                                                    conserving='area')
+        scalararray_v_location = self.change_grid_location_t_to_v(scalararray,
+                                                    conserving='area')
+
+        #- multiplication and creation of VectorFiel2d
+        x_component = scalararray_u_location * vectorfield.x_component
+        y_component = scalararray_v_location * vectorfield.y_component
+        return VectorField2d(x_component,y_component,\
+                             x_component_grid_location = 'u',\
+                             y_component_grid_location = 'v')
 
     def vertical_component_of_the_cross_product(self,vectorfield1,vectorfield2):
         """Return the cross product of two vector fields.
 
-        Not implemented yet.
+        So far, only available for vector fields at u,v grid_location.
 
         Parameters
         ----------
         vectorfield1 : VectorField2d namedtuple
+            two-dimensional vector field at u,v grid_location
         vectorfield2 : VectorField2d namedtuple
+            two-dimensional vector field at u,v grid_location
 
         Return
         ------
-        vectorfield : VectorField2d namedtuple
-        """
-        pass
+        scalararray : xarray.DataArray
+            vertical component at t grid location
 
+        Methods
+        -------
+        Relocates all the components of the VectorFields at t grid_location
+        then compute c = v1_x * v2_y - v1_y * v2_x
+        """
+
+        #- check input arrays
+        check_input_array(vectorfield1.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield1.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+        check_input_array(vectorfield2.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield2.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+
+        #- relocate all the arrays at t grid_location
+        v1x = vectorfield1.x_component # short cuts
+        v1y = vectorfield1.y_component
+        v2x = vectorfield2.x_component
+        v2y = vectorfield2.y_component
+
+        v1x_at_t_location = self.change_grid_location_u_to_t(v1x,
+                                                    conserving='x_flux')
+        v1y_at_t_location = self.change_grid_location_v_to_t(v1y,
+                                                    conserving='y_flux')
+        v2x_at_t_location = self.change_grid_location_u_to_t(v2x,
+                                                    conserving='x_flux')
+        v2y_at_t_location = self.change_grid_location_v_to_t(v2y,
+                                                    conserving='y_flux')
+
+        # compose and output
+        cross_product =  v1_x * v2_y - v1_y * v2_x
+        return cross_product # the xarray is not finalized (name,grid_location)
 
 #-------------------- Differential Operators------------------------------------
 
