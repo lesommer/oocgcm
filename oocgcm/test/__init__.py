@@ -118,6 +118,14 @@ class TestCase(unittest.TestCase):
     def assertArrayClose(self, a1, a2,rtol=1e-05, atol=1e-08):
         assert_allclose(a1, a2,rtol=rtol, atol=atol)
 
+    def assertArray2dCloseInside(self, a1, a2,rtol=1e-05, atol=1e-08):
+        #- restrict the comparison to point away from boundaries.
+        #- assume a1 and a2 are 2d x,y arrays.
+        _a1 = a1[...,1:-2,1:-2]
+        _a2 = a2[...,1:-2,1:-2]
+        assert_allclose(_a1, _a2,rtol=rtol, atol=atol)
+
+
     def assertEqual(self, a1, a2):
         assert a1 == a2 or (a1 != a1 and a2 != a2)
 

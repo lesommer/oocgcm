@@ -21,21 +21,21 @@ class TestCoreDifferenceOperators(TestCase):
         self.xrt = xu.sin(self.xrx/30.) + xu.cos(self.xry/30.)
         self.t = np.sin(self.xx/30.) + np.cos(self.yy/30.)
 
-    #def test_di(self):
-    #    di = np.roll(self.t,-1,axis=-1) - self.t
-    #    self.assertArrayClose(grids._di(self.xrt).to_masked_array(),di)
+    def test_di(self):
+        di = np.roll(self.t,-1,axis=-1) - self.t
+        self.assertArray2dCloseInside(grids._di(self.xrt).to_masked_array(),di)
 
-    #def test_dj(self):
-    #    dj = np.roll(self.t,-1,axis=-2) - self.t
-    #    self.assertArrayClose(grids._dj(self.xrt).to_masked_array(),dj)
+    def test_dj(self):
+        dj = np.roll(self.t,-1,axis=-2) - self.t
+        self.assertArray2dCloseInside(grids._dj(self.xrt).to_masked_array(),dj)
 
-    #def test_mi(self):
-    #    mi = (np.roll(self.t,-1,axis=-1) + self.t) / 2.
-    #    self.assertArrayClose(grids._mi(self.xrt).to_masked_array(),mi)
+    def test_mi(self):
+        mi = (np.roll(self.t,-1,axis=-1) + self.t) / 2.
+        self.assertArray2dCloseInside(grids._mi(self.xrt).to_masked_array(),mi)
 
-    #def test_mj(self):
-    #    mj = (np.roll(self.t,-1,axis=-2) + self.t) / 2.
-    #    self.assertArrayClose(grids._mj(self.xrt).to_masked_array(),mj)
+    def test_mj(self):
+        mj = (np.roll(self.t,-1,axis=-2) + self.t) / 2.
+        self.assertArray2dCloseInside(grids._mj(self.xrt).to_masked_array(),mj)
 
 class TestGrid2d_Array(TestCase):
     def setUp(self):
