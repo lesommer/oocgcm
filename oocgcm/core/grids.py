@@ -50,7 +50,7 @@ def _horizontal_gradient(scalararray):
     dims = scalararray.dims
     chunks = scalararray.chunks
     if is_numpy(data):
-        gy,gx = np.gradient(data)
+        da_dj,da_di = np.gradient(data)
     else:
         x_derivative = lambda arr:np.gradient(arr,axis=-1)
         y_derivative = lambda arr:np.gradient(arr,axis=-2)
@@ -589,7 +589,7 @@ class generic_2d_grid:
         #        (dictionnary) or the posteriori value (tuple of tuples).
         self.shape  = self.arrays["sea_binary_mask_at_t_location"].shape
         self.dims   = self.arrays["sea_binary_mask_at_t_location"].dims
-        self.ndims = len(self.dims)
+        self.ndims = 2 #len(self.dims)
         self._define_area_of_grid_cells()
         self._define_extra_projection_coordinates_if_required()
         self._define_coriolis_parameter()

@@ -11,6 +11,8 @@ from numpy.testing import assert_array_equal,assert_allclose
 
 from xarray.core.variable import as_variable
 
+from oocgcm.core.utils import is_xarray
+
 PY3 = sys.version_info[0] >= 3
 
 
@@ -118,11 +120,11 @@ class TestCase(unittest.TestCase):
     def assertArrayClose(self, a1, a2,rtol=1e-05, atol=1e-08):
         assert_allclose(a1, a2,rtol=rtol, atol=atol)
 
-    def assertArray2dCloseInside(self, a1, a2,rtol=1e-05, atol=1e-08):
+    def assertArray2dCloseInside(self, a1, a2,rtol=1e-05, atol=1e-08,depth=1):
         #- restrict the comparison to point away from boundaries.
         #- assume a1 and a2 are 2d x,y arrays.
-        _a1 = a1[...,1:-2,1:-2]
-        _a2 = a2[...,1:-2,1:-2]
+        _a1 = a1[...,depth:-1 - depth,depth:-1 - depth]
+        _a2 = a2[...,depth:-1 - depth,depth:-1 - depth]
         assert_allclose(_a1, _a2,rtol=rtol, atol=atol)
 
 
@@ -176,6 +178,20 @@ class UnexpectedDataAccess(Exception):
 class ReturnItem(object):
     def __getitem__(self, key):
         return key
+
+def print_array_around(expected = None, actual=None,around=(20,20)):
+    """Customized print used for debugging tests."""
+    j,i = around
+    print '\n expected array : '
+    if is_xarray(expected):
+        print expected.to_masked_array()[j-1:j+2,i-1:i+2]
+    else:
+        print expected[j-1:j+2,i-1:i+2]
+    print 'actual array : '
+    if is_xarray(actual):
+        print actual.to_masked_array()[j-1:j+2,i-1:i+2]
+    else:
+        print actual[j-1:j+2,i-1:i+2]
 
 
 def source_ndarray(array):
