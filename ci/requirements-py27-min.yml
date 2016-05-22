@@ -1,8 +1,8 @@
 name: test_env
 dependencies:
   - python=2.7
-  - numpy==1.11
-  - pandas==0.15.0
+  - numpy==1.11.0
+  - pandas==0.18.0
   - xarray==0.7.2
   - dask==0.8.1
   - bottleneck==1.0.0
