@@ -14,6 +14,8 @@ import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
 from .utils import is_numpy,is_xarray,has_chunks,add_extra_attrs_to_dataarray
 from ..parameters.physicalparameters import coriolis_parameter, grav
+from ..parameters.physicalparameters import earthrad
+from ..parameters.mathematicalparameters import deg2rad
 
 #
 #==================== Differences and Averages =================================
@@ -207,6 +209,7 @@ def convert_dataarray_attributes_yderivative(attrs,grid_location=None):
     if grid_location is not None:
         new_attrs['grid_location'] = grid_location
     return new_attrs
+
 
 def convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
     """Return the dictionary of attributes corresponding to the horizontal
@@ -724,6 +727,26 @@ class generic_2d_grid:
             sliced_arrays[dataname] = self.arrays[dataname][item]
         return generic_2d_grid(variables=sliced_arrays,\
                              parameters=self.parameters)
+
+#---------------------------- Misc utilities ------------------------------------
+#-
+    def get_projection_coordinates_in_meters(self,grid_location='t'):
+        """Return (x,y) the coordinate arrays (in m) at grid location.
+
+        Caution the name of this function is likely to change in the future
+
+        TODO : check the meaning of CF projection coordinates. see #23
+               see  https://github.com/lesommer/oocgcm/issues/23
+
+        Caution : only available at t grid_location at present.
+	    """
+        lat = self.arrays['projection_y_coordinate_at_' + grid_location \
+                                                        + '_location']
+        lon = self.arrays['projection_x_coordinate_at_' + grid_location \
+                                                        + '_location']
+        x = earthrad  * deg2rad * lon * xu.cos(lat * deg2rad)
+        y = earthrad  * deg2rad * lat
+        return x,y
 
 #---------------------------- Grid Swapping ------------------------------------
 #- Core swapping utilities
@@ -1298,7 +1321,21 @@ class generic_2d_grid:
         -------
         scalararray: xarray.DataArray
         """
-        pass
+
+        # check inpit vector field.
+        check_input_array(vectorfield.x_component,\
+                          chunks=self.chunks,grid_location='u',ndims=self.ndims)
+        check_input_array(vectorfield.y_component,\
+                          chunks=self.chunks,grid_location='v',ndims=self.ndims)
+
+        # define arrays
+        vx = _di(vectorfield.y_component) \
+              / self.arrays["cell_x_size_at_f_location"]
+        uy = _dj(vectorfield.x_component) \
+              / self.arrays["cell_y_size_at_f_location"]
+        curl = vx - uy
+        curl.name = 'vertical component of the curl'
+        return add_extra_attrs_to_dataarray(curl,grid_location='t')
 
     def horizontal_divergence(self,vectorfield):
         """
