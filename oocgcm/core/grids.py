@@ -52,8 +52,8 @@ def _horizontal_gradient(scalararray):
     if is_numpy(data):
         da_dj,da_di = np.gradient(data)
     else:
-        x_derivative = lambda arr:np.gradient(arr,axis=-1)
-        y_derivative = lambda arr:np.gradient(arr,axis=-2)
+        x_derivative = lambda arr:np.gradient(arr,axis=-1) # req. numpy > 1.11
+        y_derivative = lambda arr:np.gradient(arr,axis=-2) # req. numpy > 1.11
         gx = data.map_overlap(x_derivative,depth=(0,1),boundary={1: np.nan})
         gy = data.map_overlap(y_derivative,depth=(1,0),boundary={0: np.nan})
     da_di = xr.DataArray(gx,coords,dims)
@@ -1355,8 +1355,8 @@ class generic_2d_grid:
         check_input_array(vectorfield.y_component,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
         # define
-        div  = _di( vectorfield.x_component / self._array_e2u)
-        div += _dj( vectorfield.y_component / self._array_e1v)
+        div  = _di( vectorfield.x_component * self._array_e2u)
+        div += _dj( vectorfield.y_component * self._array_e1v)
         div /= self._array_e1t * self._array_e2t
         # finalize
         divatts = convert_dataarray_attributes_divergence(\
