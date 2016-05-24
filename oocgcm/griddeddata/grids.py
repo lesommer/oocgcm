@@ -158,7 +158,7 @@ class variables_holder_for_2d_grid_from_plane_coordinate_arrays:
         self.shape = xcoord.shape
 
         xcoord = add_extra_attrs_to_dataarray(xcoord,grid_location='t')
-        ycoord  = add_extra_attrs_to_dataarray(ycoord,grid_location='t')
+        ycoord = add_extra_attrs_to_dataarray(ycoord,grid_location='t')
         self.variables\
             ["plane_x_coordinate_at_t_location"] = xcoord.chunk(chunks)
         self.variables\
@@ -203,6 +203,10 @@ class variables_holder_for_2d_grid_from_plane_coordinate_arrays:
             lon = xr.DataArray(lon,dims=['y','x'])
         self.variables['longitude_at_t_location'] = lon
 
+        for dataname in self.variables:
+            data = self.variables[dataname]
+            if isinstance(data, xr.DataArray):
+                self.variables[dataname] = data.chunk(chunks)
 
         self.parameters = {}
         self.parameters['chunks'] = chunks

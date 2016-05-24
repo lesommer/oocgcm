@@ -1479,7 +1479,7 @@ class generic_2d_grid:
         Returns
         -------
         result : xarray.DataArray
-           Frontogenesis fcuntion at at t location.
+           Frontogenesis function at at t location.
         """
         # TODO : avoid duplication of computation of gradhb
         Qkd = self.q_vector_due_to_kinematic_deformation(velocity,buoyancy)
