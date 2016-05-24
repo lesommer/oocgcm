@@ -13,9 +13,9 @@ from .io import return_xarray_dataarray # alt version of return_xarray_dataarray
 #
 
 # not used yet, only kept as an indication of the actual variables to be loaded
-_nemo_keymap_projection_coordinates = {
-    'nav_lon': 'projection_x_coordinate_at_t_location',
-    'nav_lat': 'projection_y_coordinate_at_t_location'
+_nemo_keymap_geographical_coordinates = {
+    'nav_lon': 'longitude_t_location',
+    'nav_lat': 'latitude_at_t_location'
 }
 
 _nemo_keymap_horizontal_metrics = {
@@ -65,18 +65,18 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self.byte_mask_level = byte_mask_level
         self.variables = {}
         self._get = return_xarray_dataarray
-        self._define_projection_coordinate()
+        self._define_latitude_and_longitude()
         self._define_horizontal_metrics()
         self._define_masks()
         self.chunk(chunks=chunks)
         self.parameters = {}
         self.parameters['chunks'] = chunks
 
-    def _define_projection_coordinate(self):
-        self.variables["projection_x_coordinate_at_t_location"] = \
+    def _define_latitude_and_longitude(self):
+        self.variables["longitude_at_t_location"] = \
                         self._get(self.coordinate_file,"nav_lon",
                                   chunks=self.chunks,grid_location='t')
-        self.variables["projection_y_coordinate_at_t_location"] = \
+        self.variables["latitude_at_t_location"] = \
                         self._get(self.coordinate_file,"nav_lat",
                                   chunks=self.chunks,grid_location='t')
 
@@ -159,6 +159,6 @@ def nemo_2d_grid(nemo_coordinate_file=None,
                      nemo_coordinate_file=nemo_coordinate_file,
                      nemo_byte_mask_file=nemo_byte_mask_file,
                      chunks=chunks)
-    grid = generic_2d_grid(variables=variables.variables,
+    grid = generic_2d_grid(arrays=variables.variables,
                            parameters= variables.parameters)
     return grid

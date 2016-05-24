@@ -552,13 +552,15 @@ class generic_2d_grid:
 
     Assume that dimension names are 'x' and 'y'.
     """
+    # the following arrays should be defined for the grid to be functional.
+    # attempts to build the gride withouth these arrays will raise an Exception.
     _required_arrays = [\
+        "latitude_at_t_location",\
+        "longitude_at_t_location",\
         "sea_binary_mask_at_t_location",\
         "sea_binary_mask_at_u_location",\
         "sea_binary_mask_at_v_location",\
         "sea_binary_mask_at_f_location",\
-        "projection_x_coordinate_at_t_location",\
-        "projection_y_coordinate_at_t_location",\
         "cell_x_size_at_t_location",\
         "cell_x_size_at_u_location",\
         "cell_x_size_at_v_location",\
@@ -567,7 +569,16 @@ class generic_2d_grid:
         "cell_y_size_at_v_location",\
         ]
 
-    def __init__(self,variables=None,parameters=None):
+    # the following arrays may or may not be available depending on how the
+    # grid was created.
+    _coordinate_arrays = [\
+        "projection_x_coordinate_at_t_location",\
+        "projection_y_coordinate_at_t_location",\
+        "plane_x_coordinate_at_t_location",\
+        "plane_y_coordinate_at_t_location",\
+        ]
+
+    def __init__(self,arrays=None,parameters=None):
         """Initialize a grid from a dictionary of xarrays and some parameters.
 
         Parameters
@@ -581,7 +592,10 @@ class generic_2d_grid:
         parameters : dict-object
             not used yet.
         """
-        self.arrays = variables
+        for arrayname in self._required_arrays:
+            if not(arrays.has_key(arrayname)):
+                raise Exception('Arrays are missing for building the grid.')
+        self.arrays = arrays
         self.parameters = parameters
         self._define_aliases_for_arrays()
         self.chunks = self.arrays["sea_binary_mask_at_t_location"].chunks
@@ -591,7 +605,7 @@ class generic_2d_grid:
         self.dims   = self.arrays["sea_binary_mask_at_t_location"].dims
         self.ndims = 2 #len(self.dims)
         self._define_area_of_grid_cells()
-        self._define_extra_projection_coordinates_if_required()
+        self._define_extra_latitude_longitude()
         self._define_coriolis_parameter()
 
 #--------------------- Extra xarrays for the grid ------------------------------
@@ -606,41 +620,40 @@ class generic_2d_grid:
                     self.arrays["cell_x_size_at_" + gloc + "_location"] \
                   * self.arrays["cell_y_size_at_" + gloc + "_location"]
 
-    def _define_extra_projection_coordinates_if_required(self):
+    def _define_extra_latitude_longitude(self):
         """Define projection coordinates at u,v,f grid_location if needed.
 
         This is only a definition, the computation is performed only if used.
         """
-        # projection_coordinates_at_u_location
-        xcoordname = "projection_x_coordinate_at_u_location"
-        ycoordname = "projection_y_coordinate_at_u_location"
-        if not(self.arrays.has_key(xcoordname)):
-            self.arrays[xcoordname] = _mi(
-                        self.arrays["projection_x_coordinate_at_t_location"])
-        if not(self.arrays.has_key(ycoordname)):
-            self.arrays[ycoordname] = _mi(
-                        self.arrays["projection_y_coordinate_at_t_location"])
+        # latitude and longitude arrays at u location
+        lonname = "longitude_at_u_location"
+        latname = "latitude_at_u_location"
+        if not(self.arrays.has_key(lonname)):
+            self.arrays[lonname] = _mi(
+                        self.arrays["longitude_at_t_location"])
+        if not(self.arrays.has_key(latname)):
+            self.arrays[latname] = _mi(
+                        self.arrays["latitude_at_t_location"])
 
-        # projection_coordinates_at_v_location
-        xcoordname = "projection_x_coordinate_at_v_location"
-        ycoordname = "projection_y_coordinate_at_v_location"
-        if not(self.arrays.has_key(xcoordname)):
-            self.arrays[xcoordname] = _mj(
-                        self.arrays["projection_x_coordinate_at_t_location"])
-        if not(self.arrays.has_key(ycoordname)):
-            self.arrays[ycoordname] = _mj(
-                        self.arrays["projection_y_coordinate_at_t_location"])
+        # latitude and longitude arrays at v location
+        lonname = "longitude_at_v_location"
+        latname = "latitude_at_v_location"
+        if not(self.arrays.has_key(lonname)):
+            self.arrays[lonname] = _mj(
+                        self.arrays["longitude_at_t_location"])
+        if not(self.arrays.has_key(latname)):
+            self.arrays[latname] = _mj(
+                        self.arrays["latitude_at_t_location"])
 
-        # projection_coordinates_at_f_location
-        xcoordname = "projection_x_coordinate_at_f_location"
-        ycoordname = "projection_y_coordinate_at_f_location"
-        if not(self.arrays.has_key(xcoordname)):
-            self.arrays[xcoordname] = _mj(
-                        self.arrays["projection_x_coordinate_at_u_location"])
-        if not(self.arrays.has_key(ycoordname)):
-            self.arrays[ycoordname] = _mj(
-                        self.arrays["projection_y_coordinate_at_u_location"])
-
+        # latitude and longitude arrays at f location
+        lonname = "longitude_at_f_location"
+        latname = "latitude_at_f_location"
+        if not(self.arrays.has_key(lonname)):
+            self.arrays[lonname] = _mj(
+                        self.arrays["longitude_at_u_location"])
+        if not(self.arrays.has_key(latname)):
+            self.arrays[latname] = _mj(
+                        self.arrays["latitude_at_u_location"])
 
     def _define_coriolis_parameter(self):
         """Define arrays of coriolis parameter at t,u,v,f grid_location.
@@ -649,7 +662,7 @@ class generic_2d_grid:
         """
         for gloc in ['t','u','v','f']:
             corname = "coriolis_parameter_at_" + gloc + "_location"
-            latname = "projection_y_coordinate_at_" + gloc + "_location"
+            latname = "latitude_at_" + gloc + "_location"
             self.arrays[corname] = coriolis_parameter(self.arrays[latname])
 
 
@@ -662,8 +675,8 @@ class generic_2d_grid:
         external libraries.
         """
         # coordinates
-        self._array_navlon = self.arrays["projection_x_coordinate_at_t_location"]
-        self._array_navlat = self.arrays["projection_y_coordinate_at_t_location"]
+        self._array_navlon = self.arrays["longitude_at_t_location"]
+        self._array_navlat = self.arrays["latitude_at_t_location"]
         # metrics
         self._array_e1t = self.arrays["cell_x_size_at_t_location"]
         self._array_e1u = self.arrays["cell_x_size_at_u_location"]
@@ -730,7 +743,7 @@ class generic_2d_grid:
 
 #---------------------------- Misc utilities ------------------------------------
 #-
-    def get_projection_coordinates_in_meters(self,grid_location='t'):
+    def get_projection_coordinates(self,grid_location='t'):
         """Return (x,y) the coordinate arrays (in m) at grid location.
 
         Caution the name of this function is likely to change in the future
@@ -740,9 +753,9 @@ class generic_2d_grid:
 
         Caution : only available at t grid_location at present.
 	    """
-        lat = self.arrays['projection_y_coordinate_at_' + grid_location \
+        lat = self.arrays['latitude_at_' + grid_location \
                                                         + '_location']
-        lon = self.arrays['projection_x_coordinate_at_' + grid_location \
+        lon = self.arrays['longitude_at_' + grid_location \
                                                         + '_location']
         x = earthrad  * deg2rad * lon * xu.cos(lat * deg2rad)
         y = earthrad  * deg2rad * lat
@@ -1193,21 +1206,23 @@ class generic_2d_grid:
         vectorfield : VectorField2d namedtuple
             x and y component of the horizontal gradient at u,v-points
         """
-        # check
+        #- check input arrays
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
-        # define
-        gx = _di(scalararray) / self._array_e1u
-        gy = _dj(scalararray) / self._array_e2v
-        # finalize attributes
+
+        #- define each component of the gradient
+        gx = _di(scalararray) / self.arrays["cell_x_size_at_u_location"] # e1u
+        gy = _dj(scalararray) / self.arrays["cell_y_size_at_v_location"] # e2v
+
+        #- finalize attributes
         gxatts = convert_dataarray_attributes_xderivative(scalararray.attrs,\
                                                           grid_location='u')
         gyatts = convert_dataarray_attributes_yderivative(scalararray.attrs,\
                                                           grid_location='v')
-        #
+
         gx = _finalize_dataarray_attributes(gx,**gxatts)
         gy = _finalize_dataarray_attributes(gy,**gyatts)
-        #
+
         return VectorField2d(gx,gy,\
                              x_component_grid_location = 'u',\
                              y_component_grid_location = 'v')
@@ -1243,12 +1258,13 @@ class generic_2d_grid:
             namedtuple holding the component of the horizontal gradient of
             the vector field at at t and f points.
         """
-        # check
+        #- check input arrays
         check_input_array(vectorfield.x_component,\
                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
         check_input_array(vectorfield.y_component,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
-        # define
+
+        #- define each component of the gradient tensor
         axx = _di(vectorfield.x_component).shift(x=1) \
               / self.arrays["cell_x_size_at_t_location"]
         axy = _dj(vectorfield.x_component) \
@@ -1258,7 +1274,7 @@ class generic_2d_grid:
         ayy = _dj(vectorfield.y_component).shift(y=1) \
               / self.arrays["cell_y_size_at_t_location"]
 
-        # finalize attributes
+        #- finalize arrays' attributes
         arr_x = vectorfield.x_component
         arr_y = vectorfield.y_component
         axxatts = convert_dataarray_attributes_xderivative(arr_x.attrs,
@@ -1274,7 +1290,7 @@ class generic_2d_grid:
         axy = _finalize_dataarray_attributes(axy,**axyatts)
         ayx = _finalize_dataarray_attributes(ayx,**ayxatts)
         ayy = _finalize_dataarray_attributes(ayy,**ayyatts)
-        #
+
         return Tensor2d(axx,axy,ayx,ayy,\
                              xx_component_grid_location = 't',\
                              xy_component_grid_location = 'f',\
@@ -1320,20 +1336,21 @@ class generic_2d_grid:
         scalararray: xarray.DataArray
         """
 
-        # check inpit vector field.
+        #- check inpit vector field.
         check_input_array(vectorfield.x_component,\
                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
         check_input_array(vectorfield.y_component,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
 
-        # define arrays
+        #- define dataarray
         vx = _di(vectorfield.y_component) \
               / self.arrays["cell_x_size_at_f_location"]
         uy = _dj(vectorfield.x_component) \
               / self.arrays["cell_y_size_at_f_location"]
         curl = vx - uy
+
         curl.name = 'vertical component of the curl'
-        return add_extra_attrs_to_dataarray(curl,grid_location='t')
+        return add_extra_attrs_to_dataarray(curl,grid_location='f')
 
     def horizontal_divergence(self,vectorfield):
         """
@@ -1355,8 +1372,8 @@ class generic_2d_grid:
         check_input_array(vectorfield.y_component,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
         # define
-        div  = _di( vectorfield.x_component * self._array_e2u)
-        div += _dj( vectorfield.y_component * self._array_e1v)
+        div  = _di( vectorfield.x_component * self._array_e2u).shift(x=1)
+        div += _dj( vectorfield.y_component * self._array_e1v).shift(y=1)
         div /= self._array_e1t * self._array_e2t
         # finalize
         divatts = convert_dataarray_attributes_divergence(\
