@@ -90,6 +90,23 @@ class TestCreationGrid2d_from_NEMO(TestCase):
         assert(isinstance(fgrd,grids.generic_2d_grid))
 
 
+
+class TestGrid2d_slicing_chunking(TestCase):
+    def setUp(self):
+        self.x = np.arange(start=-180, stop=181, step=10,dtype=float)
+        self.y = np.arange(start=-90, stop=91, step=10,dtype=float)
+        self.grd = agrids.latlon_2d_grid(latitudes=self.y,longitudes=self.x)
+
+    def test_grid2d_slicing(self):
+        sgrd = self.grd[:5,:5]
+        assert(isinstance(sgrd,grids.generic_2d_grid))
+        assert(sgrd.shape==(5,5))
+
+    def test_grid2d_chunking(self):
+        self.grd.chunk({'x':5,'y':5})
+        assert(self.grd.chunks is not None)
+
+
 class TestGrid2d_DifferentialOperators(TestCase):
     def setUp(self):
         #lons = np.arange(start=0, stop=90, step=1,dtype=float)

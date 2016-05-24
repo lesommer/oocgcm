@@ -692,7 +692,7 @@ class generic_2d_grid:
         self._array_fmask = self.arrays["sea_binary_mask_at_f_location"]
 
 #--------------------- Chunking and Slicing ------------------------------------
-    def rechunk(self,chunks=None):
+    def chunk(self,chunks=None):
         """Rechunk all the variables defining the grid.
 
         Parameters
@@ -704,14 +704,14 @@ class generic_2d_grid:
         -------
         >>> xr_chunk = {'x':200,'y':200}
         >>> grd = generic_2d_grid(...)
-        >>> grd.rechunk(xr_chunk)
+        >>> grd.chunk(xr_chunk)
 
         """
         for dataname in self.arrays:
             data = self.arrays[dataname]
             if isinstance(data, xr.DataArray):
                 self.arrays[dataname] = data.chunk(chunks)
-        self.chunks = self._array_tmask.chunks
+        self.chunks = self.arrays["sea_binary_mask_at_t_location"].chunks
 
     def __getitem__(self,item):
         """Return a grid object restricted to a subdomain.
@@ -738,7 +738,7 @@ class generic_2d_grid:
         sliced_arrays = {}
         for dataname in self.arrays:
             sliced_arrays[dataname] = self.arrays[dataname][item]
-        return generic_2d_grid(variables=sliced_arrays,\
+        return generic_2d_grid(arrays=sliced_arrays,\
                              parameters=self.parameters)
 
 #---------------------------- Misc utilities ------------------------------------
@@ -746,17 +746,10 @@ class generic_2d_grid:
     def get_projection_coordinates(self,grid_location='t'):
         """Return (x,y) the coordinate arrays (in m) at grid location.
 
-        Caution the name of this function is likely to change in the future
-
-        TODO : check the meaning of CF projection coordinates. see #23
-               see  https://github.com/lesommer/oocgcm/issues/23
-
         Caution : only available at t grid_location at present.
 	    """
-        lat = self.arrays['latitude_at_' + grid_location \
-                                                        + '_location']
-        lon = self.arrays['longitude_at_' + grid_location \
-                                                        + '_location']
+        lat = self.arrays['latitude_at_' + grid_location + '_location']
+        lon = self.arrays['longitude_at_' + grid_location + '_location']
         x = earthrad  * deg2rad * lon * xu.cos(lat * deg2rad)
         y = earthrad  * deg2rad * lat
         return x,y
