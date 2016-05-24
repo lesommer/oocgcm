@@ -1,3 +1,5 @@
 #!/usr/bin/env python
 
-__all__ = ["core","oceanmodels","parameters"]
+from .version import version as __version__
+
+__all__ = ["core","oceanmodels","griddeddata","parameters"]

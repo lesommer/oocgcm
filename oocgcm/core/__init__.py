@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 #
 
-__all__ = ["grids", "io","stdnames"]
+__all__ = ["grids", "io","utils","stdnames"]

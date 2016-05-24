@@ -8,6 +8,10 @@ clean
 
 *.swp
 
+doc/_build
+doc/generated
+oocgcm/version.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
