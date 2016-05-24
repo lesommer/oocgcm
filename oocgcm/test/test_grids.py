@@ -141,7 +141,6 @@ class TestGrid2d_DifferentialOperators(TestCase):
         self.assertArray2dCloseInside(actual_gy / s,expected_gy /s ,
                                       depth=2, **tols)
 
-
     def test_curl_of_horizontal_gradient(self):
         tols = {'rtol':1e-3,'atol':1e-3}
         s = self.scale

@@ -2,11 +2,12 @@
 [![codecov.io](https://codecov.io/github/lesommer/oocgcm/coverage.svg?branch=master)](https://codecov.io/github/lesommer/oocgcm?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/lesommer/oocgcm/badge.svg?branch=master)](https://coveralls.io/github/lesommer/oocgcm?branch=master)
 
+
 # oocgcm
-#### Out of core analysis tools for C-grid general circulation models in python.
+#### Out of core analysis tools for general circulation models in python.
 
 This project provides tools for post-processing and **analyzing** output of
-**general circulation models** and **gridded satellite data**.
+**general circulation models** (based on the Arakawa C-grid) and **gridded satellite data**.
 
 Our aim is to simplify the analysis of **very large datasets of model output**
 (~1-100Tb) like those produced by basin-to-global scale sub-mesoscale permitting
