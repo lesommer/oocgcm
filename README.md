@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/lesommer/oocgcm.svg?branch=master)](https://travis-ci.org/lesommer/oocgcm)
 [![codecov.io](https://codecov.io/github/lesommer/oocgcm/coverage.svg?branch=master)](https://codecov.io/github/lesommer/oocgcm?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/lesommer/oocgcm/badge.svg?branch=master)](https://coveralls.io/github/lesommer/oocgcm?branch=master)
-
+[![Documentation Status](https://readthedocs.org/projects/oocgcm/badge/?version=latest)](http://oocgcm.readthedocs.io/en/latest/?badge=latest)
 
 # oocgcm
 #### Out of core analysis tools for general circulation models in python.
