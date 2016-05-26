@@ -29,6 +29,22 @@ def return_xarray_dataset(filename,chunks=None):
     """
     return xr.open_dataset(filename,chunks=chunks,lock=False)
 
+def return_xarray_mfdataset(filename,chunks=None):
+    """Return an xarray dataset corresponding to filename which may include wildcards (e.g. file_*.nc).
+
+    Parameters
+    ----------
+    filename : str
+        path to a netcdf file or several netcdf files from which to create a xarray dataset
+    chunks : dict-like
+        dictionnary of sizes of chunk for creating xarray.Dataset.
+
+    Returns
+    ------
+    ds : xarray.Dataset
+    """
+    return xr.open_mfdataset(filename,chunks=chunks,lock=False)
+
 def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
     """Return a xarray dataarray corresponding to varname in filename.
 

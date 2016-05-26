@@ -47,7 +47,7 @@ for i in xrange(v_xr.shape[0]):
     plt.clf()
     v_xr[i,...].plot.pcolormesh(vmin=-1.,vmax=1.3)
     plt.title(v_xr[i, ...].coords['time_centered'].values, size=10) # to modify the title
-    plt.savefig('movies/fig%04d.jpg'%i, dpi=100)
+    plt.savefig('movies/fig%04d.jpg'%i, dpi=300)
     print i,'/',v_xr.shape[0]-1
 
 os.system("ffmpeg -y -r 4 -i movies/fig%04d.jpg  movies/movie_ffmpeg_ssh.mp4")
