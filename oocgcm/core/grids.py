@@ -1278,7 +1278,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def horizontal_gradient_tensor(self,vectorfield):
-        """
+        r"""
         Return the horizontal gradient tensor of a two-dimensional vector
         field at u,v locations.
 
@@ -1297,6 +1297,7 @@ class generic_2d_grid:
         -----
         The gradient of a vector field :math:`\mathbf{u} = (u,v)` is defined
         as follows :
+
         .. math::
 
              \nabla \mathbf{u} =
@@ -1586,7 +1587,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def q_vector_due_to_kinematic_deformation(self,velocity,buoyancy):
-        """Return the component of the generalized Q-vector associated
+        r"""Return the component of the generalized Q-vector associated
         with kinematic deformation of a two-dimensional velocity field.
 
         Parameters
@@ -1605,7 +1606,9 @@ class generic_2d_grid:
         -----
         Definition of the Q-vector due to kinematic deformation
         (following [1]_, see also [2]_):
+
         .. math::
+
              \mathbf{Q}^g_{kd} =
              -
              \begin{pmatrix}
@@ -1643,7 +1646,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def frontogenesis_function(self,velocity,buoyancy):
-        """Return the frontogeneis function.
+        r"""Return the frontogeneis function.
 
         Parameters
         ----------
@@ -1660,7 +1663,9 @@ class generic_2d_grid:
         Notes
         -----
         Definition of the frontogenesis function (following [1]_)
+
         .. math::
+
              F_s = \mathbf{Q}_{kd} \cdot \nabla_h b
 
         References
