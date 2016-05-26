@@ -595,14 +595,14 @@ class generic_2d_grid:
         for arrayname in self._required_arrays:
             if not(arrays.has_key(arrayname)):
                 raise Exception('Arrays are missing for building the grid.')
-        self.arrays = arrays
+        self._arrays = arrays
         self.parameters = parameters
         self._define_aliases_for_arrays()
-        self.chunks = self.arrays["sea_binary_mask_at_t_location"].chunks
+        self.chunks = self._arrays["sea_binary_mask_at_t_location"].chunks
         # TODO : not clear whether to store the priori description of chunks
         #        (dictionnary) or the posteriori value (tuple of tuples).
-        self.shape  = self.arrays["sea_binary_mask_at_t_location"].shape
-        self.dims   = self.arrays["sea_binary_mask_at_t_location"].dims
+        self.shape  = self._arrays["sea_binary_mask_at_t_location"].shape
+        self.dims   = self._arrays["sea_binary_mask_at_t_location"].dims
         self.ndims = 2 #len(self.dims)
         self._define_area_of_grid_cells()
         self._define_extra_latitude_longitude()
@@ -616,9 +616,9 @@ class generic_2d_grid:
         This is only a definition, the computation is performed only if used.
         """
         for gloc in ['t','u','v','f']:
-            self.arrays["cell_area_at_" + gloc + "_location"] = \
-                    self.arrays["cell_x_size_at_" + gloc + "_location"] \
-                  * self.arrays["cell_y_size_at_" + gloc + "_location"]
+            self._arrays["cell_area_at_" + gloc + "_location"] = \
+                    self._arrays["cell_x_size_at_" + gloc + "_location"] \
+                  * self._arrays["cell_y_size_at_" + gloc + "_location"]
 
     def _define_extra_latitude_longitude(self):
         """Define projection coordinates at u,v,f grid_location if needed.
@@ -628,32 +628,32 @@ class generic_2d_grid:
         # latitude and longitude arrays at u location
         lonname = "longitude_at_u_location"
         latname = "latitude_at_u_location"
-        if not(self.arrays.has_key(lonname)):
-            self.arrays[lonname] = _mi(
-                        self.arrays["longitude_at_t_location"])
-        if not(self.arrays.has_key(latname)):
-            self.arrays[latname] = _mi(
-                        self.arrays["latitude_at_t_location"])
+        if not(self._arrays.has_key(lonname)):
+            self._arrays[lonname] = _mi(
+                        self._arrays["longitude_at_t_location"])
+        if not(self._arrays.has_key(latname)):
+            self._arrays[latname] = _mi(
+                        self._arrays["latitude_at_t_location"])
 
         # latitude and longitude arrays at v location
         lonname = "longitude_at_v_location"
         latname = "latitude_at_v_location"
-        if not(self.arrays.has_key(lonname)):
-            self.arrays[lonname] = _mj(
-                        self.arrays["longitude_at_t_location"])
-        if not(self.arrays.has_key(latname)):
-            self.arrays[latname] = _mj(
-                        self.arrays["latitude_at_t_location"])
+        if not(self._arrays.has_key(lonname)):
+            self._arrays[lonname] = _mj(
+                        self._arrays["longitude_at_t_location"])
+        if not(self._arrays.has_key(latname)):
+            self._arrays[latname] = _mj(
+                        self._arrays["latitude_at_t_location"])
 
         # latitude and longitude arrays at f location
         lonname = "longitude_at_f_location"
         latname = "latitude_at_f_location"
-        if not(self.arrays.has_key(lonname)):
-            self.arrays[lonname] = _mj(
-                        self.arrays["longitude_at_u_location"])
-        if not(self.arrays.has_key(latname)):
-            self.arrays[latname] = _mj(
-                        self.arrays["latitude_at_u_location"])
+        if not(self._arrays.has_key(lonname)):
+            self._arrays[lonname] = _mj(
+                        self._arrays["longitude_at_u_location"])
+        if not(self._arrays.has_key(latname)):
+            self._arrays[latname] = _mj(
+                        self._arrays["latitude_at_u_location"])
 
     def _define_coriolis_parameter(self):
         """Define arrays of coriolis parameter at t,u,v,f grid_location.
@@ -663,7 +663,7 @@ class generic_2d_grid:
         for gloc in ['t','u','v','f']:
             corname = "coriolis_parameter_at_" + gloc + "_location"
             latname = "latitude_at_" + gloc + "_location"
-            self.arrays[corname] = coriolis_parameter(self.arrays[latname])
+            self._arrays[corname] = coriolis_parameter(self._arrays[latname])
 
 
 #--------------------- Aliases for DataArrays ----------------------------------
@@ -675,21 +675,21 @@ class generic_2d_grid:
         external libraries.
         """
         # coordinates
-        self._array_navlon = self.arrays["longitude_at_t_location"]
-        self._array_navlat = self.arrays["latitude_at_t_location"]
+        self._array_navlon = self._arrays["longitude_at_t_location"]
+        self._array_navlat = self._arrays["latitude_at_t_location"]
         # metrics
-        self._array_e1t = self.arrays["cell_x_size_at_t_location"]
-        self._array_e1u = self.arrays["cell_x_size_at_u_location"]
-        self._array_e1v = self.arrays["cell_x_size_at_v_location"]
-        self._array_e2t = self.arrays["cell_y_size_at_t_location"]
-        self._array_e2u = self.arrays["cell_y_size_at_u_location"]
-        self._array_e2v = self.arrays["cell_y_size_at_v_location"]
+        self._array_e1t = self._arrays["cell_x_size_at_t_location"]
+        self._array_e1u = self._arrays["cell_x_size_at_u_location"]
+        self._array_e1v = self._arrays["cell_x_size_at_v_location"]
+        self._array_e2t = self._arrays["cell_y_size_at_t_location"]
+        self._array_e2u = self._arrays["cell_y_size_at_u_location"]
+        self._array_e2v = self._arrays["cell_y_size_at_v_location"]
 
         # masks
-        self._array_tmask = self.arrays["sea_binary_mask_at_t_location"]
-        self._array_umask = self.arrays["sea_binary_mask_at_u_location"]
-        self._array_vmask = self.arrays["sea_binary_mask_at_v_location"]
-        self._array_fmask = self.arrays["sea_binary_mask_at_f_location"]
+        self._array_tmask = self._arrays["sea_binary_mask_at_t_location"]
+        self._array_umask = self._arrays["sea_binary_mask_at_u_location"]
+        self._array_vmask = self._arrays["sea_binary_mask_at_v_location"]
+        self._array_fmask = self._arrays["sea_binary_mask_at_f_location"]
 
 #--------------------- Chunking and Slicing ------------------------------------
     def chunk(self,chunks=None):
@@ -707,39 +707,61 @@ class generic_2d_grid:
         >>> grd.chunk(xr_chunk)
 
         """
-        for dataname in self.arrays:
-            data = self.arrays[dataname]
+        for dataname in self._arrays:
+            data = self._arrays[dataname]
             if isinstance(data, xr.DataArray):
-                self.arrays[dataname] = data.chunk(chunks)
-        self.chunks = self.arrays["sea_binary_mask_at_t_location"].chunks
+                self._arrays[dataname] = data.chunk(chunks)
+        self.chunks = self._arrays["sea_binary_mask_at_t_location"].chunks
 
     def __getitem__(self,item):
-        """Return a grid object restricted to a subdomain.
+        """The behavior of this fcuntion depends on the type of item.
+            - if item is a string, return the array self._arrays[item]
+            - if item is a slice, a grid object restricted to a subdomain.
 
-        Use with caution, this functionnality depends on the order of the
-        dimensions in the netcdf files.
+        Use slicing with caution, this functionnality depends on the order of
+        the dimensions in the netcdf files.
 
         Parameters
         ----------
-        item : slice
-            slice that restrict the grid to a subdomain.
+        item : slice or str
+            item can be a string identifying a key in self._arrays
+            item can be a slice for restricting the grid to a subdomain.
 
         Returns
         -------
-        newgrd : generic_2d_grid
-            a new grid object corresponding to the restructed region.
+        out :  xarray.DataArray or generic_2d_grid
+            either a dataarray corresponding to self._arrays[item]
+            or a new grid object corresponding to the restructed region.
 
         Example
         -------
         >>> grd = generic_2d_grid(...)
+        restricting the grid to a subdomain :
         >>> new_grd = grd[100:200,300:500]
+        accessing a specific dataarray describing the grid
+        >>> e1t = grd['cell_x_size_at_t_location']
 
         """
-        sliced_arrays = {}
-        for dataname in self.arrays:
-            sliced_arrays[dataname] = self.arrays[dataname][item]
-        return generic_2d_grid(arrays=sliced_arrays,\
-                             parameters=self.parameters)
+        if isinstance(item,str):
+            returned = self._arrays[item]
+            
+        else:
+            sliced_arrays = {}
+            for dataname in self._arrays:
+                sliced_arrays[dataname] = self._arrays[dataname][item]
+            returned =  generic_2d_grid(arrays=sliced_arrays,\
+                                        parameters=self.parameters)
+
+        return returned
+
+    def __contains__(self, key):
+        """The 'in' operator will return true or false depending on whether
+        'key' is an array in the dataset or not.
+        """
+        return key in self._arrays
+
+    def __iter__(self):
+        return iter(self._arrays)
 
 #---------------------------- Misc utilities ------------------------------------
 #-
@@ -748,8 +770,8 @@ class generic_2d_grid:
 
         Caution : only available at t grid_location at present.
 	    """
-        lat = self.arrays['latitude_at_' + grid_location + '_location']
-        lon = self.arrays['longitude_at_' + grid_location + '_location']
+        lat = self._arrays['latitude_at_' + grid_location + '_location']
+        lon = self._arrays['longitude_at_' + grid_location + '_location']
         x = earthrad  * deg2rad * lon * xu.cos(lat * deg2rad)
         y = earthrad  * deg2rad * lat
         return x,y
@@ -816,14 +838,14 @@ class generic_2d_grid:
         This function is used internally for change_grid_location_*_to_*
         """
         if conserving is 'area':
-            weights_in  = self.arrays["cell_area_at_" + input  + "_location"]
-            weights_out = self.arrays["cell_area_at_" + output + "_location"]
+            weights_in  = self._arrays["cell_area_at_" + input  + "_location"]
+            weights_out = self._arrays["cell_area_at_" + output + "_location"]
         elif conserving is 'x_flux':
-            weights_in  = self.arrays["cell_y_size_at_" + input  + "_location"]
-            weights_out = self.arrays["cell_y_size_at_" + output + "_location"]
+            weights_in  = self._arrays["cell_y_size_at_" + input  + "_location"]
+            weights_out = self._arrays["cell_y_size_at_" + output + "_location"]
         elif conserving is 'y_flux':
-            weights_in  = self.arrays["cell_x_size_at_" + input  + "_location"]
-            weights_out = self.arrays["cell_x_size_at_" + output + "_location"]
+            weights_in  = self._arrays["cell_x_size_at_" + input  + "_location"]
+            weights_out = self._arrays["cell_x_size_at_" + output + "_location"]
 
         return weights_in, weights_out
 
@@ -1204,8 +1226,8 @@ class generic_2d_grid:
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
 
         #- define each component of the gradient
-        gx = _di(scalararray) / self.arrays["cell_x_size_at_u_location"] # e1u
-        gy = _dj(scalararray) / self.arrays["cell_y_size_at_v_location"] # e2v
+        gx = _di(scalararray) / self._arrays["cell_x_size_at_u_location"] # e1u
+        gy = _dj(scalararray) / self._arrays["cell_y_size_at_v_location"] # e2v
 
         #- finalize attributes
         gxatts = convert_dataarray_attributes_xderivative(scalararray.attrs,\
@@ -1259,13 +1281,13 @@ class generic_2d_grid:
 
         #- define each component of the gradient tensor
         axx = _di(vectorfield.x_component).shift(x=1) \
-              / self.arrays["cell_x_size_at_t_location"]
+              / self._arrays["cell_x_size_at_t_location"]
         axy = _dj(vectorfield.x_component) \
-              / self.arrays["cell_y_size_at_f_location"]
+              / self._arrays["cell_y_size_at_f_location"]
         ayx = _di(vectorfield.y_component) \
-              / self.arrays["cell_x_size_at_f_location"]
+              / self._arrays["cell_x_size_at_f_location"]
         ayy = _dj(vectorfield.y_component).shift(y=1) \
-              / self.arrays["cell_y_size_at_t_location"]
+              / self._arrays["cell_y_size_at_t_location"]
 
         #- finalize arrays' attributes
         arr_x = vectorfield.x_component
@@ -1337,9 +1359,9 @@ class generic_2d_grid:
 
         #- define dataarray
         vx = _di(vectorfield.y_component) \
-              / self.arrays["cell_x_size_at_f_location"]
+              / self._arrays["cell_x_size_at_f_location"]
         uy = _dj(vectorfield.x_component) \
-              / self.arrays["cell_y_size_at_f_location"]
+              / self._arrays["cell_y_size_at_f_location"]
         curl = vx - uy
 
         curl.name = 'vertical component of the curl'
@@ -1430,11 +1452,11 @@ class generic_2d_grid:
                               ndims=self.ndims)
         else:
             maskname = "sea_binary_mask_at_" + grid_location + "_location"
-            where = self.arrays[maskname]
+            where = self._arrays[maskname]
 
         # actual definition
         idims = ('x','y')
-        dxdy = self.arrays['cell_area_at_' + grid_location + '_location']
+        dxdy = self._arrays['cell_area_at_' + grid_location + '_location']
         array_dxdy = array.where(where.squeeze()) * dxdy
         integral = array_dxdy.sum(dim=idims)
 
@@ -1502,10 +1524,10 @@ class generic_2d_grid:
 
         vg = grav \
            * self.change_grid_location_u_to_v(gssh.x_component) \
-           / self.arrays["coriolis_parameter_at_v_location"]
+           / self._arrays["coriolis_parameter_at_v_location"]
         ug = - grav \
            * self.change_grid_location_v_to_u(gssh.y_component) \
-           / self.arrays["coriolis_parameter_at_u_location"]
+           / self._arrays["coriolis_parameter_at_u_location"]
 
         return VectorField2d(ug,vg,\
                              x_component_grid_location = 'u',\

@@ -47,15 +47,15 @@ class TestCreationGrid2d_from_arrays(TestCase):
 
     def test_grid2d_from_latlon_array1d(self):
         grd = agrids.latlon_2d_grid(latitudes=self.y,longitudes=self.x)
-        xx = grd.arrays['longitude_at_t_location']
-        yy = grd.arrays['latitude_at_t_location']
+        xx = grd._arrays['longitude_at_t_location']
+        yy = grd._arrays['latitude_at_t_location']
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
 
     def test_grid2d_from_latlon_array2d(self):
         grd = agrids.latlon_2d_grid(latitudes=self.yy,longitudes=self.xx)
-        xx = grd.arrays['longitude_at_t_location']
-        yy = grd.arrays['latitude_at_t_location']
+        xx = grd._arrays['longitude_at_t_location']
+        yy = grd._arrays['latitude_at_t_location']
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
         self.assertArrayEqual(xx.to_masked_array()[0,:],self.x)
@@ -63,15 +63,15 @@ class TestCreationGrid2d_from_arrays(TestCase):
 
     def test_grid2d_from_plane_coordinate_array1d(self):
         grd = agrids.plane_2d_grid(xcoord=self.x,ycoord=self.y)
-        xx = grd.arrays['plane_x_coordinate_at_t_location']
-        yy = grd.arrays['plane_y_coordinate_at_t_location']
+        xx = grd._arrays['plane_x_coordinate_at_t_location']
+        yy = grd._arrays['plane_y_coordinate_at_t_location']
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
 
     def test_grid2d_from_plane_coordinate_array2d(self):
         grd = agrids.plane_2d_grid(xcoord=self.x,ycoord=self.y)
-        xx = grd.arrays['plane_x_coordinate_at_t_location']
-        yy = grd.arrays['plane_y_coordinate_at_t_location']
+        xx = grd._arrays['plane_x_coordinate_at_t_location']
+        yy = grd._arrays['plane_y_coordinate_at_t_location']
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
         self.assertArrayEqual(xx.to_masked_array()[0,:],self.x)
@@ -112,8 +112,8 @@ class TestGrid2d_spatial_integration(TestCase):
         y = np.arange(start=0, stop=1.2e7, step=1.e6,dtype=float)
         self.xx, self.yy = np.meshgrid(x,y)
         self.grd = agrids.plane_2d_grid(ycoord=self.yy,xcoord=self.xx)
-        self.xax = self.grd.arrays["plane_x_coordinate_at_t_location"]
-        self.xay = self.grd.arrays["plane_y_coordinate_at_t_location"]
+        self.xax = self.grd._arrays["plane_x_coordinate_at_t_location"]
+        self.xay = self.grd._arrays["plane_y_coordinate_at_t_location"]
 
     def test_integrate_dxdy(self):
         integral = self.grd.integrate_dxdy(self.xax>self.xay,grid_location='t')
@@ -132,8 +132,8 @@ class TestGrid2d_DifferentialOperators(TestCase):
         x,y = np.meshgrid(x,y)
         self.grd = agrids.plane_2d_grid(ycoord=y,xcoord=x)
         self.scale = 2. * 3.14159 / 1.e7
-        self.xt = self.grd.arrays['plane_x_coordinate_at_t_location']
-        self.yt = self.grd.arrays['plane_y_coordinate_at_t_location']
+        self.xt = self.grd._arrays['plane_x_coordinate_at_t_location']
+        self.yt = self.grd._arrays['plane_y_coordinate_at_t_location']
         self.xu = self.grd.change_grid_location_t_to_u(self.xt)
         self.yu = self.grd.change_grid_location_t_to_u(self.yt)
         self.xv = self.grd.change_grid_location_t_to_v(self.xt)
@@ -161,8 +161,8 @@ class TestGrid2d_DifferentialOperators(TestCase):
         self.assertArray2dCloseInside(actual_gx / s,expected_gx / s ,
                                       depth=2,**tols)
         #print dxdy[:,20].values
-        #print self.grd.arrays['cell_y_size_at_t_location'][:,20].values
-        #print self.grd.arrays['cell_y_size_at_v_location'][:,20].values
+        #print self.grd._arrays['cell_y_size_at_t_location'][:,20].values
+        #print self.grd._arrays['cell_y_size_at_v_location'][:,20].values
         #print_array_around(expected=expected_gy/s,actual=actual_gy/s)
         self.assertArray2dCloseInside(actual_gy / s,expected_gy /s ,
                                       depth=2, **tols)
@@ -186,7 +186,7 @@ class TestGrid2d_DifferentialOperators(TestCase):
         s = self.scale
         divvar = self.grd.horizontal_divergence(self.vector)
         dxdy = grids._dj(self.xv).shift(y=1) \
-              / self.grd.arrays["cell_y_size_at_t_location"] # custom derivative
+              / self.grd._arrays["cell_y_size_at_t_location"] # custom derivative
         actual_div = divvar.to_masked_array()
         expected_div = (xu.cos(self.xt * s) * s
                       - xu.sin(self.yt * s) * s
