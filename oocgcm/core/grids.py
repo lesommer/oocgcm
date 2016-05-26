@@ -1176,7 +1176,7 @@ class generic_2d_grid:
         Notes
         -----
         Relocates all the components of the VectorFields at t grid_location
-        then compute :math::`c = v1_x . v2_y - v1_y . v2_x.
+        then compute :math:`c = v1_x . v2_y - v1_y . v2_x.
 
         So far, only available for vector fields at u,v grid_location.
 
@@ -1600,7 +1600,7 @@ class generic_2d_grid:
         Returns
         -------
         vectorfield : VectorField2d
-           Two-dimensional vector field of $Q_{kd}$ at u,v-points.
+           Two-dimensional vector field of :math:`Q_{kd}` at u,v-points.
 
         Notes
         -----
