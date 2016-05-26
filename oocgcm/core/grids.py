@@ -465,10 +465,17 @@ def Tensor2d(axx,axy,ayx,ayy,\
              yy_component_grid_location=None):
     """Minimal data structure for manupulating 2d tensors on a grid.
 
-    use the following notations :
-                | axx   axy|
-            T = |          |
-                | ayx   ayy|
+    Notes
+    -----
+    uses the following notations :
+    .. math::
+
+         \mathbf{T} =
+         \begin{pmatrix}
+         a_{xx} & a_{xy} \\
+         a_{yv} & a_{yy}
+         \end{pmatrix}
+
     Parameters
     ----------
     axx : xarray.DataArray
@@ -1169,7 +1176,7 @@ class generic_2d_grid:
         Notes
         -----
         Relocates all the components of the VectorFields at t grid_location
-        then compute :math::`c = v1_x . v2_y - v1_y . v2_x`.
+        then compute :math::`c = v1_x . v2_y - v1_y . v2_x.
 
         So far, only available for vector fields at u,v grid_location.
 
@@ -1610,10 +1617,10 @@ class generic_2d_grid:
         References
         ----------
         .. [1] Hoskins, B.J., Bretherton, F.P., 1972. Atmospheric Frontogenesis
-        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11–37.
+        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11-37.
         .. [2] Giordani, H., Prieur, L., Caniaux, G., 2006. Advanced insights
         into sources of vertical velocity in the ocean. Ocean Dynamics 56,
-        513–524.
+        513-524.
 
 
         """
@@ -1659,7 +1666,7 @@ class generic_2d_grid:
         References
         ----------
         .. [1] Hoskins, B.J., Bretherton, F.P., 1972. Atmospheric Frontogenesis
-        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11–37.
+        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11-37.
 
         """
         # TODO : avoid duplication of computation of gradhb
