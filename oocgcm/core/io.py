@@ -24,7 +24,7 @@ def return_xarray_dataset(filename,chunks=None):
         dictionnary of sizes of chunk for creating xarray.Dataset.
 
     Returns
-    ------
+    -------
     ds : xarray.Dataset
     """
     return xr.open_dataset(filename,chunks=chunks,lock=False)
@@ -44,7 +44,7 @@ def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
         not used
 
     Returns
-    ------
+    -------
     da : xarray.DataArray
     """
     ds = return_xarray_dataset(filename,chunks=chunks)

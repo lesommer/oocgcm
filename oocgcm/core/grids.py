@@ -1211,8 +1211,8 @@ class generic_2d_grid:
         ----------
         datastructure : xarray.DataArray or VectorField2d
 
-        Return
-        ------
+        Returns
+        -------
         result : VectorField2d or Tensor2d
 
         Methods
@@ -1220,7 +1220,7 @@ class generic_2d_grid:
         calls horizontal_gradient_vector or horizontal_gradient_tensor depending
         on th type of the input datastructure.
 
-        See also:
+        See also
         --------
         self.horizontal_gradient_vector,  self.horizontal_gradient_tensor
 
@@ -1241,8 +1241,8 @@ class generic_2d_grid:
         scalararray : xarray.DataArray
             xarray of a scalar variable at grid_location='t'
 
-        Return
-        ------
+        Returns
+        -------
         vectorfield : VectorField2d namedtuple
             x and y component of the horizontal gradient at u,v-points
         """
@@ -1292,8 +1292,8 @@ class generic_2d_grid:
         vectorfield : VectorField2d
             namedtuple of a vector field defined at u,v points
 
-        Return
-        ------
+        Returns
+        -------
         gradtensor : Tensor2d
             namedtuple holding the component of the horizontal gradient of
             the vector field at at t and f points.
@@ -1609,7 +1609,7 @@ class generic_2d_grid:
         with kinematic deformation of a two-dimensional velocity field.
 
         Namely,
-        $$F_s = \mathbf{Q}_{kd} \cdot \nabla_h b$$
+        ##F_s = \mathbf{Q}_{kd} \cdot \nabla_h b$$
 
         see Hoskins and Bretherthon 1972.
 

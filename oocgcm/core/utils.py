@@ -42,7 +42,7 @@ def add_extra_attrs_to_dataarray(xarr,**extra_kwargs):
         not used
 
     Returns
-    ------
+    -------
     da : xarray.DataArray
     """
     if not(is_xarray(xarr)):

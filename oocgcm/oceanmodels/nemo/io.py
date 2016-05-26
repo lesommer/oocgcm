@@ -42,11 +42,11 @@ def return_xarray_dataarray(*args,**kwargs):
     **kwargs : keyword arguments
 
     Returns
-    ------
+    -------
     da : xarray.DataArray
 
     Methods
-    ------
+    -------
     change the name of dimension 'time_counter' in 't'
     """
     _da = _return_xarray_dataarray(*args,**kwargs)
