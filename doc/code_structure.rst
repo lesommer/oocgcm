@@ -1,7 +1,7 @@
 .. currentmodule:: oocgcm
 
-For oocgcm developpers : 
-=======================
+For oocgcm developpers  
+======================
 
 If you are willing to contribute to developping oocgcm, we here provide information 
 about the structure of oocgcm library. 
@@ -18,7 +18,7 @@ structure of oocgcm library
    but transvers to particular sources of data (numpy version and xarray wrappers)
  - airseafuncs : will contain methods for analysing air-sea exchanges. 
  - regrid : will contain methods for regridding gridded data.
- - spectra : will contain methode for computing wavenumber spectra and frequency 
+ - spectra : will contain methods for computing wavenumber spectra and frequency 
    spectra out of xarray.DataArray
  - stats : will contain methods for applying descriptive statistics to gridded 
    data.
