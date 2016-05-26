@@ -1375,6 +1375,110 @@ class generic_2d_grid:
         return div
 
 #
+#-------------------- Spatial Integration and averages --------------------------
+#
+
+    def integrate_dxdy(self,array,where=None,grid_location=None,normalize=False):
+        """Return the horizontal integral of array in regions where
+        where is True.
+
+        Parameters
+        ----------
+        array : xarray.DataArray
+            a dataarray with an additonal attribute specifying the grid_location.
+            The dimension of array should include 'x' and 'y'.
+            The shape of array should match the shape of the grid.
+        where: boolean xarray.DataArray
+            dataarray with value = True where the integration should be applied.
+            The dimension of where should be a subset of the dimension of array.
+            For each dimension, the size should be equal to the corresponding
+            size of array dataarray.
+            if where is None, the function return the integral in all the domain
+            defined by the grid object.
+        grid_location : str
+            string describing the grid location : eg 'u','v','t','f'...
+             - if grid_location is not None
+                    check compatibility with array.attrs.grid_location
+             - if grid_location is None
+                    use array.attrs.grid_location by default
+        normalize
+
+        Returns
+        -------
+        integral: xarray.DataArray
+            a dataarray with reduced dimension defining the integral of array in
+            the region of interest.
+        """
+        # check grid location
+        if grid_location is None:
+            if not(isinstance(array,xr.DataArray)):
+                raise TypeError('input array should be a xarray.DataArray')
+            elif array.attrs.has_key("grid_location"):
+                grid_location = array.attrs["grid_location"]
+            else:
+                raise Exception('grid_location is not known.')
+            #except:
+            #    raise TypeError('input array should be a xarray.DataArray')
+
+        # check arrays
+        check_input_array(array,\
+                            chunks=self.chunks,grid_location=grid_location,
+                            ndims=self.ndims)
+        if where is not None:
+            check_input_array(where,\
+                              chunks=self.chunks,grid_location=grid_location,
+                              ndims=self.ndims)
+        else:
+            maskname = "sea_binary_mask_at_" + grid_location + "_location"
+            where = self.arrays[maskname]
+
+        # actual definition
+        idims = ('x','y')
+        dxdy = self.arrays['cell_area_at_' + grid_location + '_location']
+        array_dxdy = array.where(where.squeeze()) * dxdy
+        integral = array_dxdy.sum(dim=idims)
+
+        # normalize if required
+        if normalize:
+            integral /= dxdy.where(where.squeeze()).sum(dim=idims)
+
+        return integral
+
+    def spatial_average_xy(self,array,where=None,grid_location=None):
+        """Return the horizontal average of array in regions where where is True.
+
+        Parameters
+        ----------
+        array : xarray.DataArray
+            a dataarray with an additonal attribute specifying the grid_location.
+            The dimension of array should include 'x' and 'y'.
+            The shape of array should match the shape of the grid.
+        where: boolean xarray.DataArray
+            dataarray with value = True where the integration should be applied
+            The dimension of where should be a subset of the dimension of array.
+            For each dimension, the size should be equal to the corresponding
+            size of array dataarray.
+            if where is None, the function return the integral in all the domain
+            defined by the grid object.
+        grid_location : str
+            string describing the grid location : eg 'u','v','t','f'...
+             - if grid_location is not None
+                    check compatibility with array.attrs.grid_location
+             - if grid_location is None
+                    use array.attrs.grid_location by default
+
+        Returns
+        -------
+        average: xarray.DataArray
+            a dataarray with reduced dimension defining the average of array in
+            the region of interest.
+        """
+
+        average = self.integrate_dxdy(array,where=where,
+                                 grid_location=grid_location,normalize=True)
+        return average
+
+#
 #--------------- Operators specific to oceanic applications --------------------
 #
 #   TODO : could move to another module if oocgcm is used for atmospheric models

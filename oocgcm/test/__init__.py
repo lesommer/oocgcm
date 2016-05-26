@@ -7,7 +7,7 @@ import warnings
 from contextlib import contextmanager
 
 import numpy as np
-from numpy.testing import assert_array_equal,assert_allclose
+from numpy.testing import assert_equal,assert_array_equal,assert_allclose
 
 from xarray.core.variable import as_variable
 
