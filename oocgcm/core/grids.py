@@ -860,6 +860,8 @@ class generic_2d_grid:
                                           conserving=None):
         """Return the weights for changing grid location.
 
+        Notes
+        -----
         This function is used internally for change_grid_location_*_to_*
         """
         if conserving is 'area':
@@ -884,9 +886,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
@@ -906,9 +908,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
@@ -928,9 +930,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
@@ -950,9 +952,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
@@ -972,9 +974,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='f',ndims=self.ndims)
@@ -994,9 +996,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='f',ndims=self.ndims)
@@ -1016,9 +1018,9 @@ class generic_2d_grid:
             original array to be relocated
         conserving : str
             any of 'area', 'x_flux' or 'y_flux'.
-             - 'area' : conserves the area
-             - 'x_flux' : conserves the flux in x-direction (eastward)
-             - 'y_flux' : conserves the flux in y-direction (northward)
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
         """
         # first move to t-point
         newarr = self.change_grid_location_v_to_t(scalararray,
@@ -1082,8 +1084,8 @@ class generic_2d_grid:
         ------
         scalararray : xarray.DataArray
 
-        Methods
-        -------
+        Notes
+        -----
         Multiplies each component independently, relocates each component at
         t grid_location then add the two products.
         """
@@ -1122,8 +1124,8 @@ class generic_2d_grid:
         ------
         vectorfield : VectorField2d namedtuple
 
-        Methods
-        -------
+        Notes
+        -----
         Relocates scalararray at u,v grid_location then multiply each component
         of vectorfield by the relocated scalararray.
         """
@@ -1152,8 +1154,6 @@ class generic_2d_grid:
     def vertical_component_of_the_cross_product(self,vectorfield1,vectorfield2):
         """Return the cross product of two vector fields.
 
-        So far, only available for vector fields at u,v grid_location.
-
         Parameters
         ----------
         vectorfield1 : VectorField2d namedtuple
@@ -1166,10 +1166,13 @@ class generic_2d_grid:
         scalararray : xarray.DataArray
             vertical component at t grid location
 
-        Methods
-        -------
+        Notes
+        -----
         Relocates all the components of the VectorFields at t grid_location
-        then compute c = v1_x * v2_y - v1_y * v2_x
+        then compute :math::`c = v1_x . v2_y - v1_y . v2_x`.
+
+        So far, only available for vector fields at u,v grid_location.
+
         """
 
         #- check input arrays
@@ -1272,21 +1275,6 @@ class generic_2d_grid:
         Return the horizontal gradient tensor of a two-dimensional vector
         field at u,v locations.
 
-        Namely, with $\mathbf{u} = (u,v)$
-        $$
-        \nabla \mathbf{u} =
-        \begin{pmatrix}
-        \partial_x u & \partial_y u \\
-        \partial_y v &  \partial_y v
-        \end{pmatrix}
-        $$
-
-        $ \partial_x u $ is defined at t grid location.
-        $ \partial_y u $ is defined at f grid location.
-        $ \partial_x v $ is defined at f grid location.
-        $ \partial_y v $ is defined at t grid location.
-
-
         Parameters
         ----------
         vectorfield : VectorField2d
@@ -1297,6 +1285,25 @@ class generic_2d_grid:
         gradtensor : Tensor2d
             namedtuple holding the component of the horizontal gradient of
             the vector field at at t and f points.
+
+        Notes
+        -----
+        The gradient of a vector field :math:`\mathbf{u} = (u,v)` is defined
+        as follows :
+        .. math::
+
+             \nabla \mathbf{u} =
+             \begin{pmatrix}
+             \partial_x u & \partial_y u \\
+             \partial_y v &  \partial_y v
+             \end{pmatrix}
+
+        where:
+          - :math:`\partial_x u` is defined at t grid location.
+          - :math:`\partial_y u` is defined at f grid location.
+          - :math:`\partial_x v` is defined at f grid location.
+          - :math:`\partial_y v` is defined at t grid location.
+
         """
         #- check input arrays
         check_input_array(vectorfield.x_component,\
@@ -1341,8 +1348,6 @@ class generic_2d_grid:
         """
         Return the horizontal laplacian of a scalar field at t-points.
 
-        Compute the laplacian as the divergence of the gradient.
-
         Parameters
         ----------
         scalararray : xarray.DataArray
@@ -1352,6 +1357,11 @@ class generic_2d_grid:
         -------
         scalararray : xarray.DataArray
             xarray of laplacian defined at grid_location='t'
+
+        Notes
+        -----
+        Compute the laplacian as the divergence of the gradient.
+
         """
         # check
         check_input_array(scalararray,\
@@ -1448,13 +1458,19 @@ class generic_2d_grid:
                     check compatibility with array.attrs.grid_location
              - if grid_location is None
                     use array.attrs.grid_location by default
-        normalize
+        normalize : boolean
+            boolean stating whether of not the integral should be normalized
+            by the area of the region over which the integration is performed.
 
         Returns
         -------
         integral: xarray.DataArray
             a dataarray with reduced dimension defining the integral of array in
             the region of interest.
+
+        See also
+        --------
+        spatial_average_xy : averaging over a region
         """
         # check grid location
         if grid_location is None:
@@ -1519,6 +1535,10 @@ class generic_2d_grid:
         average: xarray.DataArray
             a dataarray with reduced dimension defining the average of array in
             the region of interest.
+
+        See also
+        --------
+        integrate_dxdy : spatial integral over a region
         """
 
         average = self.integrate_dxdy(array,where=where,
@@ -1562,18 +1582,6 @@ class generic_2d_grid:
         """Return the component of the generalized Q-vector associated
         with kinematic deformation of a two-dimensional velocity field.
 
-        Namely,
-        $$
-        \mathbf{Q}^g_{kd} =
-        -
-        \begin{pmatrix}
-        \partial_x u \,\partial_x b  + \partial_x v_g \,\partial_y b \\
-        \partial_y u \,\partial_x b  + \partial_y v_g \,\partial_y b
-        \end{pmatrix}
-        $$
-
-        see Hoskins and Bretherthon 1972.
-
         Parameters
         ----------
         velocity : VectorField2d
@@ -1585,6 +1593,29 @@ class generic_2d_grid:
         -------
         vectorfield : VectorField2d
            Two-dimensional vector field of $Q_{kd}$ at u,v-points.
+
+        Notes
+        -----
+        Definition of the Q-vector due to kinematic deformation
+        (following [1]_, see also [2]_):
+        .. math::
+             \mathbf{Q}^g_{kd} =
+             -
+             \begin{pmatrix}
+             \partial_x u \,\partial_x b  + \partial_x v_g \,\partial_y b \\
+             \partial_y u \,\partial_x b  + \partial_y v_g \,\partial_y b
+             \end{pmatrix}
+
+
+        References
+        ----------
+        .. [1] Hoskins, B.J., Bretherton, F.P., 1972. Atmospheric Frontogenesis
+        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11–37.
+        .. [2] Giordani, H., Prieur, L., Caniaux, G., 2006. Advanced insights
+        into sources of vertical velocity in the ocean. Ocean Dynamics 56,
+        513–524.
+
+
         """
         gradhb = self.horizontal_gradient(buoyancy)  # at u,v location
         gradvel = self.horizontal_gradient(velocity) # at t,f locations
@@ -1605,13 +1636,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def frontogenesis_function(self,velocity,buoyancy):
-        """Return the component of the generalized Q-vector associated
-        with kinematic deformation of a two-dimensional velocity field.
-
-        Namely,
-        ##F_s = \mathbf{Q}_{kd} \cdot \nabla_h b$$
-
-        see Hoskins and Bretherthon 1972.
+        """Return the frontogeneis function.
 
         Parameters
         ----------
@@ -1624,6 +1649,18 @@ class generic_2d_grid:
         -------
         result : xarray.DataArray
            Frontogenesis function at at t location.
+
+        Notes
+        -----
+        Definition of the frontogenesis function (following [1]_)
+        .. math::
+             F_s = \mathbf{Q}_{kd} \cdot \nabla_h b
+
+        References
+        ----------
+        .. [1] Hoskins, B.J., Bretherton, F.P., 1972. Atmospheric Frontogenesis
+        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11–37.
+
         """
         # TODO : avoid duplication of computation of gradhb
         Qkd = self.q_vector_due_to_kinematic_deformation(velocity,buoyancy)

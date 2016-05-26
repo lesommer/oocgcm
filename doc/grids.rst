@@ -29,7 +29,7 @@ grids can also be constructed from netcdf files describing the model grid
 (only available for NEMO so far). This method should ne preferred as the 
 metric factor defining the grid are more accurate in this case. 
 
->>> from oocgcm.oceanmodels import grids
+>>> from oocgcm.oceanmodels.nemo import grids
 >>> grids.nemo_2d_grid(nemo_coordinate_file=...,nemo_byte_mask_file=...,chunks=...)
 
 grids can also be constructed from x,y coordinate (in m). This can be useful for 
