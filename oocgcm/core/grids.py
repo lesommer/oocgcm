@@ -596,17 +596,41 @@ class generic_2d_grid:
             if not(arrays.has_key(arrayname)):
                 raise Exception('Arrays are missing for building the grid.')
         self._arrays = arrays
-        self.parameters = parameters
+        self._extra_parameters = parameters
         self._define_aliases_for_arrays()
-        self.chunks = self._arrays["sea_binary_mask_at_t_location"].chunks
-        # TODO : not clear whether to store the priori description of chunks
-        #        (dictionnary) or the posteriori value (tuple of tuples).
-        self.shape  = self._arrays["sea_binary_mask_at_t_location"].shape
-        self.dims   = self._arrays["sea_binary_mask_at_t_location"].dims
-        self.ndims = 2 #len(self.dims)
         self._define_area_of_grid_cells()
         self._define_extra_latitude_longitude()
         self._define_coriolis_parameter()
+
+#--------------------- Public attributes ---------------------------------------
+    @property
+    def dims(self):
+        """Dimensions of the xarray dataarrays describing the grid.
+        """
+        dims = list(self._arrays["sea_binary_mask_at_t_location"].dims)
+        if 't' in dims: dims.remove('t')
+        return tuple(dims)
+
+    @property
+    def ndims(self):
+        """Number of dimensions of the dataarrays describing the grid.
+        """
+        return len(self.dims)
+
+    @property
+    def shape(self):
+        """Shape of the xarray dataarrays describing the grid.
+        """
+        return self._arrays["sea_binary_mask_at_t_location"].squeeze().shape
+
+    @property
+    def chunks(self):
+        """Chunks of the xarray dataarrays describing the grid.
+        """
+        # TODO : not clear whether to store the priori description of chunks
+        #        (dictionnary) or the posteriori value (tuple of tuples).
+
+        return self._arrays["sea_binary_mask_at_t_location"].chunks
 
 #--------------------- Extra xarrays for the grid ------------------------------
 
@@ -744,13 +768,13 @@ class generic_2d_grid:
         """
         if isinstance(item,str):
             returned = self._arrays[item]
-            
+
         else:
             sliced_arrays = {}
             for dataname in self._arrays:
                 sliced_arrays[dataname] = self._arrays[dataname][item]
             returned =  generic_2d_grid(arrays=sliced_arrays,\
-                                        parameters=self.parameters)
+                                        parameters=self._extra_parameters)
 
         return returned
 
@@ -768,7 +792,8 @@ class generic_2d_grid:
     def get_projection_coordinates(self,grid_location='t'):
         """Return (x,y) the coordinate arrays (in m) at grid location.
 
-        Caution : only available at t grid_location at present.
+        Caution : This function may change in future versions of oocgcm.
+
 	    """
         lat = self._arrays['latitude_at_' + grid_location + '_location']
         lon = self._arrays['longitude_at_' + grid_location + '_location']
