@@ -1,8 +1,13 @@
 .. currentmodule:: oocgcm
 
-For developpers : structure of oocgcm library
-=============================================
+For oocgcm developpers : 
+=======================
 
+If you are willing to contribute to developping oocgcm, we here provide information 
+about the structure of oocgcm library. 
+
+structure of oocgcm library
+---------------------------
  - core : contains data-agnostic versions of methods that are inherently
    data-specific
  - oceanmodels : contains data-specific methods adapted to a range of c-grid
