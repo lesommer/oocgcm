@@ -8,14 +8,14 @@ import warnings
 from setuptools import setup, find_packages
 
 MAJOR = 0
-MINOR = 0
-MICRO = 1 
+MINOR = 1
+MICRO = 0 
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 QUALIFIER = ''
 
 DISTNAME = 'oocgcm'
-LICENSE = 'not defined yet'
+LICENSE = 'Apache License, Version 2'
 AUTHOR = 'oocgcm Developers'
 AUTHOR_EMAIL = 'julien.lesommer@gmail.com'
 URL = 'https://github.com/lesommer/oocgcm'
@@ -29,20 +29,20 @@ CLASSIFIERS = [
 ]
 
 
-INSTALL_REQUIRES = ['numpy >= 1.7', 'xarray >= 0.7.2']
+INSTALL_REQUIRES = ['numpy >= 1.11', 'xarray >= 0.7.2']
 
 DESCRIPTION = "Out of core diagnostics of C-grid GCMs in Python"
 
 LONG_DESCRIPTION = """
 **oocgcm** is an open source project and Python package that aims to 
 simplify the analysis of large scale datasets (1-100Tb) produced by 
-ocean general circulation models. The project builds upon the xarray
+general circulation models. The project builds upon the xarray
 and dask python packages.
 
 Our goal is to provide a set of tools that allow to perform out-of-core
 computations within a robust and intuitive framework. We intend to  
-reduce the time needed to deploy a complex analysis of model output 
-from the prototyping phase to the production phase.
+reduce the time needed to deploy a complex analysis of gridded satelite 
+date or model output from the prototyping phase to the production phase.
 
 Important links
 ---------------

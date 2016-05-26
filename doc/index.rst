@@ -66,6 +66,7 @@ Documentation
    grids
    io
    api
+   code_structure
    faq
    whats-new
 
