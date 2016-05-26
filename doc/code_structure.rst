@@ -10,13 +10,12 @@ For developpers : structure of oocgcm library
  - griddeddata : contains data-specific methods adapted to two-dimensional
    gridded data, including satellite data
  - oceanfuncs : contains functions that are only relevant for analysing ocean data
-    but transvers to particular sources of data (numpy version and xarray
-    wrappers)
+   but transvers to particular sources of data (numpy version and xarray wrappers)
  - airseafuncs : will contain methods for analysing air-sea exchanges. 
  - regrid : will contain methods for regridding gridded data.
- - spectra : will contain methode for computing wavenumber spectra and frequency
-    spectra out of xarray.DataArray
- - stats : will contain methods for applying descriptive statistics to gridded
-    data.
+ - spectra : will contain methode for computing wavenumber spectra and frequency 
+   spectra out of xarray.DataArray
+ - stats : will contain methods for applying descriptive statistics to gridded 
+   data.
  - filtering : will contain methods for filtering gridded data in space or in
    time

@@ -37,8 +37,8 @@ I/O tools
 
    core.io.return_xarray_dataset
    core.io.return_xarray_dataarray
-   oceanmodels.nemo.return_xarray_dataset
-   oceanmodels.nemo.return_xarray_dataarray
+   oceanmodels.nemo.io.return_xarray_dataset
+   oceanmodels.nemo.io.return_xarray_dataarray
 
 Miscellaneous
 -------------
