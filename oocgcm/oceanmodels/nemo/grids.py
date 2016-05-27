@@ -138,7 +138,7 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
 #
 def nemo_2d_grid(nemo_coordinate_file=None,
                  nemo_byte_mask_file=None,
-                 chunks=None):
+                 chunks=None,byte_mask_level=0):
     """Return a generic 2d grid from nemo coordinate and mask files.
 
     Parameters
@@ -149,6 +149,8 @@ def nemo_2d_grid(nemo_coordinate_file=None,
         path to NEMO mask file associated to the model configuration.
     chunks : dict-like
         dictionnary of sizes of chunk for creating xarray.DataArray.
+    byte_mask_level : int
+        index of the level from which the masks should be loaded
 
     Returns
     -------
@@ -158,7 +160,7 @@ def nemo_2d_grid(nemo_coordinate_file=None,
     variables = variables_holder_for_2d_grid_from_nemo_ogcm(
                      nemo_coordinate_file=nemo_coordinate_file,
                      nemo_byte_mask_file=nemo_byte_mask_file,
-                     chunks=chunks)
+                     chunks=chunks,byte_mask_level=byte_mask_level)
     grid = generic_2d_grid(arrays=variables.variables,
                            parameters= variables.parameters)
     return grid
