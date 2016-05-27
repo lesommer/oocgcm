@@ -9,7 +9,7 @@ A practical need
 
 oocgcm is a pure Python package built on the top of xarray_ and dask_.
 But why have we choosen to implement a diagnostic package based on
-xarray_ and dask_ instea of pursuing the development of packages based on numpy ?
+xarray_ and dask_ instead of pursuing the development of packages based on numpy ?
 
 Most of the tools that are implemented in oocgcm are indeed already available in
 several python libraries based on numpy_ and one of the several netCDF interfaces
