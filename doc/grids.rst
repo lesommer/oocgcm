@@ -126,6 +126,8 @@ data is requested, as for instance if the first two-dimensional field is written
 
 >>> gssh[0].to_necdf(path_to_my_output_file)
 
-This absstrat representation of operations that allows xarray is key for efficiently implementing 
-out-of-core procedures.
+This abstract representation of operations that allows xarray is key for efficiently implementing 
+out-of-core procedures. It also allows to straighforwardly deal **with grids with time-varying metrics**. 
+This is key for working with arbitrary **lagrangian-eulerian vertical coordinates**.
+
 
