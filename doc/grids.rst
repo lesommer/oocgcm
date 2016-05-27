@@ -28,9 +28,7 @@ In practice, a grid object can be created from arrays of latitude and longitude
 >>> grd = grids.latlon_2d_grid(latitudes=lats,longitudes=lons)
 
 Grids descriptors can also be constructed from netCDF files describing the model grid 
-(only available for NEMO so far). This method should be preferred as the 
-metric factors that described the grid (e.g. ``grd["cell_x_size_at_t_location"]``)
-are more accurate in this case. 
+(only available for NEMO ocean model so far). 
 
 >>> from oocgcm.oceanmodels.nemo import grids
 >>> grd = grids.nemo_2d_grid(nemo_coordinate_file=...,nemo_byte_mask_file=...,chunks=...)
