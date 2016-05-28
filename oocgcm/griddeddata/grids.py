@@ -11,7 +11,7 @@ import xarray as xr
 from xarray.ufuncs import sqrt, cos
 
 from ..core.grids import generic_2d_grid,_mi,_mj,_horizontal_gradient
-from ..core.utils import add_extra_attrs_to_dataarray, is_numpy
+from ..core.utils import _append_dataarray_extra_attrs, is_numpy
 from ..parameters.physicalparameters import earthrad
 from ..parameters.mathematicalparameters import deg2rad
 
@@ -157,8 +157,8 @@ class variables_holder_for_2d_grid_from_plane_coordinate_arrays:
             ycoord = xr.DataArray(ycoord,dims=['y','x'])
         self.shape = xcoord.shape
 
-        xcoord = add_extra_attrs_to_dataarray(xcoord,grid_location='t')
-        ycoord = add_extra_attrs_to_dataarray(ycoord,grid_location='t')
+        xcoord = _append_dataarray_extra_attrs(xcoord,grid_location='t')
+        ycoord = _append_dataarray_extra_attrs(ycoord,grid_location='t')
         self.variables\
             ["plane_x_coordinate_at_t_location"] = xcoord.chunk(chunks)
         self.variables\
@@ -172,7 +172,7 @@ class variables_holder_for_2d_grid_from_plane_coordinate_arrays:
             self.has_mask = False
             mask = xr.DataArray(np.ones(self.shape,dtype=bool), dims=['y','x'])
         mask = mask.chunk(chunks)
-        mask = add_extra_attrs_to_dataarray(mask,grid_location='t')
+        mask = _append_dataarray_extra_attrs(mask,grid_location='t')
         self.variables["sea_binary_mask_at_t_location"] = mask
 
         self._compute_plane_coordinates_at_all_locations()
@@ -263,11 +263,11 @@ class variables_holder_for_2d_grid_from_plane_coordinate_arrays:
         """
         tmask = self.variables["sea_binary_mask_at_t_location"]
         if not(self.has_mask): # no mask, only ocean points
-            umask = add_extra_attrs_to_dataarray(tmask.copy(),
+            umask = _append_dataarray_extra_attrs(tmask.copy(),
                                                  grid_location='u')
-            vmask = add_extra_attrs_to_dataarray(tmask.copy(),
+            vmask = _append_dataarray_extra_attrs(tmask.copy(),
                                                  grid_location='v')
-            fmask = add_extra_attrs_to_dataarray(tmask.copy(),
+            fmask = _append_dataarray_extra_attrs(tmask.copy(),
                                                  grid_location='f')
         else:
             umask,vmask,tmask = _masks_from_mask_at_t_location(tmask)
@@ -317,8 +317,8 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
             longitudes = xr.DataArray(longitudes,dims=['y','x'])
         self.shape = longitudes.shape
 
-        longitudes = add_extra_attrs_to_dataarray(longitudes,grid_location='t')
-        latitudes  = add_extra_attrs_to_dataarray(latitudes,grid_location='t')
+        longitudes = _append_dataarray_extra_attrs(longitudes,grid_location='t')
+        latitudes  = _append_dataarray_extra_attrs(latitudes,grid_location='t')
         self.variables\
             ["longitude_at_t_location"] = longitudes.chunk(chunks)
         self.variables\
@@ -332,7 +332,7 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
             self.has_mask = False
             mask = xr.DataArray(np.ones(self.shape,dtype=bool), dims=['y','x'])
         mask = mask.chunk(chunks)
-        mask = add_extra_attrs_to_dataarray(mask,grid_location='t')
+        mask = _append_dataarray_extra_attrs(mask,grid_location='t')
         self.variables["sea_binary_mask_at_t_location"] = mask
 
         self._compute_geographical_coordinates_at_all_locations()
@@ -394,11 +394,11 @@ class variables_holder_for_2d_grid_from_latlon_arrays:
         """
         tmask = self.variables["sea_binary_mask_at_t_location"]
         if not(self.has_mask): # no mask, only ocean points
-            umask = add_extra_attrs_to_dataarray(tmask.copy(),
+            umask = _append_dataarray_extra_attrs(tmask.copy(),
                                                  grid_location='u')
-            vmask = add_extra_attrs_to_dataarray(tmask.copy(),
+            vmask = _append_dataarray_extra_attrs(tmask.copy(),
                                                  grid_location='v')
-            fmask = add_extra_attrs_to_dataarray(tmask.copy(),
+            fmask = _append_dataarray_extra_attrs(tmask.copy(),
                                                  grid_location='f')
         else:
             umask,vmask,tmask = _masks_from_mask_at_t_location(tmask)

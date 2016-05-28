@@ -4,7 +4,7 @@
 Define classes that give acces to grid metrics and differential operators.
 
 """
-from collections import namedtuple # for vector data structures
+from collections import namedtuple # for vector fields data structures
 
 import numpy as np
 import xarray as xr
@@ -12,7 +12,10 @@ import dask.array as da
 import xarray.ufuncs as xu         # ufuncs like np.sin for xarray
 
 
-from .utils import is_numpy,is_xarray,has_chunks,add_extra_attrs_to_dataarray
+from .utils import is_numpy,is_xarray,check_input_array
+from .utils import _append_dataarray_extra_attrs
+from .utils import _assert_and_set_grid_location_attribute
+
 from ..parameters.physicalparameters import coriolis_parameter, grav
 from ..parameters.physicalparameters import earthrad
 from ..parameters.mathematicalparameters import deg2rad
@@ -156,7 +159,7 @@ def _finalize_dataarray_attributes(xarr,**kwargs):
         xarr.name = xarr.attrs['short_name']
     return xarr
 
-def convert_dataarray_attributes_xderivative(attrs,grid_location=None):
+def _convert_dataarray_attributes_xderivative(attrs,grid_location=None):
     """Return the dictionary of attributes corresponding to the spatial
     derivative of a scalar field in the x-direction
 
@@ -183,7 +186,7 @@ def convert_dataarray_attributes_xderivative(attrs,grid_location=None):
         new_attrs['grid_location'] = grid_location
     return new_attrs
 
-def convert_dataarray_attributes_yderivative(attrs,grid_location=None):
+def _convert_dataarray_attributes_yderivative(attrs,grid_location=None):
     """Return the dictionary of attributes corresponding to the spatial
     derivative of a scalar field in the y-direction.
 
@@ -211,7 +214,7 @@ def convert_dataarray_attributes_yderivative(attrs,grid_location=None):
     return new_attrs
 
 
-def convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
+def _convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
     """Return the dictionary of attributes corresponding to the horizontal
     laplacian of a scalar field.
 
@@ -238,7 +241,7 @@ def convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
         new_attrs['grid_location'] = grid_location
     return new_attrs
 
-def convert_dataarray_attributes_divergence(attrs1,attrs2,grid_location='t'):
+def _convert_dataarray_attributes_divergence(attrs1,attrs2,grid_location='t'):
     """Return the dictionary of attributes corresponding to the divergence of a
     vector field.
 
@@ -271,96 +274,6 @@ def convert_dataarray_attributes_divergence(attrs1,attrs2,grid_location='t'):
         new_attrs['grid_location'] = grid_location
     return new_attrs
 
-def assert_chunks_are_compatible(chunks1=None,chunks2=None,ndims=None):
-    """Return True when two chunks are aligned over their common dimensions.
-
-    Parameters
-    ----------
-    chunks1 : list-like of list-like object
-        chunks associated to a xarray data array
-    chunks2 : list-like of list-like object
-        chunks associated to a xarray data array
-    ndims : int
-        number of dimensions over which chunks should ne compared.
-
-    Returns
-    -------
-    test : bool
-        boolean value of the test.
-
-    """
-    # TODO : not clear whether to compare a priori description of chunks
-    #        (dictionnaries) or a posteriori values (tuple of tuples).
-    test = True
-    if (chunks1 is None) or (chunks2 is None):
-        if (chunks1 is None) and (chunks2 is None):
-            return True
-        else:
-            return False
-    for idim in range(ndims):
-        test *= chunks1[-idim-1] == chunks2[-idim-1]
-    return test
-
-def assert_grid_location(xarr,grid_location=None):
-    """Return True when the xarr grid_location attribute is grid_location
-
-    Parameters
-    ----------
-    xarr : xarray.DataArray
-       xarray dataarray which attributes should be tested.
-    grid_location : str
-        string describing the grid location : eg 'u','v','t','f'...
-
-    Returns
-    -------
-    test : bool
-        boolean value of the test.
-
-    """
-    test = True
-    if xarr.attrs.has_key('grid_location'):
-        test *= (xarr.attrs['grid_location']==grid_location)
-    return test
-
-def check_input_array(xarr,shape=None,chunks=None,\
-                      grid_location=None,ndims=None):
-    """Return true if arr is a dataarray with expected shape, chunks at
-    grid_location attribute. Raise an error if one of the tests fails.
-
-    Parameters
-    ----------
-    xarr : xarray.DataArray
-       xarray dataarray which attributes should be tested.
-    shape : tuple
-       expected shape of the xarray dataarray xarr
-    chunks : list-like of list-like object
-        expected chunks of the xarray dataarray xarr
-    grid_location : str
-        string describing the expected grid location : eg 'u','v','t','f'...
-    ndims : int
-        number of dimensions over which chunks should be compared.
-
-    Returns
-    -------
-    test : bool
-        boolean value of the test.
-
-    """
-    if hasattr(xarr,'name'):
-       arrayname = xarr.name
-    else:
-       arrayname = 'array'
-    if not(isinstance(xarr,xr.DataArray)):
-        raise TypeError(arrayname + 'is expected to be a xarray.DataArray')
-        return False
-    if not(assert_chunks_are_compatible(xarr.chunks,chunks,ndims=ndims)):
-        raise ChunkError()
-        return False
-    if not(assert_grid_location(xarr,grid_location)):
-        raise GridLocationError()
-        return False
-    return True
-
 #
 #========================== Data structures ====================================
 #
@@ -368,23 +281,6 @@ def check_input_array(xarr,shape=None,chunks=None,\
 #
 # data structures for vector fields and tensors.
 #
-
-def assert_and_set_grid_location_attribute(xarr,grid_location=None):
-    """Assert whether xarr holds an extra attribute 'grid_location' that
-    equals grid_location. If xarr does not have such extra-attribute, create
-    one with value grid_location.
-
-    Parameters
-    ----------
-    xarr : xarray.DataArray
-        xarray dataarray that should be associated with a grid location
-    grid_location : str
-        string describing the grid location : eg 'u','v','t','f'...
-    """
-    if xarr.attrs.has_key('grid_location'):
-        assert ( xarr.attrs['grid_location'] == grid_location )
-    else:
-        xarr.attrs['grid_location'] = grid_location
 
 def VectorField2d(vx,vy,\
                   x_component_grid_location=None,\
@@ -411,8 +307,8 @@ def VectorField2d(vx,vy,\
                                     'x_component_grid_location',\
                                     'y_component_grid_location'])
     #
-    assert_and_set_grid_location_attribute(vx,x_component_grid_location)
-    assert_and_set_grid_location_attribute(vy,y_component_grid_location)
+    _assert_and_set_grid_location_attribute(vx,x_component_grid_location)
+    _assert_and_set_grid_location_attribute(vy,y_component_grid_location)
     #
     o = v(vx,vy,x_component_grid_location,y_component_grid_location)
     return o
@@ -448,9 +344,9 @@ def VectorField3d(vx,vy,vz,\
                                     'y_component_grid_location',\
                                     'z_component_grid_location'])
     #
-    assert_and_set_grid_location_attribute(vx,x_component_grid_location)
-    assert_and_set_grid_location_attribute(vy,y_component_grid_location)
-    assert_and_set_grid_location_attribute(vz,z_component_grid_location)
+    _assert_and_set_grid_location_attribute(vx,x_component_grid_location)
+    _assert_and_set_grid_location_attribute(vy,y_component_grid_location)
+    _assert_and_set_grid_location_attribute(vz,z_component_grid_location)
     #
     o = v(vx,vy,vz,\
           x_component_grid_location,\
@@ -512,32 +408,16 @@ def Tensor2d(axx,axy,ayx,ayy,\
     else:
         axx.attrs['grid_location'] = xx_component_grid_location
     #
-    assert_and_set_grid_location_attribute(axx,xx_component_grid_location)
-    assert_and_set_grid_location_attribute(axy,xy_component_grid_location)
-    assert_and_set_grid_location_attribute(ayx,yx_component_grid_location)
-    assert_and_set_grid_location_attribute(ayy,yy_component_grid_location)
+    _assert_and_set_grid_location_attribute(axx,xx_component_grid_location)
+    _assert_and_set_grid_location_attribute(axy,xy_component_grid_location)
+    _assert_and_set_grid_location_attribute(ayx,yx_component_grid_location)
+    _assert_and_set_grid_location_attribute(ayy,yy_component_grid_location)
     #
     o = t(axx,axy,ayx,ayy,\
           xx_component_grid_location,xy_component_grid_location,\
           yx_component_grid_location,yy_component_grid_location)
     return o
 
-#
-#========================== Minimal exceptions =================================
-#
-# TODO : should probably move to a dedicated file oocgcm.core.exceptions.py
-#
-class ChunkError(Exception):
-    """Minimal exception for chunk incompatibility.
-    """
-    def __init__(self):
-        Exception.__init__(self,"incompatible chunk size")
-
-class GridLocationError(Exception):
-    """Minimal exception for grid location incompatibility.
-    """
-    def __init__(self):
-        Exception.__init__(self,"incompatible grid_location")
 
 #
 #======================== Generic 2D Grid Class ================================
@@ -745,7 +625,7 @@ class generic_2d_grid:
         self.chunks = self._arrays["sea_binary_mask_at_t_location"].chunks
 
     def __getitem__(self,item):
-        """The behavior of this fcuntion depends on the type of item.
+        """The behavior of this function depends on the type of item.
             - if item is a string, return the array self._arrays[item]
             - if item is a slice, a grid object restricted to a subdomain.
 
@@ -767,9 +647,11 @@ class generic_2d_grid:
         Example
         -------
         >>> grd = generic_2d_grid(...)
-        restricting the grid to a subdomain :
+
+        for restricting the grid to a subdomain :
         >>> new_grd = grd[100:200,300:500]
-        accessing a specific dataarray describing the grid
+
+        for accessing a specific dataarray describing the grid
         >>> e1t = grd['cell_x_size_at_t_location']
 
         """
@@ -903,7 +785,7 @@ class generic_2d_grid:
                                                         conserving=conserving)
         out = self._to_eastern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return add_extra_attrs_to_dataarray(out,grid_location='u')
+        return _append_dataarray_extra_attrs(out,grid_location='u')
 
     def change_grid_location_u_to_t(self,scalararray,conserving='x_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
@@ -925,7 +807,7 @@ class generic_2d_grid:
                                                         conserving=conserving)
         out = self._to_western_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return add_extra_attrs_to_dataarray(out,grid_location='t')
+        return _append_dataarray_extra_attrs(out,grid_location='t')
 
     def change_grid_location_t_to_v(self,scalararray,conserving='area'):
         """Return a xarray corresponding to scalararray averaged at a new
@@ -947,7 +829,7 @@ class generic_2d_grid:
                                                         conserving=conserving)
         out = self._to_northern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return add_extra_attrs_to_dataarray(out,grid_location='v')
+        return _append_dataarray_extra_attrs(out,grid_location='v')
 
     def change_grid_location_v_to_t(self,scalararray,conserving='y_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
@@ -969,7 +851,7 @@ class generic_2d_grid:
                                                         conserving=conserving)
         out = self._to_southern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return add_extra_attrs_to_dataarray(out,grid_location='t')
+        return _append_dataarray_extra_attrs(out,grid_location='t')
 
     def change_grid_location_f_to_u(self,scalararray,conserving='x_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
@@ -991,7 +873,7 @@ class generic_2d_grid:
                                                         conserving=conserving)
         out = self._to_southern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return add_extra_attrs_to_dataarray(out,grid_location='u')
+        return _append_dataarray_extra_attrs(out,grid_location='u')
 
     def change_grid_location_f_to_v(self,scalararray,conserving='y_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
@@ -1013,7 +895,7 @@ class generic_2d_grid:
                                                         conserving=conserving)
         out = self._to_southern_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return add_extra_attrs_to_dataarray(out,grid_location='v')
+        return _append_dataarray_extra_attrs(out,grid_location='v')
 
     def change_grid_location_v_to_u(self,scalararray,conserving='area'):
         """Return a xarray corresponding to scalararray averaged at a new
@@ -1265,9 +1147,9 @@ class generic_2d_grid:
         gy = _dj(scalararray) / self._arrays["cell_y_size_at_v_location"] # e2v
 
         #- finalize attributes
-        gxatts = convert_dataarray_attributes_xderivative(scalararray.attrs,\
+        gxatts = _convert_dataarray_attributes_xderivative(scalararray.attrs,\
                                                           grid_location='u')
-        gyatts = convert_dataarray_attributes_yderivative(scalararray.attrs,\
+        gyatts = _convert_dataarray_attributes_yderivative(scalararray.attrs,\
                                                           grid_location='v')
 
         gx = _finalize_dataarray_attributes(gx,**gxatts)
@@ -1332,13 +1214,13 @@ class generic_2d_grid:
         #- finalize arrays' attributes
         arr_x = vectorfield.x_component
         arr_y = vectorfield.y_component
-        axxatts = convert_dataarray_attributes_xderivative(arr_x.attrs,
+        axxatts = _convert_dataarray_attributes_xderivative(arr_x.attrs,
                                                           grid_location='t')
-        axyatts = convert_dataarray_attributes_xderivative(arr_x.attrs,
+        axyatts = _convert_dataarray_attributes_xderivative(arr_x.attrs,
                                                           grid_location='f')
-        ayxatts = convert_dataarray_attributes_xderivative(arr_y.attrs,
+        ayxatts = _convert_dataarray_attributes_xderivative(arr_y.attrs,
                                                           grid_location='f')
-        ayyatts = convert_dataarray_attributes_yderivative(arr_y.attrs,
+        ayyatts = _convert_dataarray_attributes_yderivative(arr_y.attrs,
                                                           grid_location='t')
 
         axx = _finalize_dataarray_attributes(axx,**axxatts)
@@ -1377,7 +1259,7 @@ class generic_2d_grid:
         # define
         lap = self.horizontal_divergence(self.horizontal_gradient(scalararray))
         # finalize
-        lapatts = convert_dataarray_attributes_laplacian(scalararray.attrs,
+        lapatts = _convert_dataarray_attributes_laplacian(scalararray.attrs,
                                                          grid_location='t')
         lap = _finalize_dataarray_attributes(lap,**lapatts)
         return lap
@@ -1408,7 +1290,7 @@ class generic_2d_grid:
         curl = vx - uy
 
         curl.name = 'vertical component of the curl'
-        return add_extra_attrs_to_dataarray(curl,grid_location='f')
+        return _append_dataarray_extra_attrs(curl,grid_location='f')
 
     def horizontal_divergence(self,vectorfield):
         """
@@ -1434,7 +1316,7 @@ class generic_2d_grid:
         div += _dj( vectorfield.y_component * self._array_e1v).shift(y=1)
         div /= self._array_e1t * self._array_e2t
         # finalize
-        divatts = convert_dataarray_attributes_divergence(\
+        divatts = _convert_dataarray_attributes_divergence(\
                     vectorfield.x_component.attrs,vectorfield.y_component.attrs)
         div = _finalize_dataarray_attributes(div,**divatts)
         return div
@@ -1620,10 +1502,11 @@ class generic_2d_grid:
         References
         ----------
         .. [1] Hoskins, B.J., Bretherton, F.P., 1972. Atmospheric Frontogenesis
-        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11-37.
+           Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29,
+           11-37.
         .. [2] Giordani, H., Prieur, L., Caniaux, G., 2006. Advanced insights
-        into sources of vertical velocity in the ocean. Ocean Dynamics 56,
-        513-524.
+           into sources of vertical velocity in the ocean. Ocean Dynamics 56,
+           513-524.
 
 
         """
@@ -1646,7 +1529,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def frontogenesis_function(self,velocity,buoyancy):
-        r"""Return the frontogeneis function.
+        r"""Return the frontogenesis function.
 
         Parameters
         ----------
@@ -1671,7 +1554,8 @@ class generic_2d_grid:
         References
         ----------
         .. [1] Hoskins, B.J., Bretherton, F.P., 1972. Atmospheric Frontogenesis
-        Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29, 11-37.
+           Models: Mathematical Formulation and Solution. J. Atmos. Sci. 29,
+           11-37.
 
         """
         # TODO : avoid duplication of computation of gradhb
