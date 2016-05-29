@@ -26,7 +26,7 @@ If you don't feel comfortable with the above tools, just contact_ me by email.
 .. _oocgcm: https://github.com/lesommer/oocgcm
 .. _pull request: https://help.github.com/articles/using-pull-requests/
 .. _git: https://git-scm.com/doc
-.. _oocgcm issues tracker: https://github.com/lesommer/oocgcm/issues
+.. _issues tracker: https://github.com/lesommer/oocgcm/issues
 .. _contact: http://lesommer.github.io/contact/
 
 Overall layout of the library
@@ -34,12 +34,12 @@ Overall layout of the library
 
 Here is some information about the overall layout of oocgcm library.
 
-   oocgcm/
-       setup.py
-       oocgcm/
-       docs/
-       examples/
-       ci/
+    oocgcm/
+        setup.py
+        oocgcm/
+        docs/
+        examples/
+        ci/
 
 ``setup.py``
     installation script.
@@ -63,6 +63,7 @@ Structure of ``oocgcm`` package
 -------------------------------
 
 The actual package itself contains the following submodules :
+
 
     oocgcm/
         oocgcm/
@@ -127,6 +128,7 @@ Structure of ``oocgcm.core``
         io.py
         grids.py
         utils.py
+
 
 ``io.py``
     contains functions that are used for creating xarray datasets and xarray
