@@ -67,7 +67,7 @@ Once created, a grid descriptor ``grd`` can be restricted to a subdomain as foll
 
    zoom = grd[500:800,2000:2500]
 
-Operation on vector fields
+Operations on vector fields
 --------------------------
 
 Grid descriptor objects allow to perform **operations on vector fields** (as defined in oocgcm.core). 
@@ -119,7 +119,7 @@ Grid descriptors also implement methods for performing spatial integration :
 Broadcasting additional dimensions 
 ---------------------------------
 
-Methods associated with two-dimensional grid descriptors define operations based on ('y','x') dimension. 
+Methods associated with two-dimensional grid descriptors define operations based on ('y','x') dimensions. 
 Because of the flexibility of xarray, these methods can therefore be applied to dataarrays with 
 additional extra dimensions (for instance, time, index in an ensemble simulation). 
 
@@ -142,7 +142,7 @@ data is requested, as for instance if the first two-dimensional field is written
 
 .. code-block:: python
 
-   gssh[0].to_necdf(path_to_my_output_file)
+   gssh[0].to_netcdf(path_to_my_output_file)
 
 This abstract representation of operations that allows xarray is key for efficiently implementing 
 out-of-core procedures. It also allows to straighforwardly deal **with grids with time-varying metrics**. 

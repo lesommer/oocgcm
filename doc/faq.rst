@@ -24,8 +24,12 @@ of data within a unique folder for facilitating the maintenance by third-parties
 In practice, switching from one model to the other should be as simple as
 changing
 
->>> from oocgcm.oceanmodels.nemo import io, grids
+.. code-block:: python
+
+   from oocgcm.oceanmodels.nemo import io, grids
 
 into
 
->>> from oocgcm.oceanmodels.mitgcm import io, grids
+.. code-block:: python
+
+   from oocgcm.oceanmodels.mitgcm import io, grids
