@@ -1,7 +1,7 @@
 .. currentmodule:: oocgcm
 
-Contributing
-============
+Contributing to oocgcm
+======================
 
 If you are willing to contribute to developing oocgcm (reporting bugs,
 suggesting improvments, ...), here is some information.
@@ -32,7 +32,7 @@ If you don't feel comfortable with the above tools, just contact_ me by email.
 Overall layout of the library
 -----------------------------
 
-Here is some information about the overall layout of oocgcm library.
+Here is some information about the overall layout of oocgcm library::
 
     oocgcm/
         setup.py
@@ -62,7 +62,7 @@ Here is some information about the overall layout of oocgcm library.
 Structure of ``oocgcm`` package
 -------------------------------
 
-The actual package itself contains the following submodules :
+The actual package itself contains the following submodules::
 
 
     oocgcm/
@@ -123,6 +123,8 @@ The actual package itself contains the following submodules :
 
 Structure of ``oocgcm.core``
 ----------------------------
+
+``oocgcm/core``contains::
 
     oocgcm/core/
         io.py
