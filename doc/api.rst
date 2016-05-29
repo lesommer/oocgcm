@@ -45,7 +45,6 @@ Miscellaneous
 .. autosummary::
    :toctree: generated/
 
-   core.utils.add_extra_attrs_to_dataarray
    core.utils.is_numpy
    core.utils.is_xarray
    core.utils.is_daskarray

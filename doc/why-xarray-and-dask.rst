@@ -7,7 +7,7 @@ oocgcm is a pure Python package built on the top of xarray_, which itself
 integrates dask.array to support streaming computation on large datasets that
 don’t fit into memory. Why have we choosen to use xarray_ and dask_ ?
 
-.. _xarray: https://github.com/pydata/xarray
+.. _xarray: http://xarray.pydata.org 
 .. _dask: http://dask.pydata.org
 
 xarray
