@@ -8,14 +8,15 @@ A practical need
 ----------------
 
 oocgcm is a pure Python package built on the top of xarray_ and dask_.
-But why have we choosen to implement a diagnostic package based on
-xarray_ and dask_ instead of pursuing the development of packages based on numpy ?
 
-Most of the tools that are implemented in oocgcm are indeed already available in
-several python libraries based on numpy_ and one of the several netCDF interfaces
-for python.
+Most of the tools that are implemented in oocgcm are already available in
+several python libraries dedicated to the analysis of gridded data, and
+based on numpy_ and one of the several netCDF interfaces for python.
 
-But numpy-based model diagnostic libraries are facing a challenge with the ongoing
+Why have we choosen to implement a diagnostic package based on
+xarray_ and dask_ ?
+
+Numpy-based model diagnostic libraries are facing a challenge with the ongoing
 evolution of geoscientific models and earth observing networks. With **the
 most high-end models being runs on several tens of thousand cores**, even
 a two-dimensional slice of model output cannot be loaded in memory at one time.
@@ -63,6 +64,6 @@ an idea into an efficient production code is too long, we will keep performing
 only simple or routine analyses on our datasets, eventually missing
 **the potential breakthrough of big-data in earth system sciences**.
 
-.. _xarray: https://github.com/pydata/xarray
+.. _xarray: http://xarray.pydata.org
 .. _dask: http://dask.pydata.org
 .. _numpy: http://www.numpy.org/

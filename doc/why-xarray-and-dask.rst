@@ -7,8 +7,6 @@ oocgcm is a pure Python package built on the top of xarray_, which itself
 integrates dask.array to support streaming computation on large datasets that
 don’t fit into memory. Why have we choosen to use xarray_ and dask_ ?
 
-.. _xarray: http://xarray.pydata.org 
-.. _dask: http://dask.pydata.org
 
 xarray
 ------
@@ -26,11 +24,6 @@ Building upon xarray_ has several advantages :
  - xarray objects can be exported to iris_ or cdms_ so that the user can merge several different analysis tools in his workflow.
  - Little work is needed for applying a numpy function to xarray objects. Several numpy ufunc are already applicable to xarray.DataArray data-structure.
 
-
-.. _xarray: https://github.com/pydata/xarray
-.. _pandas : http://pandas.pydata.org/
-.. _iris : http://scitools.org.uk/iris/
-.. _cdms : http://uvcdat.llnl.gov/documentation/cdms/cdms_1.html
 
 dask
 ----
@@ -61,5 +54,9 @@ Building upon dask_ has several advantages :
 Most importantly, xarray_ and dask_ are supported by active and friendly teams
 of developers, that we hereby gratefully acknowledge.
 
-.. _dask: http://dask.pydata.org
+
 .. _xarray: http://xarray.pydata.org
+.. _dask: http://dask.pydata.org
+.. _pandas : http://pandas.pydata.org/
+.. _iris : http://scitools.org.uk/iris/
+.. _cdms : http://uvcdat.llnl.gov/documentation/cdms/cdms_1.html
