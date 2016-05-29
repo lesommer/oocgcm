@@ -52,7 +52,7 @@ Here is some information about the overall layout of oocgcm library::
     readthedocs with sphinx and numpydoc
 
 ``examples``
-    provides
+    provides example of applications in notebooks and python scripts
 
 ``ci``
     contains the yaml files for continuous integration. Used for testing the
