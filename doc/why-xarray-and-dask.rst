@@ -61,5 +61,5 @@ Building upon dask_ has several advantages :
 Most importantly, xarray_ and dask_ are supported by active and friendly teams
 of developers, that we hereby gratefully acknowledge.
 
- .. _dask: http://dask.pydata.org
- .. _xarray: https://github.com/pydata/xarray
+.. _dask: http://dask.pydata.org
+.. _xarray: http://xarray.pydata.org
