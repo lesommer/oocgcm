@@ -1,4 +1,4 @@
-name: test_env
+name: py27-dev
 dependencies:
   - python=2.7
   - numpy==1.11.0

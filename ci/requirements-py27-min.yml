@@ -1,9 +1,10 @@
-name: test_env
+name: py27-min
 dependencies:
   - python=2.7
   - numpy==1.11.0
   - scipy==0.17.1
   - pandas==0.18.0
+  - dask==0.9.0
   - xarray==0.7.2
   - pip:
     - pytest-cov
