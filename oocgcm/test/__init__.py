@@ -36,6 +36,12 @@ except ImportError:
     has_dask = False
 
 try:
+    import numba
+    has_numba = True
+except ImportError:
+    has_numba = False
+
+try:
     import matplotlib
     has_matplotlib = True
 except ImportError:
@@ -56,6 +62,8 @@ def requires_xarray(test):
 def requires_dask(test):
     return test if has_dask else unittest.skip('requires dask')(test)
 
+def requires_numba(test):
+    return test if has_numba else unittest.skip('requires numba')(test)
 
 def requires_matplotlib(test):
     return test if has_matplotlib else unittest.skip('requires matplotlib')(test)
