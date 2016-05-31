@@ -3,9 +3,10 @@ import numpy as np
 
 import xarray as xr
 
-from . import TestCase, assert_equal,assert_allclose,requires_numba
+from . import TestCase, assert_equal,assert_allclose,requires_numba,has_numba
 
-from oocgcm.oceanfuncs.eos import misc
+if has_numba:
+    from oocgcm.oceanfuncs.eos import misc
 
 @requires_numba
 def test_numpy_spice():
