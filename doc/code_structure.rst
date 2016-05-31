@@ -124,7 +124,7 @@ The actual package itself contains the following submodules::
 Structure of ``oocgcm.core``
 ----------------------------
 
-``oocgcm/core``contains::
+``oocgcm/core`` contains::
 
     oocgcm/core/
         io.py

@@ -1256,12 +1256,15 @@ class generic_2d_grid:
         # check
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
+
         # define
         lap = self.horizontal_divergence(self.horizontal_gradient(scalararray))
+
         # finalize
         lapatts = _convert_dataarray_attributes_laplacian(scalararray.attrs,
                                                          grid_location='t')
         lap = _finalize_dataarray_attributes(lap,**lapatts)
+
         return lap
 
     def vertical_component_of_curl(self,vectorfield):
@@ -1311,14 +1314,17 @@ class generic_2d_grid:
                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
         check_input_array(vectorfield.y_component,\
                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
+
         # define
         div  = _di( vectorfield.x_component * self._array_e2u).shift(x=1)
         div += _dj( vectorfield.y_component * self._array_e1v).shift(y=1)
         div /= self._array_e1t * self._array_e2t
+
         # finalize
         divatts = _convert_dataarray_attributes_divergence(\
                     vectorfield.x_component.attrs,vectorfield.y_component.attrs)
         div = _finalize_dataarray_attributes(div,**divatts)
+
         return div
 
 #
