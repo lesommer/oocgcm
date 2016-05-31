@@ -7,11 +7,24 @@ equation of state of sea water.
 """
 
 import numpy as np
+from numba import jit
 
 from ...core.utils import map_apply, _assert_are_compatible_dataarrays
 
 #---------------------- Functions for numpy arrays ----------------------------
 
+
+_spice_coefs = \
+    np.array([
+        [ 0,            7.7442e-001,   -5.85e-003,   -9.84e-004,  -2.06e-004 ],
+        [5.1655e-002,    2.034e-003,  -2.742e-004,    -8.5e-006,    1.36e-005],
+        [6.64783e-003, -2.4681e-004,  -1.428e-005,   3.337e-005,  7.894e-006 ],
+        [-5.4023e-005,   7.326e-006,  7.0036e-006, -3.0412e-006, -1.0853e-006],
+        [3.949e-007,    -3.029e-008, -3.8209e-007,  1.0012e-007,  4.7133e-008],
+        [-6.36e-010,    -1.309e-009,   6.048e-009, -1.1409e-009,  -6.676e-010]
+    ])
+
+@jit
 def _spice(t,s):
     """Return spiciness.
 
@@ -21,14 +34,14 @@ def _spice(t,s):
     Parameters
     ----------
     t : numpy.array
-        potential temperature (°C)
+        potential temperature (degC)
     s : numpy.array
         salinity (PSU)
 
     Returns
     -------
     spice : numpy.array
-        spiciness
+        spiciness  [kg/m^3]
 
     Notes
     -----
@@ -46,62 +59,24 @@ def _spice(t,s):
 
     Examples
     --------
-    >>> spice(15,33)
+    >>> _spice(15,33)
     0.54458641375
 
     """
-    B = numpy.zeros((7,6))
-    B[1,1] = 0
-    B[1,2] = 7.7442e-001
-    B[1,3] = -5.85e-003
-    B[1,4] = -9.84e-004
-    B[1,5] = -2.06e-004
-
-    B[2,1] = 5.1655e-002
-    B[2,2] = 2.034e-003
-    B[2,3] = -2.742e-004
-    B[2,4] = -8.5e-006
-    B[2,5] = 1.36e-005
-
-    B[3,1] = 6.64783e-003
-    B[3,2] = -2.4681e-004
-    B[3,3] = -1.428e-005
-    B[3,4] = 3.337e-005
-    B[3,5] = 7.894e-006
-
-    B[4,1] = -5.4023e-005
-    B[4,2] = 7.326e-006
-    B[4,3] = 7.0036e-006
-    B[4,4] = -3.0412e-006
-    B[4,5] = -1.0853e-006
-
-    B[5,1] = 3.949e-007
-    B[5,2] = -3.029e-008
-    B[5,3] = -3.8209e-007
-    B[5,4] = 1.0012e-007
-    B[5,5] = 4.7133e-008
-
-    B[6,1] = -6.36e-010
-    B[6,2] = -1.309e-009
-    B[6,3] = 6.048e-009
-    B[6,4] = -1.1409e-009
-    B[6,5] = -6.676e-010
-    #
-    coefs = B[1:7,1:6]
-    spice = numpy.zeros(t.shape)
-    ss = s - 35.
-    bigT = numpy.ones(t.shape)
-    for i in range(6):
-        bigS = numpy.ones(t.shape)
-        for j in range(5):
-            spice+= coefs[i,j]*bigT*bigS
-            bigS*= ss
-        bigT*=t
-    return spice
+    dspi    = 0.
+    dsalref = s - 35.
+    dtmp  = 1.
+    for ji in range(6):
+        dsal = 1.
+        for jj in range(5):
+            dspi = dspi +   _spice_coefs[ji,jj] * dtmp * dsal
+            dsal *= dsalref
+        dtmp *= t
+    return dspi
 
 
 #------------------ Wrapped functions for dataarrays ---------------------------
-def _spice(t,s):
+def spice(t,s):
     """Return spiciness.
 
     A state variable for characterizing water masses and their
@@ -110,7 +85,7 @@ def _spice(t,s):
     Parameters
     ----------
     t : xarray dataarray
-        potential temperature (°C)
+        potential temperature (degC)
     s : xarray dataarray
         salinity (PSU)
 
