@@ -451,9 +451,11 @@ class generic_2d_grid:
         "cell_x_size_at_t_location",\
         "cell_x_size_at_u_location",\
         "cell_x_size_at_v_location",\
+        "cell_x_size_at_f_location",\
         "cell_y_size_at_t_location",\
         "cell_y_size_at_u_location",\
         "cell_y_size_at_v_location",\
+        "cell_y_size_at_f_location",\
         ]
 
     # the following arrays may or may not be available depending on how the
@@ -464,6 +466,8 @@ class generic_2d_grid:
         "plane_x_coordinate_at_t_location",\
         "plane_y_coordinate_at_t_location",\
         ]
+
+    _accepted_arrays = _coordinate_arrays + _required_arrays
 
     def __init__(self,arrays=None,parameters=None):
         """Initialize a grid from a dictionary of xarrays and some parameters.
@@ -482,7 +486,13 @@ class generic_2d_grid:
         for arrayname in self._required_arrays:
             if not(arrays.has_key(arrayname)):
                 raise Exception('Arrays are missing for building the grid.')
-        self._arrays = arrays
+
+        # builds the list of keys in arrays that are also in _accepted_arrays
+        used_arrays = list( set( arrays.keys() ) & set( self._accepted_arrays ))
+
+        # stores only the arrays that are needed for building the grid.
+        self._arrays = dict((key, arrays[key]) for key in used_arrays)
+
         self._extra_parameters = parameters
         self._define_aliases_for_arrays()
         self._define_area_of_grid_cells()
@@ -508,7 +518,7 @@ class generic_2d_grid:
     def shape(self):
         """Shape of the xarray dataarrays describing the grid.
         """
-        return self._arrays["sea_binary_mask_at_t_location"].squeeze().shape
+        return self._arrays["sea_binary_mask_at_t_location"].shape
 
     @property
     def chunks(self):
@@ -660,8 +670,12 @@ class generic_2d_grid:
 
         else:
             sliced_arrays = {}
-            for dataname in self._arrays:
-                sliced_arrays[dataname] = self._arrays[dataname][item]
+            # list of keys in arrays that are also in _accepted_arrays
+            used_arrays = list( set( self._arrays.keys() ) \
+                               & set( self._accepted_arrays ))
+            for dataname in used_arrays:
+                array = self._arrays[dataname][item].copy(deep=True)
+                sliced_arrays[dataname] = array
             returned =  generic_2d_grid(arrays=sliced_arrays,\
                                         parameters=self._extra_parameters)
 
@@ -1394,13 +1408,13 @@ class generic_2d_grid:
         # actual definition
         idims = ('x','y')
         dxdy = self._arrays['cell_area_at_' + grid_location + '_location']
-        array_dxdy = array.where(where.squeeze()) * dxdy
+        array_dxdy = array.where(where.squeeze()) * dxdy # squeeze is not lazy
         integral = array_dxdy.sum(dim=idims)
 
         # normalize if required
         if normalize:
             integral /= dxdy.where(where.squeeze()).sum(dim=idims)
-
+        #        Nota Bene : dataarray.squeeze() is not a lazy operation.
         return integral
 
     def spatial_average_xy(self,array,where=None,grid_location=None):

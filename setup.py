@@ -42,7 +42,7 @@ and dask python packages.
 Our goal is to provide a set of tools that allow to perform out-of-core
 computations within a robust and intuitive framework. We intend to  
 reduce the time needed to deploy a complex analysis of gridded satelite 
-date or model output from the prototyping phase to the production phase.
+data or model output, from the prototyping phase to the production phase.
 
 Important links
 ---------------

@@ -7,7 +7,7 @@ Define classes that give acces to NEMO model grid metrics and operators.
 import xarray as xr
 
 from ...core.grids import generic_2d_grid
-from .io import return_xarray_dataarray # alt version of return_xarray_dataarray
+from .io import return_xarray_dataarray # nemo version of io routine
 
 #==================== Name of variables in NEMO ================================
 #
@@ -64,13 +64,17 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self.chunks = chunks
         self.byte_mask_level = byte_mask_level
         self.variables = {}
-        self._get = return_xarray_dataarray
+        #self._get = return_xarray_dataarray
         self._define_latitude_and_longitude()
         self._define_horizontal_metrics()
         self._define_masks()
         self.chunk(chunks=chunks)
         self.parameters = {}
         self.parameters['chunks'] = chunks
+
+
+    def _get(self,*args,**kwargs):
+        return return_xarray_dataarray(*args,**kwargs)
 
     def _define_latitude_and_longitude(self):
         self.variables["longitude_at_t_location"] = \
