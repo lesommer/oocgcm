@@ -164,6 +164,13 @@ class TestCase(unittest.TestCase):
             v2 = d2.coords[k]
             self.assertVariableEqual(v1, v2)
 
+    def assertDataArrayHasValues(self,da):
+        try:
+	    assert(isinstance(float(da[0,0].to_masked_array()),float))
+	except:
+	    print da[0,0]
+            raise Exception(da.name + ' has no valid values.')
+
     def assertDataArrayEqual(self, ar1, ar2):
         self.assertVariableEqual(ar1, ar2)
         self.assertCoordinatesEqual(ar1, ar2)
