@@ -99,7 +99,7 @@ class TestGrid2d_definition_from_NEMO(TestCase):
         _fgrd =  fgrids.nemo_2d_grid(nemo_coordinate_file=self.coordfile,\
                                     nemo_byte_mask_file=self.maskfile,\
 				    chunks=chunks)	    
-	fgrd = _fgrd[:10,:10]
+	fgrd = _fgrd[...,:10,:10]
         assert(isinstance(fgrd,grids.generic_2d_grid))
 	assert(fgrd.shape==(10,10))
         self.assertDataArrayHasValues(fgrd["cell_area_at_t_location"])
