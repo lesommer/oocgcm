@@ -3,7 +3,6 @@ dependencies:
   - python=2.7
   - numpy==1.11.0
   - scipy==0.17.0
-  - netcdf4==1.2.4
   - pandas==0.18.0
   - xarray==0.7.2
   - dask==0.9.0
@@ -11,3 +10,4 @@ dependencies:
   - numba==0.26.0
   - pip:
     - pytest-cov
+    - git+https://github.com/Unidata/netcdf4-python.git
