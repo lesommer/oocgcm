@@ -525,7 +525,7 @@ class generic_2d_grid:
         """Chunks of the xarray dataarrays describing the grid.
         """
         # TODO : not clear whether to store the priori description of chunks
-        #        (dictionnary) or the posteriori value (tuple of tuples).
+        #        (dictionnary) or the a posteriori value (tuple of tuples).
 
         return self._arrays["sea_binary_mask_at_t_location"].chunks
 
@@ -632,7 +632,6 @@ class generic_2d_grid:
             data = self._arrays[dataname]
             if isinstance(data, xr.DataArray):
                 self._arrays[dataname] = data.chunk(chunks)
-        self.chunks = self._arrays["sea_binary_mask_at_t_location"].chunks
 
     def __getitem__(self,item):
         """The behavior of this function depends on the type of item.
