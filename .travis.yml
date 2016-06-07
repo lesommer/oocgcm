@@ -32,7 +32,7 @@ install:
   - pip install coveralls
 
 script:
-  - py.test oocgcm --cov=oocgcm
+  - py.test oocgcm --cov=oocgcm --cov-report=term-missing
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
