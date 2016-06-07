@@ -168,8 +168,8 @@ class TestCase(unittest.TestCase):
         try:
 	    assert(isinstance(float(da[0,0].to_masked_array()),float))
 	except:
-	    print da[0,0]
-            raise Exception(da.name + ' has no valid values.')
+	    print da
+            raise Exception(' This DataArray is empty/not valid.')
 
     def assertDataArrayEqual(self, ar1, ar2):
         self.assertVariableEqual(ar1, ar2)
