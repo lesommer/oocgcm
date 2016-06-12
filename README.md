@@ -10,9 +10,10 @@ This project provides tools for post-processing and **analyzing** output of
 **general circulation models** (based on the Arakawa C-grid) and **gridded satellite data**.
 
 Our aim is to simplify the analysis of **very large datasets of model output**
-(~1-100Tb) like those produced by basin-to-global scale sub-mesoscale permitting
-ocean models and ensemble simulations of eddying ocean models by **leveraging
-the potential of [xarray](https://github.com/pydata/xarray) and
+(~1-100Tb) like those produced by basin-to-global scale [sub-mesoscale permitting
+ocean models](http://meom-group.github.io/swot-natl60/) and 
+[ensemble simulations of eddying ocean models](http://www.agence-nationale-recherche.fr/?Project=ANR-13-BS06-0007) 
+by **leveraging the potential of [xarray](https://github.com/pydata/xarray) and
 [dask](https://github.com/dask/dask)** python packages.
 
 The project is so far mostly targeting [NEMO](http://www.nemo-ocean.eu/)
