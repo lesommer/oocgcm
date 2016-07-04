@@ -29,7 +29,12 @@ def return_xarray_dataset(*args,**kwargs):
     change the name of depth dimension to 'depth' and add an attribute
     about the actual depth location
     """
-    ds = _return_xarray_dataset(*args,**kwargs)
+    
+    # filters chunks out of the kwargs in order to perform chunking after
+    # coordinate renaming
+    if 'chunks' in kwargs:
+        _chunks = kwargs['chunks']
+        kwargs.pop('chunks')
     
     if 'time_counter' in ds.keys():
         ds = ds.rename({'time_counter':'t'})
@@ -64,6 +69,13 @@ def return_xarray_mfdataset(*args,**kwargs):
     change the name of depth dimension to 'depth' and add an attribute
     about the actual depth location
     """
+    
+    # filters chunks out of the kwargs in order to perform chunking after
+    # coordinate renaming
+    if 'chunks' in kwargs:
+        _chunks = kwargs['chunks']
+        kwargs.pop('chunks')
+    
     ds = _return_xarray_mfdataset(*args,**kwargs)
     
     if 'time_counter' in ds.keys():
@@ -78,6 +90,8 @@ def return_xarray_mfdataset(*args,**kwargs):
     if 'depthv' in ds.keys():
         ds = ds.rename({'depthv':'depth'})
         ds['depth_location'] = 'v'
+
+    ds = ds.chunk(_chunks)
     
     return ds
 
