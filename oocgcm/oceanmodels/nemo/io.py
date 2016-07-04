@@ -36,6 +36,8 @@ def return_xarray_dataset(*args,**kwargs):
         _chunks = kwargs['chunks']
         kwargs.pop('chunks')
     
+    ds = _return_xarray_dataset(*args,**kwargs)
+    
     if 'time_counter' in ds.keys():
         ds = ds.rename({'time_counter':'t'})
 
