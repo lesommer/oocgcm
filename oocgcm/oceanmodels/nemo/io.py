@@ -26,12 +26,24 @@ def return_xarray_dataset(*args,**kwargs):
     Methods
     ------
     change the name of dimension 'time_counter' in 't'
+    change the name of depth dimension to 'depth' and add an attribute
+    about the actual depth location
     """
-    _ds = _return_xarray_dataset(*args,**kwargs)
-    if 'time_counter' in _ds.keys():
-        ds = _ds.rename({'time_counter':'t'})
-    else:
-        ds = _ds
+    ds = _return_xarray_dataset(*args,**kwargs)
+    
+    if 'time_counter' in ds.keys():
+        ds = ds.rename({'time_counter':'t'})
+
+    if 'deptht' in ds.keys():
+        ds = ds.rename({'deptht':'depth'})
+        ds['depth_location'] = 't'
+    if 'depthu' in ds.keys():
+        ds = ds.rename({'depthu':'depth'})        
+        ds['depth_location'] = 'u'
+    if 'depthv' in ds.keys():
+        ds = ds.rename({'depthv':'depth'})
+        ds['depth_location'] = 'v'
+               
     return ds
 
 def return_xarray_mfdataset(*args,**kwargs):
@@ -49,12 +61,24 @@ def return_xarray_mfdataset(*args,**kwargs):
     Methods
     ------
     change the name of dimension 'time_counter' in 't'
+    change the name of depth dimension to 'depth' and add an attribute
+    about the actual depth location
     """
-    _ds = _return_xarray_mfdataset(*args,**kwargs)
-    if 'time_counter' in _ds.keys():
-        ds = _ds.rename({'time_counter':'t'})
-    else:
-        ds = _ds
+    ds = _return_xarray_mfdataset(*args,**kwargs)
+    
+    if 'time_counter' in ds.keys():
+        ds = ds.rename({'time_counter':'t'})
+
+    if 'deptht' in ds.keys():
+        ds = ds.rename({'deptht':'depth'})
+        ds['depth_location'] = 't'
+    if 'depthu' in ds.keys():
+        ds = ds.rename({'depthu':'depth'})        
+        ds['depth_location'] = 'u'
+    if 'depthv' in ds.keys():
+        ds = ds.rename({'depthv':'depth'})
+        ds['depth_location'] = 'v'
+    
     return ds
 
 def return_xarray_dataarray(*args,**kwargs):
