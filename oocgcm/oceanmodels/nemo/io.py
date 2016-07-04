@@ -114,10 +114,36 @@ def return_xarray_dataarray(*args,**kwargs):
     Methods
     -------
     change the name of dimension 'time_counter' in 't'
+    change the name of depth dimension to 'depth' and add an attribute
+    about the actual depth location
     """
-    _da = _return_xarray_dataarray(*args,**kwargs)
-    if 'time_counter' in _da.coords.keys():
-       da = _da.rename({'time_counter':'t'})
-    else:
-       da = _da
+    
+    # filters chunks out of the kwargs in order to perform chunking after
+    # coordinate renaming
+    if 'chunks' in kwargs:
+        _chunks = kwargs['chunks']
+        kwargs.pop('chunks')
+    
+    da = _return_xarray_dataarray(*args,**kwargs)
+    if 'time_counter' in da.coords.keys():
+       da = da.rename({'time_counter':'t'})
+
+    if 'deptht' in da.coords.keys():
+        da = da.rename({'deptht':'depth'})
+        da['depth_location'] = 't'
+    if 'depthu' in da.coords.keys():
+        da = da.rename({'depthu':'depth'})        
+        da['depth_location'] = 'u'
+    if 'depthv' in da.coords.keys():
+        da = da.rename({'depthv':'depth'})
+        da['depth_location'] = 'v'
+        
+    # for vertical metric files
+    if 'z' in da.coords.keys():
+        da = da.rename({'z':'depth'})
+        
+    # set chunks now
+    da = da.chunk(_chunks)
+    
+    
     return da
