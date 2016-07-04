@@ -48,7 +48,10 @@ def return_xarray_dataset(*args,**kwargs):
     if 'depthv' in ds.keys():
         ds = ds.rename({'depthv':'depth'})
         ds['depth_location'] = 'v'
-               
+    
+    # set chunks now
+    ds = ds.chunk(_chunks)
+
     return ds
 
 def return_xarray_mfdataset(*args,**kwargs):
@@ -91,6 +94,7 @@ def return_xarray_mfdataset(*args,**kwargs):
         ds = ds.rename({'depthv':'depth'})
         ds['depth_location'] = 'v'
 
+    # set chunks now
     ds = ds.chunk(_chunks)
     
     return ds
