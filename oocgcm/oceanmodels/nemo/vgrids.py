@@ -142,7 +142,6 @@ def nemo_vertical_grid(nemo_coordinate_file=None,
                      nemo_coordinate_file=nemo_coordinate_file,
                      nemo_byte_mask_file=nemo_byte_mask_file,
                      chunks=chunks)
-    vgrid=[]
     vgrid = generic_vertical_grid(arrays=variables.variables,
                                   parameters= variables.parameters)
     return vgrid
