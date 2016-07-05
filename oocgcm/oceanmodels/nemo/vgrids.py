@@ -99,7 +99,7 @@ class variables_holder_for_vertical_grid_from_nemo_ogcm:
                      self._get(self.byte_mask_file,"vmask",
                             chunks=self.chunks3D,depth_location='v')[:]
         self.variables["sea_binary_mask_at_f_location"] = \
-                     self._get(self.byte_mask_file,"vmask",
+                     self._get(self.byte_mask_file,"fmask",
                             chunks=self.chunks3D,depth_location='f')[:]
 
     def chunk(self,chunks=None):
