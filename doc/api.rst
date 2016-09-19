@@ -62,6 +62,24 @@ Grid-related data structures
    griddeddata.grids.variables_holder_for_2d_grid_from_latlon_arrays
    griddeddata.grids.latlon_2d_grid
 
+Tools for filtering timeseries and spatial fields
+=================================================
+
+.. autosummary::
+   :toctree: generated/
+
+   oocgcm.filtering.timefilters
+
+
+Testing tools
+=============
+
+.. autosummary::
+   :toctree: generated/
+
+   oocgcm.test.signals
+
+
 Tools for NEMO ocean model
 ==========================
 
@@ -73,3 +91,5 @@ Grid-related data structures
 
    oceanmodels.nemo.grids.variables_holder_for_2d_grid_from_nemo_ogcm
    oceanmodels.nemo.grids.nemo_2d_grid
+
+
