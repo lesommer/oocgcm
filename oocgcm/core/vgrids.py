@@ -430,7 +430,7 @@ class generic_vertical_grid:
                                                         conserving=conserving)
         out = self._to_upper_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
-        return _append_dataarray_extra_attrs(out,grid_location='u')
+        return _append_dataarray_extra_attrs(out,grid_location='w')
 
 
         return out
