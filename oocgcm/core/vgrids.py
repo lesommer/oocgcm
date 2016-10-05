@@ -413,7 +413,7 @@ class generic_vertical_grid:
             weights_out = 1.
         return weights_in, weights_out
 
-    def change_grid_location_t_to_w(self,scalararray,conserving='area'):
+    def change_grid_location_t_to_w(self,scalararray,conserving='z_flux'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
 
