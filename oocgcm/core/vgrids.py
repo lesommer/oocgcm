@@ -59,6 +59,24 @@ def _mk(scalararray):
     mk = ( scalararray.shift(depth=-1) + scalararray ) / 2.
     return mk
 
+def _mkm(scalararray):
+    """Return the average of scalararray(k-1) and scalararray(k)
+
+    A priori, for internal use only.
+
+    Parameters
+    ----------
+    scalararray : xarray.DataArray
+        xarray that should be averaged at k-1/2.
+
+    Returns
+    -------
+    mkm : xarray.DataArray
+       averaged xarray, defined at point k-1/2
+    """
+    mkm = ( scalararray.shift(depth=+1) + scalararray ) / 2.    
+    return mkm
+
 #
 #==================== Methods for testing xarrays ==============================
 #
