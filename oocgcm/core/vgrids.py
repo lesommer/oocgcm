@@ -405,20 +405,12 @@ class generic_vertical_grid:
         -----
         This function is used internally for change_grid_location_*_to_*
         """
-        # shortcut weights for now:
-        print 'Weighting is off in _weights_for_change_grid_location'
-        weights_in  = 1.
-        weights_out = 1.
-#         if conserving is 'area':
-#             weights_in  = self._arrays["cell_area_at_" + input  + "_location"]
-#             weights_out = self._arrays["cell_area_at_" + output + "_location"]
-#         elif conserving is 'x_flux':
-#             weights_in  = self._arrays["cell_y_size_at_" + input  + "_location"]
-#             weights_out = self._arrays["cell_y_size_at_" + output + "_location"]
-#         elif conserving is 'y_flux':
-#             weights_in  = self._arrays["cell_x_size_at_" + input  + "_location"]
-#             weights_out = self._arrays["cell_x_size_at_" + output + "_location"]
-
+        if conserving is 'z_flux':
+            weights_in  = self._arrays["cell_z_size_at_" + input  + "_location"]
+            weights_out = self._arrays["cell_z_size_at_" + output + "_location"]
+        else:
+            weights_in  = 1.
+            weights_out = 1.
         return weights_in, weights_out
 
     def change_grid_location_t_to_w(self,scalararray,conserving='area'):
