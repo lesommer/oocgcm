@@ -368,11 +368,11 @@ class generic_vertical_grid:
 
 #---------------------------- Grid Swapping ------------------------------------
 #- Core swapping utilities
-    def _to_upper_grid_location(self,scalararray,
+    def _to_lower_grid_location(self,scalararray,
                                 weights_in=None,weights_out=None):
         """Return an average of scalararray at point k + 1/2
         """
-        average = lambda xarr:( xarr.shift(depth=-1) + xarr ) / 2.
+        average = lambda xarr:_mk(xarr)
         if weights_in is None:
             out = average(scalararray)
         else:
@@ -381,11 +381,11 @@ class generic_vertical_grid:
             out = average(scalararray * weights_in) / weights_out
         return out
 
-    def _to_lower_grid_location(self,scalararray,
+    def _to_upper_grid_location(self,scalararray,
                                 weights_in=None,weights_out=None):
         """Return an average of scalararray at point k - 1/2
         """
-        average = lambda xarr:( xarr.shift(depth=1) + xarr ) / 2.
+        average = lambda xarr:_mkm(xarr)
         if weights_in is None:
             out = average(scalararray)
         else:
