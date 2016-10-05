@@ -910,6 +910,28 @@ class generic_2d_grid:
                                                          weights_out=wo)
         return _append_dataarray_extra_attrs(out,grid_location='v')
 
+    def change_grid_location_f_to_t(self,scalararray,conserving='area'):
+        """Return a xarray corresponding to scalararray averaged at a new
+        grid location.
+
+        Parameters
+        ----------
+        scalararray : xarray.DataArray
+            original array to be relocated
+        conserving : str
+            any of 'area', 'x_flux' or 'y_flux'.
+              - 'area' : conserves the area
+              - 'x_flux' : conserves the flux in x-direction (eastward)
+              - 'y_flux' : conserves the flux in y-direction (northward)
+        """
+        # first move to u-point
+        newarr = self.change_grid_location_f_to_u(scalararray,
+                                                  conserving=conserving)
+        # then move to t-point
+        out = self.change_grid_location_u_to_t(newarr,
+                                                  conserving=conserving)
+        return out
+
     def change_grid_location_v_to_u(self,scalararray,conserving='area'):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
