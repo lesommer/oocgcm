@@ -421,19 +421,40 @@ class generic_vertical_grid:
         ----------
         scalararray : xarray.DataArray
             original array to be relocated
-        conserving : str !!! turned of for now !!!
-            any of 'area', 'x_flux' or 'y_flux'.
-              - 'area' : conserves the area
-              - 'x_flux' : conserves the flux in x-direction (eastward)
-              - 'y_flux' : conserves the flux in y-direction (northward)
+        conserving : str 
+               - 'z_flux' : conserves the flux in z-direction (downward)
         """
         check_input_array(scalararray,\
                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
-        wi, wo = self._weights_for_change_grid_location(input='t',output='u',
+        wi, wo = self._weights_for_change_grid_location(input='t',output='w',
                                                         conserving=conserving)
         out = self._to_upper_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return _append_dataarray_extra_attrs(out,grid_location='u')
+
+
+        return out
+
+    def change_grid_location_w_to_t(self,scalararray,conserving='z_flux'):
+        """Return a xarray corresponding to scalararray averaged at a new
+        grid location.
+ 
+        Parameters
+        ----------
+        scalararray : xarray.DataArray
+             original array to be relocated
+        conserving : str
+               - 'z_flux' : conserves the flux in z-direction (downward)
+        """
+
+
+        check_input_array(scalararray,\
+                           chunks=self.chunks,grid_location='w',ndims=self.ndims)        
+        wi, wo = self._weights_for_change_grid_location(input='w',output='t',
+                                                        conserving=conserving)
+        out = self._to_lower_grid_location(scalararray,weights_in=wi,
+                                                         weights_out=wo)
+        return _append_dataarray_extra_attrs(out,grid_location='t')
 
 
         return out
