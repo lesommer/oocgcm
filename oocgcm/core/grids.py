@@ -1604,3 +1604,67 @@ class generic_2d_grid:
         gradhb = self.horizontal_gradient(buoyancy)  # at u,v location
         Fs = self.scalar_product(Qkd,gradhb)
         return Fs
+
+    def geostrophic_current_from_pressure(self,pressure):
+        """Return the geostrophic current on u,v-grids.
+
+        Parameters
+        ----------
+        pressure : xarray.DataArray
+            xarray of pressure
+
+        Returns
+        -------
+        vectorfield : VectorField2d namedtuple
+           Two-dimensional vector field of geostrophic currents at u,v-points.
+        """
+        if pressure.attrs.has_key('grid_location'):
+            grid_location=pressure.attrs['grid_location']
+            check_input_array(pressure,\
+                          chunks=self.chunks,grid_location=grid_location,ndims=self.ndims)
+        gp = self.horizontal_gradient(pressure)
+
+        vg = self.change_grid_location_u_to_v(gp.x_component) \
+           / self._arrays["coriolis_parameter_at_v_location"]
+        ug = - self.change_grid_location_v_to_u(gp.y_component) \
+           / self._arrays["coriolis_parameter_at_u_location"]
+
+        return VectorField2d(ug,vg,\
+                             x_component_grid_location = 'u',\
+                             y_component_grid_location = 'v')
+ 
+
+    def geostrophic_current_from_pressure_fplane(self,pressure,f0=1e-4):
+        """Return the geostrophic current on u,v-grids on a f-plane
+
+        Parameters
+        ----------
+        pressure : xarray.DataArray
+            xarray of pressure
+        f0 : float
+          Value of Coriolis parameter for the f-plane
+        
+
+        Returns
+        -------
+        vectorfield : VectorField2d namedtuple
+           Two-dimensional vector field of geostrophic currents at u,v-points.
+        """
+        
+        print 'f-plane: f0 = '+str(f0)
+        
+        if pressure.attrs.has_key('grid_location'):
+            grid_location=pressure.attrs['grid_location']
+            check_input_array(pressure,\
+                          chunks=self.chunks,grid_location=grid_location,ndims=self.ndims)
+        gp = self.horizontal_gradient(pressure)
+
+        vg = self.change_grid_location_u_to_v(gp.x_component)
+        ug = -self.change_grid_location_v_to_u(gp.y_component)
+        
+        vg/=f0
+        ug/=f0
+
+        return VectorField2d(ug,vg,\
+                             x_component_grid_location = 'u',\
+                             y_component_grid_location = 'v')
