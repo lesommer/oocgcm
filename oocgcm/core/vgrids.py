@@ -464,7 +464,7 @@ class generic_vertical_grid:
 
 #-------------------- Differential Operators------------------------------------
 
-    def vertical_derivative(self,scalararray):
+    def vertical_derivative(self,scalararray,grid_location=None):
         """
         Return the vertical derivative of the input datastructure.
 
@@ -478,31 +478,50 @@ class generic_vertical_grid:
 
         Methods
         -------
-        calls horizontal_gradient_vector or horizontal_gradient_tensor depending
-        on th type of the input datastructure.
+
 
         See also
         --------
-        self.horizontal_gradient_vector,  self.horizontal_gradient_tensor
+
 
         """
         
-        #- check input arrays
-        print 'checks missing in vertical_derivative'
-        #if _grid_location_equals(scalararray, grid_location=None):
-        #check_input_array(scalararray,\
-        #                  chunks=self.chunks,grid_location='t',ndims=self.ndims)
+	# Input and output grid_location (works only for z-coordinate grid)
+	# _eq is the input centered grid_location
+	# _neq is the output grid_location
+        if grid_location is None:
+            grid_location=scalararray['grid_location']            
+        if grid_location=='u' or grid_location=='v' or grid_location=='f' or grid_location=='t':
+            grid_location_eq='t'
+            grid_location_neq='w'
+        elif grid_location=='w':
+            grid_location_eq='w'
+            grid_location_neq='t'  
+        else:
+            raise TypeError('No correct grid location in arguments or input attributes')  
 
-        #- compute the vertical derivative
-        gz = _dk(scalararray) / self._arrays["cell_z_size_at_t_location"]
+	# Average z_sizes in order to deal with shape differences between dz (3D) and df (1D or 3D)
+        print 'Cell z-size is averaged in space to avoid conflict with non-3D data.'
 
-        #- finalize attributes
+        df=_dk(scalararray)
+        dz=self._arrays['cell_z_size_at_'+grid_location_neq+'_location'].isel(t=0)
+	# force alignment        
+	df['depth'].values=dz['depth'].values
+        dz= dz.mean(dim=['x','y'],keep_attrs=True)
+        # quick broadcast (preserve chunks, method to be improved)
+        dz2=df*0.+dz
+        gz = df / dz2
+        print gz
+            
+        # Finalize attributes
+               
+        grid_location_attr=grid_location_neq
+            
         gzatts = _convert_dataarray_attributes_zderivative(scalararray.attrs,
-                                                           grid_location='w')
+                                                           grid_location=grid_location_attr)
 
-        print 'Missing attribute finalization in vertical_derivative'
-        #gx = _finalize_dataarray_attributes(gx,**gxatts)
-        
+        gz = _finalize_dataarray_attributes(gz,**gzatts)
+               
         return gz
 
 
