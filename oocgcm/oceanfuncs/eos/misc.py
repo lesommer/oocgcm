@@ -1,15 +1,40 @@
 #!/usr/bin/env python
 #
 """oocgcm.oceanfuncs.eos.misc
-Equation of state related functions that are not attached to a particular
+Equation of state-related functions that are not attached to a particular
 equation of state of sea water.
+
+Potential temperature is the 0-bar reference.
+
+
+
+Currently, functions are split into two families: one dealing with
+numpy arrays only (if useful for optimisation), the other dealing
+with  xarray dataarrays as input (if no optimisation needed).
+
+The list is as follows:
+
+- Numpy only:
+_spice : spiciness from theta0 and s
+_theta : theta0 from t,s,p
+_gamma_b73 : adiabatic lapse rate from Bryden (1973)    )     alternative code is a safer option
+_gamma_b73_2 : alternative code                         )
+
+- Xarray datarray input
+spice: spiciness from theta0 and s. Numpy calculation and output.
+_theta_xr: theta0 from t,s,p. Xarray only.
+_gamma_b73_xr : adiabatic lapse rate from Bryden (1973)    )     alternative code is a safer option
+_gamma_b73_2_xr : alternative code                         )
 
 """
 
 import numpy as np
-from numba import jit
+#from numba import jit
 
-from ...core.utils import map_apply, _assert_are_compatible_dataarrays
+#from ...core.utils import *
+
+from xarray import ufuncs as uf
+
 
 #---------------------- Functions for numpy arrays ----------------------------
 
@@ -24,8 +49,30 @@ _spice_coefs = \
         [-6.36e-010,    -1.309e-009,   6.048e-009, -1.1409e-009,  -6.676e-010]
     ])
 
-@jit
-def _spice(t,s):
+
+
+    
+_gamma_b73_coefs = \
+    np.array([
+        [ 
+         [ 0.35803e-001,     0.85258e-002,   -0.68360e-004,  0.66228e-006  ],
+         [ 0.18932e-002,     -0.42393e-004,    0.          ,  0.           ],
+         [ 0.,0.,0.,0.]
+        ],
+        [
+         [0.18741e-004,      -0.67795e-006,   0.87330e-008, -0.54481e-010 ],  
+         [-0.11351e-006,      0.27759e-008,   0.          ,  0.           ],
+         [ 0.,0.,0.,0.]
+        ],
+        [         
+         [-0.46206e-009,     0.18676e-010,   -0.21687e-012,  0.           ],
+         [0.,0.,0.,0.],
+         [0.,0.,0.,0.]
+        ]
+    ])
+
+#@jit
+def _spice(theta0,s):
     """Return spiciness.
 
     A state variable for characterizing water masses and their
@@ -33,7 +80,7 @@ def _spice(t,s):
 
     Parameters
     ----------
-    t : numpy.array
+    theta0 : numpy.array
         potential temperature (degC)
     s : numpy.array
         salinity (PSU)
@@ -73,9 +120,59 @@ def _spice(t,s):
             dsal *= dsalref
         dtmp *= t
     return dspi
+    
+#@jit
+def _gamma_b73(t,s,p):
+    """Return adiabatic lapse rate (degC/1000 db) using pressure 
+    in db.
+
+    Parameters
+    ----------
+    t : numpy.array
+        temperature (degC)
+    s : numpy.array
+        salinity (PSU)
+    p : numpy.array
+        pressure (db)
+
+    Returns
+    -------
+    gamma : numpy.array
+        adiabatic lapse rate
+
+    Notes
+    -----
+    The calculation follows Bryden (1973) polynomial.
+
+
+    References
+    ----------
+
+    """
+
+    salref = s - 35.
+
+    gamma    = 0.
+    
+    dp=1.
+    for ji in range(3):
+          dsal=1.
+          for jj in range(3):
+              dtmp = 1.
+              for jk in range(4):
+                  gamma = gamma +   _gamma_b73_coefs[ji,jj,jk] * dtmp * dsal * dp
+                  dtmp *= t
+              dsal *= salref
+          dp *= p
+          
+    return gamma
+
+ 
 
 
 #------------------ Wrapped functions for dataarrays ---------------------------
+
+
 def spice(t,s):
     """Return spiciness.
 
@@ -109,3 +206,51 @@ def spice(t,s):
     .. [2] Jackett and McDougall, Deep Sea Research, 32A, 1195-1208, 1985.
     """
     pass
+
+
+def _gamma_b73_xr(t,s,p):
+    """Return adiabatic lapse rate (degC/1000 db) using pressure 
+    in db.
+
+    Parameters
+    ----------
+    t : xarray dataarray
+        temperature (degC)
+    s : xarray dataarray
+        salinity (PSU)
+    p : xarray dataarray
+        pressure (db)
+
+    Returns
+    -------
+    gamma : xarray dataarray
+        adiabatic lapse rate
+
+    Notes
+    -----
+
+    The calculation follows Bryden (1973) polynomial. 
+
+
+    References
+    ----------
+
+    """
+
+    salref = s - 35.
+
+    gamma    = 0.
+    
+    dp=1.
+    for ji in range(3):
+          dsal=1.
+          for jj in range(3):
+              dtmp = 1.
+              for jk in range(4):
+                  gamma = gamma +   _gamma_b73_coefs[ji,jj,jk] * dtmp * dsal * dp
+                  dtmp *= t
+              dsal *= salref
+          dp *= p 
+
+    return gamma
+
