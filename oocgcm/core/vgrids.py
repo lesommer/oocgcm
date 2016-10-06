@@ -639,4 +639,129 @@ class generic_vertical_grid:
                                  grid_location=grid_location,normalize=True)
         return average
 
+    def integrate_dxdy_vgrid(self,array,grd,where=None,grid_location=None,normalize=False,chunks=None):
+        """Return the horizontal integral of array in regions where
+        where is True. 3-D input version.
+
+        Parameters
+        ----------
+        grd: horizontal grid object
+        array : xarray.DataArray
+            a dataarray with an additonal attribute specifying the grid_location.
+            The dimension of array should include 'x' and 'y'.
+            The shape of array should match the shape of the grid.
+        where: boolean xarray.DataArray
+            dataarray with value = True where the integration should be applied.
+            The dimension of where should be a subset of the dimension of array.
+            For each dimension, the size should be equal to the corresponding
+            size of array dataarray.
+            if where is None, the function return the integral in all the domain
+            defined by the grid object.
+        grid_location : str
+            string describing the grid location : eg 'u','v','t','f'...
+             - if grid_location is not None
+                    check compatibility with array.attrs.grid_location
+             - if grid_location is None
+                    use array.attrs.grid_location by default
+        normalize : boolean
+            boolean stating whether of not the integral should be normalized
+            by the area of the region over which the integration is performed.
+
+        Returns
+        -------
+        integral: xarray.DataArray
+            a dataarray with reduced dimension defining the integral of array in
+            the region of interest.
+
+        See also
+        --------
+        spatial_average_xy : averaging over a region
+        """
+        # check grid location
+        if grid_location is None:
+            if not(isinstance(array,xr.DataArray)):
+                raise TypeError('input array should be a xarray.DataArray')
+            elif array.attrs.has_key("grid_location"):
+                grid_location = array.attrs["grid_location"]
+            else:
+                raise Exception('grid_location is not known.')
+            #except:
+            #    raise TypeError('input array should be a xarray.DataArray')
+
+        # check arrays
+        check_input_array(array,\
+                            chunks=self.chunks,grid_location=grid_location,
+                            ndims=self.ndims)
+        if where is not None:
+            where['depth'].values=array['depth'].values
+            check_input_array(where,\
+                              chunks=self.chunks,grid_location=grid_location,
+                              ndims=self.ndims)
+        else:
+            maskname = "sea_binary_mask_at_" + grid_location + "_location"
+            where = self._arrays[maskname]
+            where['depth'].values=array['depth'].values
+
+        # actual definition
+        idims = ('x','y')
+        dxdy = grd._arrays['cell_area_at_' + grid_location + '_location']
+        
+        print array
+        print where.squeeze()
+        print dxdy
+               
+        array_dxdy = array.where(where.squeeze()) * dxdy # squeeze is not lazy
+
+        integral = array_dxdy.sum(dim=idims)
+
+        # normalize if required
+        if normalize:
+           integral /= dxdy.where(where.squeeze()).sum(dim=idims)
+        #        Nota Bene : dataarray.squeeze() is not a lazy operation.
+        return integral
+    
+
+    def spatial_average_xy_vgrid(self,array,grd,where=None,grid_location=None):
+        """Return the horizontal average of array in regions where where is True.
+        3-D input version.
+
+        Parameters
+        ----------
+        grd : horizontal grid object
+        array : xarray.DataArray
+            a dataarray with an additonal attribute specifying the grid_location.
+            The dimension of array should include 'x' and 'y'.
+            The shape of array should match the shape of the grid.
+        where: boolean xarray.DataArray
+            dataarray with value = True where the integration should be applied
+            The dimension of where should be a subset of the dimension of array.
+            For each dimension, the size should be equal to the corresponding
+            size of array dataarray.
+            if where is None, the function return the integral in all the domain
+            defined by the grid object.
+        grid_location : str
+            string describing the grid location : eg 'u','v','t','f'...
+             - if grid_location is not None
+                    check compatibility with array.attrs.grid_location
+             - if grid_location is None
+                    use array.attrs.grid_location by default
+
+        Returns
+        -------
+        average: xarray.DataArray
+            a dataarray with reduced dimension defining the average of array in
+            the region of interest.
+
+        See also
+        --------
+        integrate_dxdy_vgrid : spatial integral over a region for a 3-D input.
+        """
+
+        if grid_location=='w':
+            grid_location='t'
+        
+        average = self.integrate_dxdy_vgrid(array,grd,where=where,
+                                 grid_location=grid_location,normalize=True)
+
+        return average
 
