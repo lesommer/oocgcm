@@ -183,7 +183,9 @@ def density_meters(theta0,s,z):
    We use  Jackett and McDougall (1995)'s [1]_ equation of state.
    the in situ density is computed directly as a function of
    potential temperature relative to the surface (theta0), salt 
-   and pressure
+   and pressure (assuming no pressure variation
+   along geopotential surfaces, i.e. the pressure p in decibars
+   is approximated by the depth in meters.
 
     with:
 
@@ -309,7 +311,7 @@ def density_meters_xr(theta0,s,z):
     
 
     """
-    
+
     # caution: depth (m) replaces pressure (db)        
     rho=_density_xr(theta0,s,z)
                     

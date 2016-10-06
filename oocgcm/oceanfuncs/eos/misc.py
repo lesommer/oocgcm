@@ -26,6 +26,10 @@ _theta_xr: theta0 from t,s,p. Xarray only.
 _gamma_b73_xr : adiabatic lapse rate from Bryden (1973)    )     alternative code is a safer option
 _gamma_b73_2_xr : alternative code                         )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 06536b05509bac03a55ac8ca91eebc0a22c9d7e9
 """
 
 import numpy as np
@@ -169,8 +173,190 @@ def _gamma_b73(t,s,p):
 
  
 
+def _theta(t,s,p):
+    """Return potential temperature (degC) at 0-bar level using pressure in
+    db.
+
+    Parameters
+    ----------
+    t : numpy.array
+        temperature (degC)
+    s : numpy.array
+        salinity (PSU)
+    p : numpy.array
+        pressure (db)
+
+    Returns
+    -------
+    theta : numpy.array
+        potential temperature
+
+    Notes
+    -----
+    The calculation follows Bryden (1973) for the adiabatic lapse rate and
+    Fofonoff (1977) for the integration to a reference level (i.e. a 
+    1-iterate Runge-Kutta 4 scheme)
+
+
+    References
+    ----------
+
+    """
+
+    r2=np.sqrt(2.)
+
+    # Adiabatic lapse rate (degC/db)
+    #g=lambda t,s,p: _gamma_b73(t,s,p)*0.001
+    g=lambda t,s,p: _gamma_b73_2(t,s,p)
+#
+#     # My script
+#     
+#     pr=0.
+#     dp= pr - p
+#     
+#     dt1 =   dp*g(t,  s,  p      )
+#     
+#     t1  =   t           +   0.5*dt1
+#     
+#     dt2 =   dp*g(t1, s,  p+0.5*dp)
+#     
+#     q1  =   dt1
+#     
+#     t2  =   t1          +   (1.-1./r2)*(dt2-q1)
+#     
+#     dt3 =   dp*g(t2, s,  p+0.5*dp)
+#     
+#     q2  =   (2.-r2)*dt2  +   (-2.+3./r2)*dt1
+#     
+#     t3  =   t2          +   (1.+1./r2)*(dt3-q2)
+#     
+#     dt4 =   dp*g(t3, s,  p+dp    )
+#     
+#     q3  =   (2.+r2)*dt3  +   (-2.-3./r2)*dt2
+#         
+#     theta = t3          +   (1./6.)*(dt4-2.*q3)
+
+    
+    # Fofonoff and Millard (1983)
+
+    pr=0.
+    h=pr-p
+    xk=h*g(t,s,p)
+    t=t+0.5*xk
+    q=xk
+    p=p+0.5*h
+    xk=h*g(t,s,p)
+    t=t+0.29289322*(xk-q)
+    q=0.58578644*xk+0.121320344*q
+    xk=h*g(t,s,p)
+    t=t+1.707106781*(xk-q)
+    q=3.424213562*xk-4.121320344*q
+    p=p+0.5*h
+    xk=h*g(t,s,p)
+    theta=t+(xk-2.0*q)/6.0
+
+    
+    print 'theta: '
+    print theta[0,0,0]
+    
+    return theta
+    
+#@jit
+def _gamma_b73(t,s,p):
+    """Return adiabatic lapse rate (degC/1000 db) using pressure 
+    in db.
+
+    Parameters
+    ----------
+    t : numpy.array
+        temperature (degC)
+    s : numpy.array
+        salinity (PSU)
+    p : numpy.array
+        pressure (db)
+
+    Returns
+    -------
+    gamma : numpy.array
+        adiabatic lapse rate
+
+    Notes
+    -----
+    The calculation follows Bryden (1973) polynomial.
+
+
+    References
+    ----------
+
+    """
+
+    salref = s - 35.
+
+    gamma    = 0.
+    
+    dp=1.
+    for ji in range(3):
+          dsal=1.
+          for jj in range(3):
+              dtmp = 1.
+              for jk in range(4):
+                  gamma = gamma +   _gamma_b73_coefs[ji,jj,jk] * dtmp * dsal * dp
+                  dtmp *= t
+              dsal *= salref
+          dp *= p
+          
+    print 'gamma: '      
+    print gamma[0,0,0]     
+
+    return gamma
+
+def _gamma_b73_2(t,s,p):
+    """Adiabatic lapse rate (deg C/dBar).
+ 
+    Adiabatic lapse rate (deg C/dBar) from salinity (psu), 
+    temperature (deg C) and pressure (dbar)
+
+    Parameters
+    ----------
+    t : numpy.array
+        temperature (deg C)
+    s : numpy.array
+        salinity (psu)
+    p : numpy.array
+        pressure (dbar)
+
+
+    Notes 
+    -----
+    
+    The script is drawn from Fofonoff and Millard (1983).
+    The calculation follows Bryden (1973) polynomial.
+
+ 
+    References
+    ----------
+
+
+    """ 
+    #
+    ds = s - 35.0
+    atg = ((-2.1687e-16 * t + 1.8676e-14) * t - 4.6206e-13) * p * p
+    atg+= (2.7759e-12 * t - 1.1351e-10 ) * ds * p
+    atg+= (((-5.4481e-14 * t + 8.7330e-12) * t - 6.7795e-10) * t + 1.8741e-8) * p
+    atg+= (-4.2393e-8 * t + 1.8932e-6 ) * ds
+    atg+= ((6.6228e-10 * t - 6.8360e-8) * t + 8.5258e-6) * t + 3.5803e-5
+    
+    print atg[0,0].values
+    
+    return atg
+ 
+
+
+
+
 
 #------------------ Wrapped functions for dataarrays ---------------------------
+
 
 
 def spice(t,s):
@@ -253,4 +439,5 @@ def _gamma_b73_xr(t,s,p):
           dp *= p 
 
     return gamma
+
 
