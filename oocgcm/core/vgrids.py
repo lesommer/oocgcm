@@ -424,8 +424,12 @@ class generic_vertical_grid:
         conserving : str 
                - 'z_flux' : conserves the flux in z-direction (downward)
         """
-        check_input_array(scalararray,\
-                          chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        
+#         check_input_array(scalararray,\
+#                           chunks=self.chunks,grid_location='t',ndims=self.ndims)
+        # NB: checking procedure fails if xarray.dims < self.ndims
+
+        
         wi, wo = self._weights_for_change_grid_location(input='t',output='w',
                                                         conserving=conserving)
         out = self._to_upper_grid_location(scalararray,weights_in=wi,
@@ -446,10 +450,12 @@ class generic_vertical_grid:
         conserving : str
                - 'z_flux' : conserves the flux in z-direction (downward)
         """
+       
+#         check_input_array(scalararray,\
+#                            chunks=self.chunks,grid_location='w',ndims=self.ndims)        
+        # NB: checking procedure fails if xarray.dims < self.ndims
 
-
-        check_input_array(scalararray,\
-                           chunks=self.chunks,grid_location='w',ndims=self.ndims)        
+        
         wi, wo = self._weights_for_change_grid_location(input='w',output='t',
                                                         conserving=conserving)
         out = self._to_lower_grid_location(scalararray,weights_in=wi,
@@ -486,9 +492,9 @@ class generic_vertical_grid:
 
         """
         
-	# Input and output grid_location (works only for z-coordinate grid)
-	# _eq is the input centered grid_location
-	# _neq is the output grid_location
+        # Input and output grid_location (works only for z-coordinate grid)
+	    # _eq is the input centered grid_location
+	    # _neq is the output grid_location
         if grid_location is None:
             grid_location=scalararray['grid_location']            
         if grid_location=='u' or grid_location=='v' or grid_location=='f' or grid_location=='t':
@@ -500,13 +506,13 @@ class generic_vertical_grid:
         else:
             raise TypeError('No correct grid location in arguments or input attributes')  
 
-	# Average z_sizes in order to deal with shape differences between dz (3D) and df (1D or 3D)
+	    # Average z_sizes in order to deal with shape differences between dz (3D) and df (1D or 3D)
         print 'Cell z-size is averaged in space to avoid conflict with non-3D data.'
 
         df=_dk(scalararray)
         dz=self._arrays['cell_z_size_at_'+grid_location_neq+'_location'].isel(t=0)
-	# force alignment        
-	df['depth'].values=dz['depth'].values
+	    # force alignment        
+        df['depth'].values=dz['depth'].values
         dz= dz.mean(dim=['x','y'],keep_attrs=True)
         # quick broadcast (preserve chunks, method to be improved)
         dz2=df*0.+dz
@@ -578,14 +584,18 @@ class generic_vertical_grid:
             #    raise TypeError('input array should be a xarray.DataArray')
 
         # check arrays
-        check_input_array(array,\
-                            chunks=self.chunks,grid_location=grid_location,
-                            ndims=self.ndims)
-        if where is not None:
-            check_input_array(where,\
-                              chunks=self.chunks,grid_location=grid_location,
-                              ndims=self.ndims)
-        else:
+#         check_input_array(array,\
+#                             chunks=self.chunks,grid_location=grid_location,
+#                             ndims=self.ndims)
+        # NB: checking procedure fails if xarray.dims < self.ndims
+        
+#         if where is not None:
+#             check_input_array(where,\
+#                               chunks=self.chunks,grid_location=grid_location,
+#                               ndims=self.ndims)
+        # NB: checking procedure fails if xarray.dims < self.ndims
+        
+        if where is None:
             maskname = "sea_binary_mask_at_" + grid_location + "_location"
             where = self._arrays[maskname]
 
