@@ -413,7 +413,7 @@ class generic_vertical_grid:
             weights_out = 1.
         return weights_in, weights_out
 
-    def change_grid_location_t_to_w(self,scalararray,conserving='z_flux'):
+    def change_grid_location_t_to_w(self,scalararray,conserving=None):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
 
@@ -432,6 +432,9 @@ class generic_vertical_grid:
         
         wi, wo = self._weights_for_change_grid_location(input='t',output='w',
                                                         conserving=conserving)
+        if not 'x' in scalararray.dims and conserving=='z_flux':
+            wi=wi.mean(dim=['x','y'],keep_attrs=True)
+            wo=wo.mean(dim=['x','y'],keep_attrs=True)
         out = self._to_upper_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return _append_dataarray_extra_attrs(out,grid_location='w')
@@ -439,7 +442,7 @@ class generic_vertical_grid:
 
         return out
 
-    def change_grid_location_w_to_t(self,scalararray,conserving='z_flux'):
+    def change_grid_location_w_to_t(self,scalararray,conserving=None):
         """Return a xarray corresponding to scalararray averaged at a new
         grid location.
  
@@ -458,6 +461,9 @@ class generic_vertical_grid:
         
         wi, wo = self._weights_for_change_grid_location(input='w',output='t',
                                                         conserving=conserving)
+        if not 'x' in scalararray.dims and conserving=='z_flux':
+            wi=wi.mean(dim=['x','y'],keep_attrs=True)
+            wo=wo.mean(dim=['x','y'],keep_attrs=True)
         out = self._to_lower_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return _append_dataarray_extra_attrs(out,grid_location='t')

@@ -3,15 +3,15 @@
 """oocgcm.oceanfuncs.eos.eos80
 Equation of state of sea water and related quantities.
 
-This module uses the formulas from Unesco’s joint panel on oceanographic 
+This module uses the formulas from Unesco's joint panel on oceanographic 
 tables and standards, UNESCO 1981 and UNESCO 1983 (EOS-80).
 
 """
 
-
+import numpy as np
+from xarray import ufuncs as uf
 
 #--------------------------------------------------------------------------
-
 
 def _theta(t,s,p):
     """Return potential temperature (degC) at 0-bar level using pressure in
@@ -70,7 +70,7 @@ def _theta(t,s,p):
     return theta
 
 
-def _gamma_b73_2_xr(t,s,p):
+def _gamma_b73_2(t,s,p):
     """Adiabatic lapse rate (deg C/dBar).
  
     Adiabatic lapse rate (deg C/dBar) from salinity (psu), 
@@ -78,11 +78,11 @@ def _gamma_b73_2_xr(t,s,p):
 
     Parameters
     ----------
-    t : xarray dataarray
+    t : numpy.array
         temperature (deg C)
-    s : xarray dataarray
+    s : numpy.array
         salinity (psu)
-    p : xarray dataarray
+    p : numpy.array
         pressure (dbar)
 
 
@@ -196,8 +196,6 @@ def _theta_xr(t,s,p):
     ----------
 
     """
-
-    r2=uf.sqrt(2.)
 
     # Adiabatic lapse rate (degC/db)
     g=lambda t,s,p:  _gamma_b73_2_xr(t,s,p)

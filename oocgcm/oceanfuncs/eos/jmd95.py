@@ -49,7 +49,6 @@ import numpy as np
 from ...core.utils import *
 
 from xarray import ufuncs as uf
-from rexec import RHooks
 from oocgcm.parameters.physicalparameters import grav
 
 
