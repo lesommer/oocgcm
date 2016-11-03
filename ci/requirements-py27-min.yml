@@ -3,8 +3,10 @@ dependencies:
   - python=2.7
   - numpy==1.9.3
   - pandas==0.15.0
-  - xarray==0.7.2
+  - xarray==0.8.2
   - dask==0.8.1
   - bottleneck==1.0.0
+  - numba==0.29.0
+  - matplotlib==1.5.3
   - pip:
     - pytest-cov
