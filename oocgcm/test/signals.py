@@ -81,13 +81,13 @@ def trend(time, slope, offset):
 	"""
 	return slope * time + offset
 
-def signaltest_xyt1():
+def signaltest_xyt1(coastlines=False):
 	"""
 	Generate
 	"""
 	nt = 100
-	nx = 50
-	ny = 50
+	nx = 128
+	ny = 128
 	t1d = np.linspace(0, 20 * np.pi, nt)
 	x1d = np.linspace(0, 2 * np.pi, nx)
 	y1d = np.linspace(0, 2 * np.pi, ny)
@@ -105,9 +105,9 @@ def signaltest_xyt1():
 	z3 = np.sin(x) * np.sin(2.5 * y) * m3
 	z4 = np.sin(2.5 * x) * np.sin(2.5 * y) * m4
 	z = z1 + z2 + z3 + z4 + noise
-	print z.shape
-	return xr.DataArray(z, coords=[t1d, y1d, x1d], dims=['time', 'y', 'x'],
-	                    name='signal')
+	if coastlines:
+		z[:, 0:ny/4, 0:nx/4] = np.nan
+	return xr.DataArray(z, coords=[t1d, y1d, x1d], dims=['time', 'y', 'x'], name='signal')
 
 
 class TestExecutable(unittest.TestCase):
@@ -117,7 +117,12 @@ class TestExecutable(unittest.TestCase):
 		ds.to_netcdf(path=(savedir + 'signaltest_xyt1.nc'),
 		             format='NETCDF3_64BIT')
 
+	def generate_signaltest_xyt1_with_coastlines(self):
+		ds = signaltest_xyt1(coastlines=True).to_dataset()
+		ds.to_netcdf(path=(savedir + 'signaltest_xyt1_with_coastlines.nc'),
+		             format='NETCDF3_64BIT')
+
 if __name__ == '__main__':
-	test_list = ['generate_signaltest_xyt1']
+	test_list = ['generate_signaltest_xyt1_with_coastlines']
 	suite = unittest.TestSuite(map(TestExecutable, test_list))
 	unittest.TextTestRunner(verbosity=2).run(suite)

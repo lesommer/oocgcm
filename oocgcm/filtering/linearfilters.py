@@ -213,13 +213,11 @@ class Window(object):
 		mask = self.obj.notnull()
 		new_dims = copy.copy(self.obj.dims)
 		new_coords = copy.copy(self.coords)
-		try:
-			for dim in drop_dims:
-				mask = mask.isel(dim=0)
-				del(new_dims[dim])
-				del(new_coords[dim])
-		except:
-			raise TypeError
+		for dim in drop_dims:
+			#TODO: Make the function work
+			mask = mask.isel({dim:0})
+			del(new_dims[dim])
+			del(new_coords[dim])
 		weights = im.convolve(mask.astype(float), self.coefficients, mode=mode)
 		res = xr.DataArray(weights, dims=new_dims, coords=new_coords, name='boundary weights')
 		return res.where(mask == 1)
