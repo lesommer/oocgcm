@@ -5,7 +5,7 @@ oocgcm.filtering.linearfilters
 Define functions for linear filtering that works on multi-dimensional
 xarray.DataArray and xarray.Dataset objects.
 """
-
+import copy
 import xarray as xr
 import numpy as np
 # Matplotlib
@@ -196,7 +196,7 @@ class Window(object):
 
 		return res.where(mask == 1)
 
-	def boundary_weights(self, mode='reflect', fixed_dims=None):
+	def boundary_weights(self, mode='reflect', drop_dims=None):
 		"""
 		Compute the boundary weights
 
@@ -204,15 +204,24 @@ class Window(object):
 		----------
 			mode:
 
-			fixed_dims:
+			drop_dims:
 				Specify dimensions along which the mask is constant
 
 		Returns
 		-------
 		"""
 		mask = self.obj.notnull()
+		new_dims = copy.copy(self.obj.dims)
+		new_coords = copy.copy(self.coords)
+		try:
+			for dim in drop_dims:
+				mask = mask.isel(dim=0)
+				del(new_dims[dim])
+				del(new_coords[dim])
+		except:
+			raise TypeError
 		weights = im.convolve(mask.astype(float), self.coefficients, mode=mode)
-		res = xr.DataArray(weights, dims=self.obj.dims, coords=self.coords, name='boundary weights')
+		res = xr.DataArray(weights, dims=new_dims, coords=new_coords, name='boundary weights')
 		return res.where(mask == 1)
 
 	def plot(self, format = 'landscape'):
