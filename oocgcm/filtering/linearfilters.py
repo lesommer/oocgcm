@@ -14,12 +14,12 @@ from matplotlib import gridspec
 # Scipy
 import scipy.signal.windows as win
 import scipy.ndimage as im
+import scipy.special as spec
 # Dask
 from dask.diagnostics import ProgressBar
 # Oocgcm modules
 from oocgcm.plot.plot2d import spectrum2d_plot
 from oocgcm.plot.plot1d import spectrum_plot
-from oocgcm.test.signals import signaltest_xyt1
 
 # ------------------------------------------------------------------------------
 # First part : Definition of custom window functions
@@ -48,14 +48,33 @@ def lanczos(n, fc=0.02):
 			TypeError, "n must be an integer"
 	if not n % 2 == 1:
 		raise ValueError, "n must an odd integer"
-	k = np.arange(- n / 2 + 1, n / 2 + 1)
-	# k = np.arange(0, n + 1)
-	# w = (np.sin(2 * pi * fc * k) / (pi * k) *
-	#     np.sin(pi * k / n) / (pi * k / n))
-	w = (np.sin(2. * np.pi * fc * k) / (np.pi * k) *
-	     np.sin(np.pi * k / (n / 2.)) / (np.pi * k / (n / 2.)))
-	# Particular case where k=0
-	w[n / 2] = 2. * fc
+	dim = 1
+	if dim ==  1:
+		k = np.arange(- n / 2 + 1, n / 2 + 1)
+		# k = np.arange(0, n + 1)
+		# w = (np.sin(2 * pi * fc * k) / (pi * k) *
+		#     np.sin(pi * k / n) / (pi * k / n))
+		w = (np.sin(2. * np.pi * fc * k) / (np.pi * k) *
+		     np.sin(np.pi * k / (n / 2.)) / (np.pi * k / (n / 2.)))
+		# Particular case where k=0
+		w[n / 2] = 2. * fc
+	elif dim == 2:
+		#TODO: Test this bidimensional window
+		fcx, fcy = fc
+		nx, ny = n
+		# Grid definition according to the number of weights
+		kx, ky = np.meshgrid(np.arange(-nx, nx + 1), np.arange(-ny, ny + 1), indexing='ij')
+		# Computation of the response weight on the grid
+		z = np.sqrt((fcx * kx) ** 2 + (fcy * ky) ** 2)
+		w_rect = 1 / z * fcx * fcy * spec.j1(2 * np.pi * z)
+		w = (w_rect * np.sin(np.pi * kx / nx) / (np.pi * kx / nx) *
+		     np.sin(np.pi * ky / ny) / (np.pi * ky / ny))
+		# Particular case where z=0
+		w[nx, :] = (w_rect[nx, :] * 1. / (np.pi * ky[nx, :] / ny) *
+		             np.sin(np.pi * ky[nx, :] / ny))
+		w[:, ny] = (w_rect[:, ny] * 1. / (np.pi * kx[:, ny] / nx) *
+		             np.sin(np.pi * kx[:, ny] / nx))
+		w[nx, ny] = np.pi * fcx * fcy
 	return w
 
 
@@ -152,14 +171,12 @@ class Window(object):
 			self.order[dimension_name] = weight_numbers
 			# Compute the coefficients associated to the window using the right
 			# function
-			coefficients1d = window_function(2 * weight_numbers + 1,
-			                                 **kargs)
+			coefficients1d = window_function(2 * weight_numbers + 1, **kargs)
 			# Normalize the coefficients
 			coefficients1d /= np.sum(coefficients1d)
 			self.coefficients = np.outer(self.coefficients, coefficients1d)
-			#TODO: Try to use meshgrid instead
+			#TODO: Try to add the rotational convention using meshgrid, in complement to the outer product
 			#TODO: check the order of dimension of the kernel compared to the DataArray/DataSet objects
-
 		self.coefficients = self.coefficients.squeeze()
 		for dim in self.obj.dims:
 			axis_dim = self.obj.get_axis_num(dim)
