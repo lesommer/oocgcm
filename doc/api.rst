@@ -109,7 +109,7 @@ and values given by ``DataArray`` objects.
 
 .. autosummary::
    :toctree: generated/
-
+   
    core.grids.generic_2d_grid.__getitem__
    core.grids.generic_2d_grid.__contains__
    core.grids.generic_2d_grid.__iter__
@@ -158,16 +158,14 @@ Differential operators
     core.grids.generic_2d_grid.horizontal_laplacian
     core.grids.generic_2d_grid.vertical_component_of_curl
     core.grids.generic_2d_grid.horizontal_divergence
-
+    core.grids.generic_2d_grid.integrate_dxdy
+    core.grids.generic_2d_grid.spatial_average_xy
 
 Spatial integration
 ------------------
 
  .. autosummary::
     :toctree: generated/
-
-    core.grids.generic_2d_grid.integrate_dxdy
-    core.grids.generic_2d_grid.spatial_average_xy
 
 Operators specific to oceanic applications
 ------------------------------------------
@@ -178,3 +176,23 @@ Operators specific to oceanic applications
     core.grids.generic_2d_grid.geostrophic_current_from_sea_surface_height
     core.grids.generic_2d_grid.q_vector_due_to_kinematic_deformation
     core.grids.generic_2d_grid.frontogenesis_function
+
+    
+
+Tools for filtering timeseries and spatial fields
+=================================================
+
+.. autosummary::
+   :toctree: generated/
+
+   oocgcm.filtering.timefilters
+
+
+Testing tools
+=============
+
+.. autosummary::
+   :toctree: generated/
+
+   oocgcm.test.signals
+
