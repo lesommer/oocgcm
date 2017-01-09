@@ -1,13 +1,17 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
-# mostly taken from xarray 
+# mostly taken from xarray
 
 import sys
 import warnings
 from contextlib import contextmanager
 
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_equal,assert_array_equal,assert_allclose
+
+from xarray.core.variable import as_variable
+
+from oocgcm.core.utils import is_xarray
 
 PY3 = sys.version_info[0] >= 3
 
@@ -18,7 +22,7 @@ except ImportError:
     import unittest
 
 try:
-    import xarray 
+    import xarray
     has_xarray = True
 except ImportError:
     has_xarray = False
@@ -30,6 +34,12 @@ try:
     has_dask = True
 except ImportError:
     has_dask = False
+
+try:
+    import numba
+    has_numba = True
+except ImportError:
+    has_numba = False
 
 try:
     import matplotlib
@@ -52,6 +62,8 @@ def requires_xarray(test):
 def requires_dask(test):
     return test if has_dask else unittest.skip('requires dask')(test)
 
+def requires_numba(test):
+    return test if has_numba else unittest.skip('requires numba')(test)
 
 def requires_matplotlib(test):
     return test if has_matplotlib else unittest.skip('requires matplotlib')(test)
@@ -113,6 +125,16 @@ class TestCase(unittest.TestCase):
     def assertArrayEqual(self, a1, a2):
         assert_array_equal(a1, a2)
 
+    def assertArrayClose(self, a1, a2,rtol=1e-05, atol=1e-08):
+        assert_allclose(a1, a2,rtol=rtol, atol=atol)
+
+    def assertArray2dCloseInside(self, a1, a2,rtol=1e-05, atol=1e-08,depth=1):
+        #- restrict the comparison to point away from boundaries.
+        #- assume a1 and a2 are 2d x,y arrays.
+        _a1 = a1[...,depth:-1 - depth,depth:-1 - depth]
+        _a2 = a2[...,depth:-1 - depth,depth:-1 - depth]
+        assert_allclose(_a1, _a2,rtol=rtol, atol=atol)
+
 
     def assertEqual(self, a1, a2):
         assert a1 == a2 or (a1 != a1 and a2 != a2)
@@ -142,6 +164,13 @@ class TestCase(unittest.TestCase):
             v2 = d2.coords[k]
             self.assertVariableEqual(v1, v2)
 
+    def assertDataArrayHasValues(self,da):
+        try:
+	    assert(isinstance(float(da[0,0].to_masked_array()),float))
+	except:
+	    print da
+            raise Exception(' This DataArray is empty/not valid.')
+
     def assertDataArrayEqual(self, ar1, ar2):
         self.assertVariableEqual(ar1, ar2)
         self.assertCoordinatesEqual(ar1, ar2)
@@ -164,6 +193,20 @@ class UnexpectedDataAccess(Exception):
 class ReturnItem(object):
     def __getitem__(self, key):
         return key
+
+def print_array_around(expected = None, actual=None,around=(20,20)):
+    """Customized print used for debugging tests."""
+    j,i = around
+    print '\n expected array : '
+    if is_xarray(expected):
+        print expected.to_masked_array()[j-1:j+2,i-1:i+2]
+    else:
+        print expected[j-1:j+2,i-1:i+2]
+    print 'actual array : '
+    if is_xarray(actual):
+        print actual.to_masked_array()[j-1:j+2,i-1:i+2]
+    else:
+        print actual[j-1:j+2,i-1:i+2]
 
 
 def source_ndarray(array):

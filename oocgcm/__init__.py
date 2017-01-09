@@ -2,4 +2,4 @@
 
 from .version import version as __version__
 
-__all__ = ["core","oceanmodels","griddeddata","parameters"]
+__all__ = ["core","oceanmodels","griddeddata","parameters","oceanfuncs"]

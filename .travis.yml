@@ -9,6 +9,8 @@ matrix:
   include:
   - python: 2.7
     env: CONDA_ENV=py27-min
+  - python: 2.7
+    env: CONDA_ENV=py27-dev
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -27,9 +29,11 @@ install:
   - conda env create --file ci/requirements-$CONDA_ENV.yml
   - source activate test_env
   - python setup.py install
+  - pip install coveralls
 
 script:
-  - py.test oocgcm --cov=oocgcm --cov-report term-missing
+  - py.test oocgcm --cov=oocgcm --cov-report=term-missing
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - coveralls

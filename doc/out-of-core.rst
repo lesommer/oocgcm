@@ -8,21 +8,22 @@ A practical need
 ----------------
 
 oocgcm is a pure Python package built on the top of xarray_ and dask_.
-But why have we choosen to reimplement a diagnostic package based on
+
+Most of the tools that are implemented in oocgcm are already available in
+several python libraries dedicated to the analysis of gridded data, and
+based on numpy_ and one of the several netCDF interfaces for python.
+
+Why have we choosen to implement a diagnostic package based on
 xarray_ and dask_ ?
 
-Indeed, most of the tools that are implemented in oocgcm are already available in
-several python libraries based on numpy_ and one of the several netcdf interface
-for python.
-
-But numpy-based model diagnostic libraries are facing a challenge with the ongoing
-evolution of geoscientific models and earth observing networks. Indeed, with **the
+Numpy-based model diagnostic libraries are facing a challenge with the ongoing
+evolution of geoscientific models and earth observing networks. With **the
 most high-end models being runs on several tens of thousand cores**, even
 a two-dimensional slice of model output cannot be loaded in memory at one time.
 Model diagnostic tools and gridded data analysis **tools should therefore be
 parallelized** and run out-of-core.
 
-One option is to run FORTRAN/MPI codes steered from bash scripts but there you
+One option is to run FORTRAN/MPI codes steered from shell scripts but there you
 loose the **flexibility and the multiple benefits of a python-based workflow**.
 Another option is to use one of the several libraries available for parallel
 computing in python. This usually implies a complete refactoring of your
@@ -51,18 +52,18 @@ The second stage involves transforming the **prototype** code into a
 because it requires a more in-depth understanding of the hardware infrastructure
 and of the software design.
 
-So, depending on the language and one the libraries that you use, what actually
+So, depending on the language and on the libraries you use, what actually
 changes is not your ability to perform your analysis but rather **the time it takes
 for you to prepare your production code** and eventually reach the scientific result
 you are after.
 
-More generally, there is objective risk for our fields of research if we don't
-embrace the question of the development of analysis tools that accelerate the
-above idea-prototype-production-results cycle. If the time needed to transform
-and idea into an efficient production code is too long, we will keep performing
-only simple and/or well-documented analysis on our datasets, eventually missing
+More generally, there is an objective risk for our fields of research if we don't
+embrace the question of the development of analysis tools that **accelerate the
+idea-prototype-production-results cycle**. If the time needed to transform
+an idea into an efficient production code is too long, we will keep performing
+only simple or routine analyses on our datasets, eventually missing
 **the potential breakthrough of big-data in earth system sciences**.
 
-.. _xarray: https://github.com/pydata/xarray
+.. _xarray: http://xarray.pydata.org
 .. _dask: http://dask.pydata.org
 .. _numpy: http://www.numpy.org/

@@ -1,15 +1,19 @@
 [![Build Status](https://travis-ci.org/lesommer/oocgcm.svg?branch=master)](https://travis-ci.org/lesommer/oocgcm)
 [![codecov.io](https://codecov.io/github/lesommer/oocgcm/coverage.svg?branch=master)](https://codecov.io/github/lesommer/oocgcm?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/lesommer/oocgcm/badge.svg?branch=master)](https://coveralls.io/github/lesommer/oocgcm?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/oocgcm/badge/?version=latest)](http://oocgcm.readthedocs.io/en/latest/?badge=latest)
+
 # oocgcm
-#### Out of core analysis tools for C-grid general circulation models in python.
+#### Out of core analysis tools for general circulation models in python.
 
 This project provides tools for post-processing and **analyzing** output of
-**general circulation models** and **gridded satellite data**.
+**general circulation models** (based on the Arakawa C-grid) and **gridded satellite data**.
 
 Our aim is to simplify the analysis of **very large datasets of model output**
-(~1-100Tb) like those produced by basin-to-global scale sub-mesoscale permitting
-ocean models and ensemble simulations of eddying ocean models by **leveraging
-the potential of [xarray](https://github.com/pydata/xarray) and
+(~1-100Tb) like those produced by basin-to-global scale [sub-mesoscale permitting
+ocean models](http://meom-group.github.io/swot-natl60/) and 
+[ensemble simulations of eddying ocean models](http://www.agence-nationale-recherche.fr/?Project=ANR-13-BS06-0007) 
+by **leveraging the potential of [xarray](https://github.com/pydata/xarray) and
 [dask](https://github.com/dask/dask)** python packages.
 
 The project is so far mostly targeting [NEMO](http://www.nemo-ocean.eu/)

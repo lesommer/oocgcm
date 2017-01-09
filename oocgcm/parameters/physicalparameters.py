@@ -44,7 +44,7 @@ def beta_parameter(latitudes):
 
     Returns
     -------
-    corio : same type as input
+    beta : float of array-like
     """
     if isinstance(latitudes,float):
         cos = math.cos

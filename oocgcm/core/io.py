@@ -13,7 +13,7 @@ import xarray as xr
 #--------------------- Creation of xarray objects ------------------------------
 #
 
-def return_xarray_dataset(filename,chunks=None):
+def return_xarray_dataset(filename,chunks=None,**kwargs):
     """Return an xarray dataset corresponding to filename.
 
     Parameters
@@ -24,10 +24,28 @@ def return_xarray_dataset(filename,chunks=None):
         dictionnary of sizes of chunk for creating xarray.Dataset.
 
     Returns
+    -------
+    ds : xarray.Dataset
+    """
+    return xr.open_dataset(filename,chunks=chunks,**kwargs)
+
+def return_xarray_mfdataset(filename,chunks=None,**kwargs):
+    """Return an xarray dataset corresponding to filename which may include
+    wildcards (e.g. file_*.nc).
+
+    Parameters
+    ----------
+    filename : str
+        path to a netcdf file or several netcdf files from which to create a
+        xarray dataset
+    chunks : dict-like
+        dictionnary of sizes of chunk for creating xarray.Dataset.
+
+    Returns
     ------
     ds : xarray.Dataset
     """
-    return xr.open_dataset(filename,chunks=chunks,lock=False)
+    return xr.open_mfdataset(filename,chunks=chunks,**kwargs)
 
 def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
     """Return a xarray dataarray corresponding to varname in filename.
@@ -44,7 +62,7 @@ def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
         not used
 
     Returns
-    ------
+    -------
     da : xarray.DataArray
     """
     ds = return_xarray_dataset(filename,chunks=chunks)
