@@ -115,7 +115,7 @@ def _mi(scalararray):
     mi : xarray.DataArray
        averaged xarray, defined at point i+1/2
     """
-    mi = ( scalararray.shift(x=-1) + scalararray ) / 2.
+    mi = (scalararray.shift(x=-1) + scalararray) / 2.
     return mi
 
 def _mj(scalararray):
@@ -441,33 +441,25 @@ class generic_2d_grid:
     """
     # the following arrays should be defined for the grid to be functional.
     # attempts to build the gride withouth these arrays will raise an Exception.
-    _required_arrays = [\
-        "latitude_at_t_location",\
-        "longitude_at_t_location",\
-        "sea_binary_mask_at_t_location",\
-        "sea_binary_mask_at_u_location",\
-        "sea_binary_mask_at_v_location",\
-        "sea_binary_mask_at_f_location",\
-        "cell_x_size_at_t_location",\
-        "cell_x_size_at_u_location",\
-        "cell_x_size_at_v_location",\
-        "cell_x_size_at_f_location",\
-        "cell_y_size_at_t_location",\
-        "cell_y_size_at_u_location",\
-        "cell_y_size_at_v_location",\
-        "cell_y_size_at_f_location",\
-        ]
+    _size_arrays = ["cell_%s_size_at_%s_location" % (dim, gloc)
+                    for dim in ['x', 'y']
+                    for gloc in ['t', 'u', 'v', 'f']]
 
     # the following arrays may or may not be available depending on how the
     # grid was created.
-    _coordinate_arrays = [\
-        "projection_x_coordinate_at_t_location",\
-        "projection_y_coordinate_at_t_location",\
-        "plane_x_coordinate_at_t_location",\
-        "plane_y_coordinate_at_t_location",\
-        ]
+    _coordinate_arrays = ["%s_at_%s_location" % (word, gloc)
+                          for word in ['longitude', 'latitude',
+                                       'projection', 'plane']
+                          for gloc in ['t', 'u', 'v', 'f']]
 
-    _accepted_arrays = _coordinate_arrays + _required_arrays
+    _area_arrays = ["cell_area_at_%s_location" % gloc
+                    for gloc in ['t', 'u', 'v', 'f']]
+
+    _mask_arrays = ["sea_binary_mask_at_%s_location" % gloc
+                    for gloc in ['t', 'u', 'v', 'f']]
+
+    _accepted_arrays = (_coordinate_arrays + _size_arrays +
+                        _area_arrays + _mask_arrays)
 
     def __init__(self,arrays=None,parameters=None):
         """Initialize a grid from a dictionary of xarrays and some parameters.
@@ -483,16 +475,17 @@ class generic_2d_grid:
         parameters : dict-object
             not used yet.
         """
-        for arrayname in self._required_arrays:
-            if not(arrays.has_key(arrayname)):
-                raise Exception('Arrays are missing for building the grid.')
+        #for arrayname in self._required_arrays:
+        #    if not(arrays.has_key(arrayname)):
+        #        raise Exception('Arrays are missing for building the grid.')
 
         # builds the list of keys in arrays that are also in _accepted_arrays
-        used_arrays = list( set( arrays.keys() ) & set( self._accepted_arrays ))
+        used_arrays = list(set(arrays.keys()) & set(self._accepted_arrays))
 
         # stores only the arrays that are needed for building the grid.
         self._arrays = dict((key, arrays[key]) for key in used_arrays)
 
+        self._define_sizes_of_grid_cells()
         self._extra_parameters = parameters
         self._define_aliases_for_arrays()
         self._define_area_of_grid_cells()
@@ -531,15 +524,54 @@ class generic_2d_grid:
 
 #--------------------- Extra xarrays for the grid ------------------------------
 
+    def _define_sizes_of_grid_cells(self):
+        """Define arrays of size at u,v,t,f grid_location.
+
+        This is only a definition, the computation is performed only if used.
+        """
+        # Cell sizes at u location
+        xname = "cell_x_size_at_t_location"
+        yname = "cell_y_size_at_t_location"
+        if xname not in self._arrays:
+            self._arrays[xname] = _mi(self._arrays["cell_x_size_at_u_location"])
+        if yname not in self._arrays:
+            self._arrays[yname] = _mi(self._arrays["cell_y_size_at_u_location"])
+
+        # Cell sizes at u location
+        xname = "cell_x_size_at_u_location"
+        yname = "cell_y_size_at_u_location"
+        if xname not in self._arrays:
+            self._arrays[xname] = _mi(self._arrays["cell_x_size_at_t_location"])
+        if yname not in self._arrays:
+            self._arrays[yname] = _mi(self._arrays["cell_y_size_at_t_location"])
+
+        # Cell sizes at u location
+        xname = "cell_x_size_at_v_location"
+        yname = "cell_y_size_at_v_location"
+        if xname not in self._arrays:
+            self._arrays[xname] = _mj(self._arrays["cell_x_size_at_t_location"])
+        if yname not in self._arrays:
+            self._arrays[yname] = _mj(self._arrays["cell_y_size_at_t_location"])
+
+        # Cell sizes at f location
+        xname = "cell_x_size_at_f_location"
+        yname = "cell_y_size_at_f_location"
+        if xname not in self._arrays:
+            self._arrays[xname] = _mj(self._arrays["cell_x_size_at_u_location"])
+        if yname not in self._arrays:
+            self._arrays[yname] = _mj(self._arrays["cell_y_size_at_u_location"])
+
     def _define_area_of_grid_cells(self):
         """Define arrays of area at u,v,t,f grid_location.
 
         This is only a definition, the computation is performed only if used.
         """
-        for gloc in ['t','u','v','f']:
-            self._arrays["cell_area_at_" + gloc + "_location"] = \
-                    self._arrays["cell_x_size_at_" + gloc + "_location"] \
-                  * self._arrays["cell_y_size_at_" + gloc + "_location"]
+        for gloc in ['t', 'u', 'v', 'f']:
+            name = "cell_area_at_%s_location" % gloc
+            if not name in self._arrays:
+                self._arrays[name] = (
+                    self._arrays["cell_x_size_at_%s_location" % gloc] *
+                    self._arrays["cell_y_size_at_%s_location" % gloc])
 
     def _define_extra_latitude_longitude(self):
         """Define projection coordinates at u,v,f grid_location if needed.
@@ -582,8 +614,8 @@ class generic_2d_grid:
         This is only a definition, the computation is performed only if used.
         """
         for gloc in ['t','u','v','f']:
-            corname = "coriolis_parameter_at_" + gloc + "_location"
-            latname = "latitude_at_" + gloc + "_location"
+            corname = "coriolis_parameter_at_%s_location" % gloc
+            latname = "latitude_at_%s_location" % gloc
             self._arrays[corname] = coriolis_parameter(self._arrays[latname])
 
 
@@ -605,12 +637,11 @@ class generic_2d_grid:
         self._array_e2t = self._arrays["cell_y_size_at_t_location"]
         self._array_e2u = self._arrays["cell_y_size_at_u_location"]
         self._array_e2v = self._arrays["cell_y_size_at_v_location"]
-
         # masks
         self._array_tmask = self._arrays["sea_binary_mask_at_t_location"]
         self._array_umask = self._arrays["sea_binary_mask_at_u_location"]
         self._array_vmask = self._arrays["sea_binary_mask_at_v_location"]
-        self._array_fmask = self._arrays["sea_binary_mask_at_f_location"]
+        #self._array_fmask = self._arrays["sea_binary_mask_at_f_location"]
 
 #--------------------- Chunking and Slicing ------------------------------------
     def chunk(self,chunks=None):

@@ -27,7 +27,8 @@ def return_xarray_dataset(filename,chunks=None,**kwargs):
     -------
     ds : xarray.Dataset
     """
-    return xr.open_dataset(filename,chunks=chunks,**kwargs)
+    return xr.open_dataset(filename,chunks=chunks,**kwargs).squeeze()
+
 
 def return_xarray_mfdataset(filename,chunks=None,**kwargs):
     """Return an xarray dataset corresponding to filename which may include
@@ -45,7 +46,8 @@ def return_xarray_mfdataset(filename,chunks=None,**kwargs):
     ------
     ds : xarray.Dataset
     """
-    return xr.open_mfdataset(filename,chunks=chunks,**kwargs)
+    return xr.open_mfdataset(filename,chunks=chunks,**kwargs).squeeze()
+
 
 def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
     """Return a xarray dataarray corresponding to varname in filename.
@@ -69,7 +71,7 @@ def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
     dataarray = ds[varname]
     for kwargs in extra_kwargs:
         dataarray.attrs[kwargs] = extra_kwargs[kwargs]
-    return dataarray
+    return dataarray.squeeze()
 
 
 #

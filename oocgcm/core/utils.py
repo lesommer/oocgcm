@@ -279,8 +279,8 @@ def check_input_array(xarr,shape=None,chunks=None,\
        arrayname = 'array'
     if not(is_xarray(xarr)):
         raise TypeError(arrayname + 'is expected to be a xarray.DataArray')
-    if not(_chunks_are_compatible(xarr.chunks,chunks,ndims=ndims)):
-        raise ChunkError()
+    #if not(_chunks_are_compatible(xarr.chunks,chunks,ndims=ndims)):
+    #    raise ChunkError()
     if not(_grid_location_equals(xarr,grid_location)):
         raise GridLocationError()
     return True

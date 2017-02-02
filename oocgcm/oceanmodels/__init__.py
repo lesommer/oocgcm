@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-__all__ = ["nemo"]
+__all__ = ["nemo", "mitgcm"]
