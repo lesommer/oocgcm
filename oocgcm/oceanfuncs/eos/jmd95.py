@@ -432,8 +432,8 @@ def bruntvaisala_xr(vgrd,theta,s,z):
     dTdz=-vgrd.vertical_derivative(theta,grid_location='t')
     dSdz=-vgrd.vertical_derivative(s,grid_location='t')
         
-    dTdz['depth'].values=alpha['depth'].values
-    dSdz['depth'].values=gamma['depth'].values
+    dTdz['depth']=alpha['depth']
+    dSdz['depth']=gamma['depth']
 
     print alpha
     print gamma
