@@ -58,8 +58,8 @@ _local_window_dict = {'lanczos': lanczos}
 # First part : Definition of window classes for filtering
 # ------------------------------------------------------------------------------
 
-@xr.register_dataarray_accessor('win')
-@xr.register_dataset_accessor('win')
+# @xr.register_dataarray_accessor('win')
+# @xr.register_dataset_accessor('win')
 class Window(object):
 	"""
 	Class for all different type of windows
@@ -181,7 +181,7 @@ class Window(object):
 				out = data.compute()
 		else:
 			out = data
-		res = xr.DataArray(out, dims=self.obj.dims, coords=self.coords,
+ 		res = xr.DataArray(out, dims=self.obj.dims, coords=self.coords,
 		                   name=self.obj.name)
 
 		return res.where(mask == 1)
