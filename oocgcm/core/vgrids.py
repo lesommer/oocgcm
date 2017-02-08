@@ -406,8 +406,8 @@ class generic_vertical_grid:
         This function is used internally for change_grid_location_*_to_*
         """
         if conserving is 'z_flux':
-            weights_in  = self._arrays["cell_z_size_at_" + input  + "_location"]
-            weights_out = self._arrays["cell_z_size_at_" + output + "_location"]
+            weights_in  = self._arrays["cell_z_size_at_" + input  + "_location"].isel(t=0)
+            weights_out = self._arrays["cell_z_size_at_" + output + "_location"].isel(t=0)
         else:
             weights_in  = 1.
             weights_out = 1.
@@ -433,8 +433,11 @@ class generic_vertical_grid:
         wi, wo = self._weights_for_change_grid_location(input='t',output='w',
                                                         conserving=conserving)
         if not 'x' in scalararray.dims and conserving=='z_flux':
+            # optimal only for z-coordinate
             wi=wi.mean(dim=['x','y'],keep_attrs=True)
             wo=wo.mean(dim=['x','y'],keep_attrs=True)
+            wi['depth']=scalararray['depth']
+            wo['depth']=scalararray['depth']
         out = self._to_upper_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return _append_dataarray_extra_attrs(out,grid_location='w')
@@ -462,8 +465,11 @@ class generic_vertical_grid:
         wi, wo = self._weights_for_change_grid_location(input='w',output='t',
                                                         conserving=conserving)
         if not 'x' in scalararray.dims and conserving=='z_flux':
+            # optimal only for z-coordinate
             wi=wi.mean(dim=['x','y'],keep_attrs=True)
             wo=wo.mean(dim=['x','y'],keep_attrs=True)
+            wi['depth']=scalararray['depth']
+            wo['depth']=scalararray['depth']
         out = self._to_lower_grid_location(scalararray,weights_in=wi,
                                                          weights_out=wo)
         return _append_dataarray_extra_attrs(out,grid_location='t')
@@ -473,6 +479,64 @@ class generic_vertical_grid:
 
 #---------------------------- Vector Operators ---------------------------------
 
+    def norm_of_vectorfield_vgrid(self,vectorfield,grd):
+        """Return the norm of a vector field, at t-point.
+
+        So far, only available for vector fields at u,v grid_location
+
+        Parameters
+        ----------
+        vectorfield : VectorField2d namedtuple
+            so far only valid for vectorfield at u,v-points
+
+        Return
+        ------
+        scalararray : xarray.DataArray
+            xarray with a specified grid_location, so far t-point only
+        """
+        return xu.sqrt(self.scalar_product_vgrid(vectorfield,vectorfield,grd))
+
+    def scalar_product_vgrid(self,vectorfield1,vectorfield2,grd):
+        """Return the scalar product of two vector fields, at t-point.
+
+        So far, only available for vector fields at u,v grid_location.
+
+        Parameters
+        ----------
+        vectorfield1 : VectorField2d namedtuple
+        vectorfield2 : VectorField2d namedtuple
+
+        Return
+        ------
+        scalararray : xarray.DataArray
+
+        Notes
+        -----
+        Multiplies each component independently, relocates each component at
+        t grid_location then add the two products.
+        """
+
+#         check_input_array(vectorfield1.x_component,\
+#                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
+#         check_input_array(vectorfield1.y_component,\
+#                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
+#         check_input_array(vectorfield2.x_component,\
+#                           chunks=self.chunks,grid_location='u',ndims=self.ndims)
+#         check_input_array(vectorfield2.y_component,\
+#                           chunks=self.chunks,grid_location='v',ndims=self.ndims)
+
+        # (checking procedure to be investigated)
+
+
+        x_component_u = vectorfield1.x_component * vectorfield2.x_component
+        y_component_v = vectorfield1.y_component * vectorfield2.y_component
+
+        x_component_t = grd.change_grid_location_u_to_t(x_component_u,
+                                                    conserving='area')
+        y_component_t = grd.change_grid_location_v_to_t(y_component_v,
+                                                    conserving='area')
+        out = x_component_t + y_component_t
+        return out
 
 #-------------------- Differential Operators------------------------------------
 
@@ -501,8 +565,11 @@ class generic_vertical_grid:
         # Input and output grid_location (works only for z-coordinate grid)
 	    # _eq is the input centered grid_location
 	    # _neq is the output grid_location
-        if grid_location is None:
+        if grid_location is None and scalararray.attrs.has_key("grid_location"):
             grid_location=scalararray['grid_location']            
+        elif grid_location is None and not scalararray.attrs.has_key("grid_location"):
+            raise TypeError('No grid location in arguments or input attributes')  
+            
         if grid_location=='u' or grid_location=='v' or grid_location=='f' or grid_location=='t':
             grid_location_eq='t'
             grid_location_neq='w'
@@ -515,7 +582,11 @@ class generic_vertical_grid:
 	    # Average z_sizes in order to deal with shape differences between dz (3D) and df (1D or 3D)
         print 'Cell z-size is averaged in space to avoid conflict with non-3D data.'
 
-        df=_dk(scalararray)
+        if grid_location_eq=='t':
+            df=_dk(scalararray).shift(depth=1)
+        elif grid_location_eq=='w':
+            df=_dk(scalararray)
+            
         dz=self._arrays['cell_z_size_at_'+grid_location_neq+'_location'].isel(t=0)
 	    # force alignment        
         df['depth'].values=dz['depth'].values
