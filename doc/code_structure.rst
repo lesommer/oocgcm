@@ -4,7 +4,7 @@ Contributing to oocgcm
 ======================
 
 If you are willing to contribute to developing oocgcm (reporting bugs,
-suggesting improvments, ...), here is some information.
+suggesting improvements, ...), here is some information.
 
 Suggesting improvments to oocgcm
 --------------------------------
