@@ -62,6 +62,8 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self.coordinate_file = nemo_coordinate_file
         self.byte_mask_file  = nemo_byte_mask_file
         self.chunks = chunks
+        self.chunks3D = chunks.copy()
+        self.chunks3D['depth'] = 1
         self.byte_mask_level = byte_mask_level
         self.variables = {}
         #self._get = return_xarray_dataarray
@@ -114,16 +116,16 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         jk = self.byte_mask_level
         self.variables["sea_binary_mask_at_t_location"] = \
                      self._get(self.byte_mask_file,"tmask",
-                            chunks=self.chunks,grid_location='t')[...,jk,:,:]
+                            chunks=self.chunks3D,grid_location='t')[...,jk,:,:]
         self.variables["sea_binary_mask_at_u_location"] = \
                      self._get(self.byte_mask_file,"umask",
-                            chunks=self.chunks,grid_location='u')[...,jk,:,:]
+                            chunks=self.chunks3D,grid_location='u')[...,jk,:,:]
         self.variables["sea_binary_mask_at_v_location"] = \
                      self._get(self.byte_mask_file,"vmask",
-                            chunks=self.chunks,grid_location='v')[...,jk,:,:]
+                            chunks=self.chunks3D,grid_location='v')[...,jk,:,:]
         self.variables["sea_binary_mask_at_f_location"] = \
                      self._get(self.byte_mask_file,"vmask",
-                            chunks=self.chunks,grid_location='f')[...,jk,:,:]
+                            chunks=self.chunks3D,grid_location='f')[...,jk,:,:]
 
     def chunk(self,chunks=None):
         """Chunk all the variables.
@@ -137,6 +139,7 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
             data = self.variables[dataname]
             if isinstance(data, xr.DataArray):
                 self.variables[dataname] = data.chunk(chunks)
+
 
 #================== NEMO grids from generic grids ==============================
 #
@@ -161,10 +164,12 @@ def nemo_2d_grid(nemo_coordinate_file=None,
     grid : oocgcm.core.grids.generic_2d_grid
         grid object corresponding to the model configuration.
     """
+               
     variables = variables_holder_for_2d_grid_from_nemo_ogcm(
                      nemo_coordinate_file=nemo_coordinate_file,
                      nemo_byte_mask_file=nemo_byte_mask_file,
                      chunks=chunks,byte_mask_level=byte_mask_level)
+    
     grid = generic_2d_grid(arrays=variables.variables,
                            parameters= variables.parameters)
     return grid
