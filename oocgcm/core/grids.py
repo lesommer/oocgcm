@@ -1195,7 +1195,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def horizontal_gradient_tensor(self,vectorfield):
-        r"""
+        """
         Return the horizontal gradient tensor of a two-dimensional vector
         field at u,v locations.
 
@@ -1510,7 +1510,7 @@ class generic_2d_grid:
                              y_component_grid_location = 'v')
 
     def q_vector_due_to_kinematic_deformation(self,velocity,buoyancy):
-        r"""Return the component of the generalized Q-vector associated
+        """Return the component of the generalized Q-vector associated
         with kinematic deformation of a two-dimensional velocity field.
 
         Parameters
