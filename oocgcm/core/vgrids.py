@@ -24,7 +24,7 @@ from .utils import _grid_location_equals
 #
 
 def _dk(scalararray):
-    """Return the difference scalararray(k+1) - scalararray(k).
+    """Return the difference scalararray(k+1) - scalararray(k), k downward.
 
     A priori, for internal use only.
 
@@ -42,7 +42,7 @@ def _dk(scalararray):
     return dk
 
 def _mk(scalararray):
-    """Return the average of scalararray(k+1) and scalararray(k)
+    """Return the average of scalararray(k+1) and scalararray(k), k downward.
 
     A priori, for internal use only.
 
@@ -60,7 +60,7 @@ def _mk(scalararray):
     return mk
 
 def _mkm(scalararray):
-    """Return the average of scalararray(k-1) and scalararray(k)
+    """Return the average of scalararray(k-1) and scalararray(k), k downward.
 
     A priori, for internal use only.
 
@@ -394,8 +394,6 @@ class generic_vertical_grid:
             out = average(scalararray * weights_in) / weights_out
         return out
 
-
-
 #- User swapping utilities
     def _weights_for_change_grid_location(self,input=None,output=None,
                                           conserving=None):
@@ -542,7 +540,8 @@ class generic_vertical_grid:
 
     def vertical_derivative(self,scalararray,grid_location=None):
         """
-        Return the vertical derivative of the input datastructure.
+        Return the vertical derivative of the input datastructure 
+        !axis points downward (depth-like coordinate)!
 
         Parameters
         ----------
@@ -649,6 +648,7 @@ class generic_vertical_grid:
         --------
         spatial_average_z : averaging over z
         """
+        
         # check grid location
         if grid_location is None:
             if not(isinstance(array,xr.DataArray)):
@@ -675,16 +675,25 @@ class generic_vertical_grid:
         if where is None:
             maskname = "sea_binary_mask_at_" + grid_location + "_location"
             where = self._arrays[maskname]
+            if 't' in where.dims:
+                if where['t'].size==1: where=where.isel(t=0)
 
         # actual definition
         idims = ('depth')
         dz = self._arrays['cell_z_size_at_' + grid_location + '_location']
-        array_dz = array.where(where.squeeze()) * dz # squeeze is not lazy
-        integral = array_dxdy.sum(dim=idims)
+        if 't' in dz.dims:
+            if dz['t'].size==1: dz=dz.isel(t=0)
+                
+#         array_dz = array.where(where.squeeze()) * dz # squeeze is not lazy
+        array_dz= array.where(where)*dz
+        integral = array_dz.sum(dim=idims)
 
         # normalize if required
         if normalize:
-            integral /= dz.where(where.squeeze()).sum(dim=idims)
+#             integral /= dz.where(where.squeeze()).sum(dim=idims)
+            dz = dz.where(where)
+            integral /= dz.sum(dim=idims)
+
         #        Nota Bene : dataarray.squeeze() is not a lazy operation.
         return integral
 
