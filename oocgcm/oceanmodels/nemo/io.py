@@ -39,7 +39,16 @@ def return_xarray_dataset(*args,**kwargs):
         kwargs.pop('chunks')
     
     ds = _return_xarray_dataset(*args,**kwargs)
-    
+
+    # compatibility with xarray > 0.9  
+    # TODO: correct nature of the coordinates (dimension vs. non-dimension)
+    for jn in range(len(ds.keys())):
+        dim=ds.keys()[jn]
+        ndim=ds[ds.keys()[jn]].size
+        if dim not in ds.coords.keys() and dim not in ds.variables:
+             coords=range(ndim)
+             ds.coords[dim]=coords
+
     if 'time_counter' in ds.keys():
         ds = ds.rename({'time_counter':'t'})
 
@@ -118,8 +127,17 @@ def return_xarray_mfdataset(*args,**kwargs):
     
     # create dataset with chunking activated
     kwargs['chunks']=_chunks
-    print kwargs 
+    print kwargs
     ds=_return_xarray_mfdataset(*args,**kwargs)
+
+    # compatibility with xarray > 0.9  
+    # TODO: correct nature of the coordinates (dimension vs. non-dimension)
+    for jn in range(len(ds.keys())):
+        dim=ds.keys()[jn]
+        ndim=ds[ds.keys()[jn]].size
+        if dim not in ds.coords.keys() and dim not in ds.variables:
+              coords=range(ndim)
+              ds.coords[dim]=coords
 
     # rename dataset keys
     if 'time_counter' in ds.keys() and 't' not in ds.keys() :
@@ -164,11 +182,20 @@ def return_xarray_dataarray(*args,**kwargs):
     if 'chunks' in kwargs:
         _chunks = kwargs['chunks']
         kwargs.pop('chunks')
-    
+
     da = _return_xarray_dataarray(*args,**kwargs)
+
+    # compatibility with xarray > 0.9  
+    for jn in range(len(da.dims)):
+        dim=da.dims[jn]
+        ndim=da.shape[jn]
+        if dim not in da.coords.keys():
+             coords=range(ndim)
+             da.coords[dim]=coords
+  
     if 'time_counter' in da.coords.keys():
        da = da.rename({'time_counter':'t'})
-
+ 
     if 'deptht' in da.coords.keys():
         da = da.rename({'deptht':'depth'})
         da['depth_location'] = 't'
