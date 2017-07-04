@@ -114,6 +114,24 @@ class variables_holder_for_vertical_grid_from_nemo_ogcm:
             data = self.variables[dataname]
             if isinstance(data, xr.DataArray):
                 self.variables[dataname] = data.chunk(chunks)
+                
+    def force_depth(self):
+        """Force true depth in 'depth' attribute.
+        
+        """
+         
+        deptht_array=self.variables['depth_at_t_location'].isel(t=0)
+        depthw_array=self.variables['depth_at_w_location'].isel(t=0)
+        for key in self.variables.keys():
+            arrays=self.variables
+            if 'depth_location' in arrays[key].attrs and 'depth' in arrays[key].coords \
+            and 'depth' in arrays[key].dims:
+                if str.lower(arrays[key].attrs['depth_location']) in ['t','u','v','f']:
+                    arrays[key].coords['depth']=deptht_array.values
+                if str.lower(arrays[key].attrs['depth_location']) in ['w']:
+                    arrays[key].coords['depth']=depthw_array.values
+    
+
 
 #================== NEMO grids from generic grids ==============================
 #
@@ -142,6 +160,9 @@ def nemo_vertical_grid(nemo_coordinate_file=None,
                      nemo_coordinate_file=nemo_coordinate_file,
                      nemo_byte_mask_file=nemo_byte_mask_file,
                      chunks=chunks)
+
+    variables.force_depth()
+
     vgrid = generic_vertical_grid(arrays=variables.variables,
                                   parameters= variables.parameters)
     return vgrid
