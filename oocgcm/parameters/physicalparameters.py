@@ -2,6 +2,7 @@
 
 import math
 import xarray.ufuncs as xu
+import numpy as np
 
 from ..core.utils import is_numpy,is_xarray
 from .mathematicalparameters import deg2rad
@@ -10,7 +11,6 @@ from .mathematicalparameters import deg2rad
 grav = 9.81                  # acceleration due to gravity (m.s-2)
 omega = 7.292115083046061e-5 # earth rotation rate (s-1)
 earthrad = 6371229            # mean earth radius (m)
-
 
 # Functions
 def coriolis_parameter(latitudes):
@@ -52,5 +52,5 @@ def beta_parameter(latitudes):
         cos = np.cos
     elif is_xarray(latitudes):
         cos = xu.cos
-    beta = 2. * omega * cos(lat * deg2rad) / earthrad
+    beta = 2. * omega * cos(latitudes * deg2rad) / earthrad
     return beta
