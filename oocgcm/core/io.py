@@ -45,6 +45,10 @@ def return_xarray_mfdataset(filename,chunks=None,**kwargs):
     ------
     ds : xarray.Dataset
     """
+    if 'autoclose' not in kwargs:
+        # fixes OS error arising from too many files open
+        # see xarray pull request #1198
+        kwargs['autoclose']=True
     return xr.open_mfdataset(filename,chunks=chunks,**kwargs)
 
 def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
