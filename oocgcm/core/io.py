@@ -49,6 +49,9 @@ def return_xarray_mfdataset(filename,chunks=None,**kwargs):
         # fixes OS error arising from too many files open
         # see xarray pull request #1198
         kwargs['autoclose']=True
+    if 'compat' not in kwargs:
+        # files are usually aligned
+        kwargs['compat']='equals'
     return xr.open_mfdataset(filename,chunks=chunks,**kwargs)
 
 def return_xarray_dataarray(filename,varname,chunks=None,**extra_kwargs):
