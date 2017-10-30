@@ -429,6 +429,8 @@ def bruntvaisala_xr(vgrd,theta,s,z):
     gamma=dfdS/rho
     
     # Brunt Vaisala frequency (z=altitude)
+    
+    # vertical derivatives (dz>0 = upward)
     dTdz=-vgrd.vertical_derivative(theta,grid_location='t')
     dSdz=-vgrd.vertical_derivative(s,grid_location='t')
         
@@ -458,7 +460,7 @@ def bruntvaisala_meters_xr(vgrd,theta,s,z):
     s : xarray dataarray
         salinity (psu)
     z : xarray dataarray
-        pressure (p)
+        depth (m)
     
     """ 
     
