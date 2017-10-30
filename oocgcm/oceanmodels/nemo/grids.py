@@ -62,15 +62,18 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self.coordinate_file = nemo_coordinate_file
         self.byte_mask_file  = nemo_byte_mask_file
         self.chunks = chunks
-        self.chunks3D = chunks.copy()
-        self.chunks3D['depth'] = 1
+        if chunks is None:
+            self.chunks3D = None           
+        else:
+            self.chunks3D = chunks.copy()
+            self.chunks3D['depth'] = 1
         self.byte_mask_level = byte_mask_level
         self.variables = {}
         #self._get = return_xarray_dataarray
         self._define_latitude_and_longitude()
         self._define_horizontal_metrics()
         self._define_masks()
-        self.chunk(chunks=chunks)
+        self._chunk(chunks=chunks)
         self.parameters = {}
         self.parameters['chunks'] = chunks
 
@@ -127,7 +130,7 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
                      self._get(self.byte_mask_file,"vmask",
                             chunks=self.chunks3D,grid_location='f')[...,jk,:,:]
 
-    def chunk(self,chunks=None):
+    def _chunk(self,chunks=None):
         """Chunk all the variables.
 
         Parameters
