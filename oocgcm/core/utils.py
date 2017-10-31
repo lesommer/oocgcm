@@ -204,8 +204,12 @@ def _chunks_are_compatible(chunks1=None,chunks2=None,ndims=None):
             return True
         else:
             return False
-    for idim in range(ndims):
-        test *= chunks1[-idim-1] == chunks2[-idim-1]
+    ## check that chunks match exactly
+    #for idim in range(ndims):
+    #    test *= chunks1[-idim-1] == chunks2[-idim-1]
+    ## check that chunks2 is included in chunks1
+    for c in chunks2:
+        test *= (c in chunks1)
     return test
 
 def _assert_are_compatible_dataarrays(array1,array2):

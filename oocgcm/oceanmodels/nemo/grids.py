@@ -73,6 +73,7 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self._define_latitude_and_longitude()
         self._define_horizontal_metrics()
         self._define_masks()
+        self._delete_time_dim()
         self._chunk(chunks=chunks)
         self.parameters = {}
         self.parameters['chunks'] = chunks
@@ -129,6 +130,14 @@ class variables_holder_for_2d_grid_from_nemo_ogcm:
         self.variables["sea_binary_mask_at_f_location"] = \
                      self._get(self.byte_mask_file,"vmask",
                             chunks=self.chunks3D,grid_location='f')[...,jk,:,:]
+
+    def _delete_time_dim(self):
+        """Delete time dimension
+        """
+        for dataname in self.variables:
+            data = self.variables[dataname]
+            if isinstance(data, xr.DataArray) and ('t' in data.dims):
+                self.variables[dataname] = data.isel(t=0)
 
     def _chunk(self,chunks=None):
         """Chunk all the variables.
