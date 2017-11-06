@@ -91,6 +91,8 @@ def return_xarray_mfdataset(*args,**kwargs):
     if 'chunks' in kwargs:
         _chunks = copy.copy(kwargs['chunks'])
         kwargs.pop('chunks')
+    else:
+        _chunks = dict()
             
     # test reading
     _ds = _return_xarray_mfdataset(*args,**kwargs)
