@@ -30,7 +30,7 @@ except ImportError:
 try:
     import dask.array
     import dask
-    dask.set_options(get=dask.get)
+    dask.config.set(get=dask.get)
     has_dask = True
 except ImportError:
     has_dask = False
@@ -166,9 +166,9 @@ class TestCase(unittest.TestCase):
 
     def assertDataArrayHasValues(self,da):
         try:
-	    assert(isinstance(float(da[0,0].to_masked_array()),float))
-	except:
-	    print da
+            assert(isinstance(float(da[0,0].to_masked_array()),float))
+        except:
+            print(da)
             raise Exception(' This DataArray is empty/not valid.')
 
     def assertDataArrayEqual(self, ar1, ar2):
@@ -197,16 +197,16 @@ class ReturnItem(object):
 def print_array_around(expected = None, actual=None,around=(20,20)):
     """Customized print used for debugging tests."""
     j,i = around
-    print '\n expected array : '
+    print('\n expected array : ')
     if is_xarray(expected):
-        print expected.to_masked_array()[j-1:j+2,i-1:i+2]
+        print(expected.to_masked_array()[j-1:j+2,i-1:i+2])
     else:
-        print expected[j-1:j+2,i-1:i+2]
-    print 'actual array : '
+        print(expected[j-1:j+2,i-1:i+2])
+    print('actual array : ')
     if is_xarray(actual):
-        print actual.to_masked_array()[j-1:j+2,i-1:i+2]
+        print(actual.to_masked_array()[j-1:j+2,i-1:i+2])
     else:
-        print actual[j-1:j+2,i-1:i+2]
+        print(actual[j-1:j+2,i-1:i+2])
 
 
 def source_ndarray(array):

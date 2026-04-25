@@ -49,7 +49,7 @@ class TestGrid2d_definition_from_arrays(TestCase):
         grd = agrids.latlon_2d_grid(latitudes=self.y,longitudes=self.x)
         xx = grd._arrays['longitude_at_t_location']
         yy = grd._arrays['latitude_at_t_location']
-	self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
 
@@ -57,7 +57,7 @@ class TestGrid2d_definition_from_arrays(TestCase):
         grd = agrids.latlon_2d_grid(latitudes=self.yy,longitudes=self.xx)
         xx = grd._arrays['longitude_at_t_location']
         yy = grd._arrays['latitude_at_t_location']
-	self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
         self.assertArrayEqual(xx.to_masked_array()[0,:],self.x)
@@ -67,7 +67,7 @@ class TestGrid2d_definition_from_arrays(TestCase):
         grd = agrids.plane_2d_grid(xcoord=self.x,ycoord=self.y)
         xx = grd._arrays['plane_x_coordinate_at_t_location']
         yy = grd._arrays['plane_y_coordinate_at_t_location']
-	self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
 
@@ -75,7 +75,7 @@ class TestGrid2d_definition_from_arrays(TestCase):
         grd = agrids.plane_2d_grid(xcoord=self.x,ycoord=self.y)
         xx = grd._arrays['plane_x_coordinate_at_t_location']
         yy = grd._arrays['plane_y_coordinate_at_t_location']
-	self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(grd["cell_area_at_t_location"])
         self.assertArrayEqual(xx.to_masked_array(),self.xx)
         self.assertArrayEqual(yy.to_masked_array(),self.yy)
         self.assertArrayEqual(xx.to_masked_array()[0,:],self.x)
@@ -92,16 +92,16 @@ class TestGrid2d_definition_from_NEMO(TestCase):
         fgrd =  fgrids.nemo_2d_grid(nemo_coordinate_file=self.coordfile,\
                                     nemo_byte_mask_file=self.maskfile)
         assert(isinstance(fgrd,grids.generic_2d_grid))
-	self.assertDataArrayHasValues(fgrd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(fgrd["cell_area_at_t_location"])
 
     def test_nemo_grid2d_slicing(self):
-	chunks = {'x':25,'y':20}
+        chunks = {'x':25,'y':20}
         _fgrd =  fgrids.nemo_2d_grid(nemo_coordinate_file=self.coordfile,\
                                     nemo_byte_mask_file=self.maskfile,\
-				    chunks=chunks)	    
-	fgrd = _fgrd[...,:10,:10]
+                    chunks=chunks)        
+        fgrd = _fgrd[...,:10,:10]
         assert(isinstance(fgrd,grids.generic_2d_grid))
-	assert(fgrd.shape==(10,10))
+        assert(fgrd.shape==(10,10))
         self.assertDataArrayHasValues(fgrd["cell_area_at_t_location"])
 
 
@@ -114,13 +114,13 @@ class TestGrid2d_slicing_chunking(TestCase):
     def test_grid2d_slicing(self):
         sgrd = self.grd[:5,:5]
         assert(isinstance(sgrd,grids.generic_2d_grid))
-	self.assertDataArrayHasValues(sgrd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(sgrd["cell_area_at_t_location"])
         assert(sgrd.shape==(5,5))
 
     def test_grid2d_chunking(self):
         self.grd.chunk({'x':5,'y':5})
         assert(self.grd.chunks is not None)
-	self.assertDataArrayHasValues(self.grd["cell_area_at_t_location"])
+        self.assertDataArrayHasValues(self.grd["cell_area_at_t_location"])
 
 
 class TestGrid2d_spatial_integration(TestCase):
@@ -217,7 +217,7 @@ class TestGrid2d_DifferentialOperators(TestCase):
         tols = {'rtol':1e-3,'atol':1e-3}
         l =  self.grd.horizontal_laplacian(self.tvar2)
         s = self.scale
-        print s
+        print(s)
         actual_lap = l.to_masked_array()
         expected_lap = (-1. *  xu.cos(self.yt * s) * s * s).to_masked_array()
         #print_array_around(expected=expected_lap/s**2,actual=actual_lap/s**2)
