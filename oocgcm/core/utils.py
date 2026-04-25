@@ -173,7 +173,7 @@ def _grid_location_equals(xarr,grid_location=None):
 
     """
     test = True
-    if xarr.attrs.has_key('grid_location'):
+    if 'grid_location' in xarr.attrs:
         test *= (xarr.attrs['grid_location']==grid_location)
     return test
 
@@ -243,7 +243,7 @@ def _assert_and_set_grid_location_attribute(xarr,grid_location=None):
     grid_location : str
         string describing the grid location : eg 'u','v','t','f'...
     """
-    if xarr.attrs.has_key('grid_location'):
+    if 'grid_location' in xarr.attrs:
         assert ( xarr.attrs['grid_location'] == grid_location )
     else:
         xarr.attrs['grid_location'] = grid_location

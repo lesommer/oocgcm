@@ -155,7 +155,7 @@ def _finalize_dataarray_attributes(xarr,**kwargs):
     """
     if isinstance(xarr, xr.DataArray):
         xarr.attrs.update(kwargs)
-    if xarr.attrs.has_key('short_name'):
+    if 'short_name' in xarr.attrs:
         xarr.name = xarr.attrs['short_name']
     return xarr
 
@@ -176,11 +176,11 @@ def _convert_dataarray_attributes_xderivative(attrs,grid_location=None):
         dictionnary of attributes of the spatial derivative.
     """
     new_attrs = attrs.copy()
-    if attrs.has_key('long_name'):
+    if 'long_name' in attrs:
         new_attrs['long_name'] = 'x-derivative of ' + attrs['long_name']
-    if attrs.has_key('short_name'):
+    if 'short_name' in attrs:
         new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dx'
-    if attrs.has_key('units'):
+    if 'units' in attrs:
         new_attrs['units'] = attrs['units'] + '/m'
     if grid_location is not None:
         new_attrs['grid_location'] = grid_location
@@ -203,11 +203,11 @@ def _convert_dataarray_attributes_yderivative(attrs,grid_location=None):
         dictionnary of attributes of the spatial derivative.
     """
     new_attrs = attrs.copy()
-    if attrs.has_key('long_name'):
+    if 'long_name' in attrs:
         new_attrs['long_name'] = 'y-derivative of ' + attrs['long_name']
-    if attrs.has_key('short_name'):
+    if 'short_name' in attrs:
         new_attrs['short_name'] = 'd_' + attrs['short_name'] + '_dy'
-    if attrs.has_key('units'):
+    if 'units' in attrs:
         new_attrs['units'] = attrs['units'] + '/m'
     if grid_location is not None:
         new_attrs['grid_location'] = grid_location
@@ -231,11 +231,11 @@ def _convert_dataarray_attributes_laplacian(attrs,grid_location='t'):
         dictionnary of attributes of the laplacian.
     """
     new_attrs = attrs.copy()
-    if attrs.has_key('long_name'):
+    if 'long_name' in attrs:
         new_attrs['long_name'] = 'horizontal laplacian of ' + attrs['long_name']
-    if attrs.has_key('short_name'):
+    if 'short_name' in attrs:
         new_attrs['short_name'] = 'hlap_' + attrs['short_name']
-    if attrs.has_key('units'):
+    if 'units' in attrs:
         new_attrs['units'] = attrs['units'] + '/m2'
     if grid_location is not None:
         new_attrs['grid_location'] = grid_location
@@ -260,16 +260,12 @@ def _convert_dataarray_attributes_divergence(attrs1,attrs2,grid_location='t'):
         dictionnary of attributes of the divergence field.
     """
     new_attrs = attrs1.copy()
-    if attrs1.has_key('long_name') and attrs2.has_key('long_name'):
-        new_attrs['long_name'] = \
-           'horizontal divergence of ('\
-           + attrs1['long_name'] + ','\
-           + attrs2['long_name'] + ')'
-    if attrs1.has_key('short_name') and attrs2.has_key('short_name'):
-            new_attrs['short_name'] = 'div_()' + attrs1['short_name'] + ','\
-                                               + attrs1['short_name'] + ')'
-    if attrs1.has_key('units'):
-            new_attrs['units'] = attrs1['units'] + '/m'
+    if 'long_name' in attrs1 and 'long_name' in attrs2:
+        new_attrs['long_name'] = 'horizontal divergence of (' + attrs1['long_name'] + ',' + attrs2['long_name'] + ')'
+    if 'short_name' in attrs1 and 'short_name' in attrs2:
+        new_attrs['short_name'] = 'div_()' + attrs1['short_name'] + ',' + attrs1['short_name'] + ')'
+    if 'units' in attrs1:
+        new_attrs['units'] = attrs1['units'] + '/m'
     if grid_location is not None:
         new_attrs['grid_location'] = grid_location
     return new_attrs
@@ -403,7 +399,7 @@ def Tensor2d(axx,axy,ayx,ayy,\
                                'yx_component_grid_location',\
                                'yy_component_grid_location'])
     #
-    if axx.attrs.has_key('grid_location'):
+    if 'grid_location' in axx.attrs:
         assert (axx.attrs['grid_location'] == xx_component_grid_location )
     else:
         axx.attrs['grid_location'] = xx_component_grid_location
@@ -484,7 +480,7 @@ class generic_2d_grid:
             not used yet.
         """
         for arrayname in self._required_arrays:
-            if not(arrays.has_key(arrayname)):
+            if arrayname not in arrays:
                 raise Exception('Arrays are missing for building the grid.')
 
         # builds the list of keys in arrays that are also in _accepted_arrays
@@ -549,30 +545,30 @@ class generic_2d_grid:
         # latitude and longitude arrays at u location
         lonname = "longitude_at_u_location"
         latname = "latitude_at_u_location"
-        if not(self._arrays.has_key(lonname)):
+        if lonname not in self._arrays:
             self._arrays[lonname] = _mi(
                         self._arrays["longitude_at_t_location"])
-        if not(self._arrays.has_key(latname)):
+        if latname not in self._arrays:
             self._arrays[latname] = _mi(
                         self._arrays["latitude_at_t_location"])
 
         # latitude and longitude arrays at v location
         lonname = "longitude_at_v_location"
         latname = "latitude_at_v_location"
-        if not(self._arrays.has_key(lonname)):
+        if lonname not in self._arrays:
             self._arrays[lonname] = _mj(
                         self._arrays["longitude_at_t_location"])
-        if not(self._arrays.has_key(latname)):
+        if latname not in self._arrays:
             self._arrays[latname] = _mj(
                         self._arrays["latitude_at_t_location"])
 
         # latitude and longitude arrays at f location
         lonname = "longitude_at_f_location"
         latname = "latitude_at_f_location"
-        if not(self._arrays.has_key(lonname)):
+        if lonname not in self._arrays:
             self._arrays[lonname] = _mj(
                         self._arrays["longitude_at_u_location"])
-        if not(self._arrays.has_key(latname)):
+        if latname not in self._arrays:
             self._arrays[latname] = _mj(
                         self._arrays["latitude_at_u_location"])
 
@@ -1385,7 +1381,7 @@ class generic_2d_grid:
         if grid_location is None:
             if not(isinstance(array,xr.DataArray)):
                 raise TypeError('input array should be a xarray.DataArray')
-            elif array.attrs.has_key("grid_location"):
+            elif "grid_location" in array.attrs:
                 grid_location = array.attrs["grid_location"]
             else:
                 raise Exception('grid_location is not known.')
